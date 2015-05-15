@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <name>Nova Ordis Utilities</name>
+    <url>https://home.feodorov.com:9443/wiki/Wiki.jsp?page=NovaOrdisUtilities</url>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.novaordis.utilities</groupId>
+    <artifactId>novaordis-utilities</artifactId>
+    <packaging>jar</packaging>
+
+    <version>1.0</version>
+
+    <repositories>
+        <repository>
+            <id>repository.novaordis.org</id>
+            <name>NovaOrdis Public Repository</name>
+            <layout>default</layout>
+            <url>http://repository.novaordis.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <properties>
+        <test.scratch.directory>target/test-scratch</test.scratch.directory>
+        <test.log.directory>target</test.log.directory>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <argLine>-Xms64m -Xmx1024m</argLine>
+                        <systemProperties>
+                            <property>
+                                <name>test.scratch.directory</name>
+                                <value>${test.scratch.directory}</value>
+                            </property>
+                            <property>
+                                <name>test.log.directory</name>
+                                <value>${test.log.directory}</value>
+                            </property>
+                            <property>
+                                <name>stress.skip</name>
+                                <value>${stress.skip}</value>
+                            </property>
+                        </systemProperties>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant</artifactId>
+                        <version>1.7.0</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${test.scratch.directory}" />
+                                <!--
+                                <property name="maven.test.classpath" refid="maven.test.classpath"/>
+                                <echo message="${maven.test.classpath}"/>
+                                -->
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.11</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
