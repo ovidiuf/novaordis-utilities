@@ -29,7 +29,7 @@
     </appender>
     -->
 
-    <category name="com.novaordis">
+    <category name="io.novaordis">
        <priority value="TRACE"/>
     </category>
 
