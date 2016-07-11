@@ -251,28 +251,57 @@ public class TimestampsTest {
         assertFalse(Timestamps.isValidTimeZoneOffset(15));
     }
 
-    // toTimezoneOffsetString() ----------------------------------------------------------------------------------------
+    // timezoneOffsetHoursToString() -----------------------------------------------------------------------------------
 
     @Test
-    public void toTimezoneOffsetString() throws Exception {
+    public void timezoneOffsetHoursToString() throws Exception {
 
         try {
 
-            Timestamps.toTimezoneOffsetString(-13);
+            Timestamps.timezoneOffsetHoursToString(-13);
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
             log.info(e.getMessage());
         }
 
-        assertEquals("-1000", Timestamps.toTimezoneOffsetString(-10));
-        assertEquals("-0900", Timestamps.toTimezoneOffsetString(-9));
-        assertEquals("+0000", Timestamps.toTimezoneOffsetString(0));
-        assertEquals("+0900", Timestamps.toTimezoneOffsetString(9));
-        assertEquals("+1400", Timestamps.toTimezoneOffsetString(14));
+        assertEquals("-1000", Timestamps.timezoneOffsetHoursToString(-10));
+        assertEquals("-0900", Timestamps.timezoneOffsetHoursToString(-9));
+        assertEquals("+0000", Timestamps.timezoneOffsetHoursToString(0));
+        assertEquals("+0900", Timestamps.timezoneOffsetHoursToString(9));
+        assertEquals("+1400", Timestamps.timezoneOffsetHoursToString(14));
 
         try {
-            Timestamps.toTimezoneOffsetString(15);
+            Timestamps.timezoneOffsetHoursToString(15);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+    }
+
+    // timezoneOffsetMsToString() --------------------------------------------------------------------------------------
+
+    @Test
+    public void timezoneOffsetMsToString() throws Exception {
+
+        try {
+
+            Timestamps.timezoneOffsetMsToString(-13 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            log.info(e.getMessage());
+        }
+
+        assertEquals("-1000", Timestamps.timezoneOffsetMsToString(-10 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertEquals("-0900", Timestamps.timezoneOffsetMsToString(-9 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertEquals("+0000", Timestamps.timezoneOffsetMsToString(0));
+        assertEquals("+0900", Timestamps.timezoneOffsetMsToString(9 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertEquals("+1400", Timestamps.timezoneOffsetMsToString(14 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+
+        try {
+            Timestamps.timezoneOffsetMsToString(15 * Timestamps.MILLISECONDS_IN_AN_HOUR);
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -381,7 +410,7 @@ public class TimestampsTest {
         }
 
         DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.toTimezoneOffsetString(sourceTimezoneOffset);
+        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
 
         Date timestamp = sourceFormat.parse(sourceTimestamp);
 
@@ -400,7 +429,7 @@ public class TimestampsTest {
                 (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
 
         DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.toTimezoneOffsetString(ourTimezoneOffsetHours);
+        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(ourTimezoneOffsetHours);
 
         Date timestamp = sourceFormat.parse(sourceTimestamp);
 
@@ -427,7 +456,7 @@ public class TimestampsTest {
         DateFormat targetFormat = new SimpleDateFormat("yy/dd/MM HH:mm:ss Z");
         DateFormat referenceFormatNoTimezone = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        String timestampString = "07/10/15 10:00:00 " + Timestamps.toTimezoneOffsetString(sourceTimezoneOffset);
+        String timestampString = "07/10/15 10:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
 
         Date timestamp = sourceFormat.parse(timestampString);
 

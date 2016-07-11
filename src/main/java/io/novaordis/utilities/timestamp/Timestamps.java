@@ -122,7 +122,7 @@ public class Timestamps {
         return offset;
     }
 
-    public static String toTimezoneOffsetString(int offsetHours) {
+    public static String timezoneOffsetHoursToString(int offsetHours) {
 
         if (!isValidTimeZoneOffset(offsetHours)) {
             throw new IllegalArgumentException("invalid timezone offset value " + offsetHours);
@@ -140,6 +140,11 @@ public class Timestamps {
         else {
             return "+" + offsetHours + "00";
         }
+    }
+
+    public static String timezoneOffsetMsToString(int offsetMs) {
+
+        return timezoneOffsetHoursToString(offsetMs/MILLISECONDS_IN_AN_HOUR);
     }
 
     /**

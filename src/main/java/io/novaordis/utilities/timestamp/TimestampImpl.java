@@ -64,6 +64,15 @@ public class TimestampImpl implements Timestamp {
         this.timestampGMT = l;
     }
 
+    @Override
+    public String toString() {
+
+        return "" +
+                timestampGMT +
+                (timezoneOffsetMs == null ? "" : ":" + Timestamps.timezoneOffsetHoursToString(timezoneOffsetMs));
+
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
