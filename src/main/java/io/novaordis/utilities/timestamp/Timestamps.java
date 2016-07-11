@@ -21,6 +21,10 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
+ * Static utilities to hadle timestamps.
+ *
+ * @see Timestamp
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/10/16
  */
