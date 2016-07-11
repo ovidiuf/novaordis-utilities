@@ -52,17 +52,17 @@ public class TimestampsTest {
     // getTimeZoneOffsetHours() ----------------------------------------------------------------------------------------
 
     @Test
-    public void getTimeZoneOffsetHours() throws Exception {
+    public void timezoneOffsetHoursFromString() throws Exception {
 
-        assertNull(Timestamps.getTimeZoneOffsetHours("blah"));
+        assertNull(Timestamps.timezoneOffsetHoursFromString("blah"));
     }
 
     @Test
-    public void getTimeZoneOffsetHours_BothNegativeAndPositiveTimezones() throws Exception {
+    public void timezoneOffsetHoursFromString_BothNegativeAndPositiveTimezones() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0100 -0200 something");
+            Timestamps.timezoneOffsetHoursFromString("something +0100 -0200 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -74,50 +74,50 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_Negative() throws Exception {
+    public void timezoneOffsetHoursFromString_Negative() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something -1200 something");
+        Integer result = Timestamps.timezoneOffsetHoursFromString("something -1200 something");
         assertNotNull(result);
         assertEquals(-12, result.intValue());
     }
     @Test
-    public void getTimeZoneOffsetHours_SmallNegative() throws Exception {
+    public void timezoneOffsetHoursFromString_SmallNegative() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something -0100 something");
+        Integer result = Timestamps.timezoneOffsetHoursFromString("something -0100 something");
         assertNotNull(result);
         assertEquals(-1, result.intValue());
     }
 
     @Test
-    public void getTimeZoneOffsetHours_Zero() throws Exception {
+    public void timezoneOffsetHoursFromString_Zero() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something -0000 something");
+        Integer result = Timestamps.timezoneOffsetHoursFromString("something -0000 something");
         assertNotNull(result);
         assertEquals(0, result.intValue());
     }
 
     @Test
-    public void getTimeZoneOffsetHours_Zero2() throws Exception {
+    public void timezoneOffsetHoursFromString_Zero2() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something +0000 something");
+        Integer result = Timestamps.timezoneOffsetHoursFromString("something +0000 something");
         assertNotNull(result);
         assertEquals(0, result.intValue());
     }
 
     @Test
-    public void getTimeZoneOffsetHours_Positive() throws Exception {
+    public void timezoneOffsetHoursFromString_Positive() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something +1400 something");
+        Integer result = Timestamps.timezoneOffsetHoursFromString("something +1400 something");
         assertNotNull(result);
         assertEquals(14, result.intValue());
     }
 
     @Test
-    public void getTimeZoneOffsetHours_LowerThanLowestBound() throws Exception {
+    public void timezoneOffsetHoursFromString_LowerThanLowestBound() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something -1300 something");
+            Timestamps.timezoneOffsetHoursFromString("something -1300 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -127,11 +127,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_HigherThanHighestBound() throws Exception {
+    public void timezoneOffsetHoursFromString_HigherThanHighestBound() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +1500 something");
+            Timestamps.timezoneOffsetHoursFromString("something +1500 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -143,11 +143,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_IncompleteTimezone() throws Exception {
+    public void timezoneOffsetHoursFromString_IncompleteTimezone() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +");
+            Timestamps.timezoneOffsetHoursFromString("something +");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -159,11 +159,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_IncompleteTimezone2() throws Exception {
+    public void timezoneOffsetHoursFromString_IncompleteTimezone2() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0");
+            Timestamps.timezoneOffsetHoursFromString("something +0");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -175,11 +175,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_IncompleteTimezone3() throws Exception {
+    public void timezoneOffsetHoursFromString_IncompleteTimezone3() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +00");
+            Timestamps.timezoneOffsetHoursFromString("something +00");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -191,11 +191,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_IncompleteTimezone4() throws Exception {
+    public void timezoneOffsetHoursFromString_IncompleteTimezone4() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +000");
+            Timestamps.timezoneOffsetHoursFromString("something +000");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -207,11 +207,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_FractionalTimeZone() throws Exception {
+    public void timezoneOffsetHoursFromString_FractionalTimeZone() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0110");
+            Timestamps.timezoneOffsetHoursFromString("something +0110");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -223,11 +223,11 @@ public class TimestampsTest {
     }
 
     @Test
-    public void getTimeZoneOffsetHours_FractionalTimeZone2() throws Exception {
+    public void timezoneOffsetHoursFromString_FractionalTimeZone2() throws Exception {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0101");
+            Timestamps.timezoneOffsetHoursFromString("something +0101");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -236,6 +236,14 @@ public class TimestampsTest {
             assertEquals(msg, "fractional timezones not supported (yet)");
             log.info(msg);
         }
+    }
+
+    @Test
+    public void timezoneOffsetMsFromString_Positive() throws Exception {
+
+        Integer result = Timestamps.timezoneOffsetMsFromString("something +1400 something");
+        assertNotNull(result);
+        assertEquals(14 * Timestamps.MILLISECONDS_IN_AN_HOUR, result.intValue());
     }
 
     // isValidTimeZoneOffset -------------------------------------------------------------------------------------------

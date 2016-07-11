@@ -39,14 +39,27 @@ public class Timestamps {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    public static boolean isValidTimeZoneOffsetHours(int hours) {
+    //
+    // timezone offset conversion methods ------------------------------------------------------------------------------
+    //
 
-        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
-    }
+    /**
+     * Designed to be lenient, and return a null if no timezone offset is found, unless we're clearly dealing with
+     * an improperly formatted timezone offset, in which case it throws Exception.
+     *
+     * @return the explicitly specified timezone offset (in hours) or null if not specified.
+     *
+     * @throws IllegalArgumentException in case of improperly formatted timestamp string
+     */
+    public static Integer timezoneOffsetMsFromString(String timestamp) {
 
-    public static boolean isValidTimeZoneOffsetMs(int offsetMs) {
+        Integer i = timezoneOffsetHoursFromString(timestamp);
 
-        return isValidTimeZoneOffsetHours(offsetMs / MILLISECONDS_IN_AN_HOUR);
+        if (i == null) {
+            return null;
+        }
+
+        return i * MILLISECONDS_IN_AN_HOUR;
     }
 
     /**
@@ -57,7 +70,7 @@ public class Timestamps {
      *
      * @throws IllegalArgumentException in case of improperly formatted timestamp string
      */
-    public static Integer getTimeZoneOffsetHours(String timestamp) {
+    public static Integer timezoneOffsetHoursFromString(String timestamp) {
 
         int negativeIndex = timestamp.indexOf(" -");
         int positiveIndex = timestamp.indexOf(" +");
@@ -156,6 +169,20 @@ public class Timestamps {
         return timezoneOffsetHoursToString(offsetMs/MILLISECONDS_IN_AN_HOUR);
     }
 
+    //
+    // END of timezone offset conversion methods -----------------------------------------------------------------------
+    //
+
+    public static boolean isValidTimeZoneOffsetHours(int hours) {
+
+        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+    }
+
+    public static boolean isValidTimeZoneOffsetMs(int offsetMs) {
+
+        return isValidTimeZoneOffsetHours(offsetMs / MILLISECONDS_IN_AN_HOUR);
+    }
+
     /**
      * Returns true if the specified date format includes a timezone specification.
      */
@@ -181,7 +208,7 @@ public class Timestamps {
      *                  in millisecond, if explicitly specified by the timestamp source representation, or null if the
      *                  source representation does not explicitly specify a time zone.
      *
-     * @see Timestamps#getTimeZoneOffsetHours(String)
+     * @see Timestamps#timezoneOffsetHoursFromString(String)
      * @see Timestamp
      *
      * @param targetFormat the target format. Cannot be null.

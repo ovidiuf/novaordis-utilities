@@ -21,7 +21,7 @@ package io.novaordis.utilities.timestamp;
  * timezone offset.
  *
  * @see Timestamp#getTimestampGMT()
- * @see Timestamp#getTimezoneOffsetMs() 
+ * @see Timestamp#getTimezoneOffsetMs()
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/11/16

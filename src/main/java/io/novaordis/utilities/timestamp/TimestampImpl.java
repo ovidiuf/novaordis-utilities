@@ -16,6 +16,9 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/11/16
@@ -47,6 +50,24 @@ public class TimestampImpl implements Timestamp {
 
         setTimestampGMT(timestampGMT);
         setTimezoneOffsetMs(timezoneOffsetMs);
+    }
+
+    /**
+     * @throws ParseException if the string cannot be parsed into a date using the given format.
+     * @throws IllegalArgumentException on invalid arguments.
+     */
+    public TimestampImpl(String timestampAsString, DateFormat format) throws ParseException {
+
+        if (format == null) {
+            throw new IllegalArgumentException("null format");
+        }
+
+        long tsGMT = format.parse(timestampAsString).getTime();
+
+        setTimestampGMT(tsGMT);
+
+        Integer toMs = Timestamps.timezoneOffsetMsFromString(timestampAsString);
+        setTimezoneOffsetMs(toMs);
     }
 
     // Timestamp implementation ----------------------------------------------------------------------------------------
