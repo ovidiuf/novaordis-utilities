@@ -1,2 +1,2 @@
 
-Introducted io.novaordis.utilities.Timestamps, which contain timestamp formatting tools. Useful for timestamped log processing.
+Introducted io.novaordis.utilities.timestamp.Timestamps, which contain timestamp formatting tools. Useful for timestamped log processing.

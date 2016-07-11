@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
+package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
 import java.util.Date;
