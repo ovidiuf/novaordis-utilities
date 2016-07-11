@@ -269,6 +269,8 @@ function get-version() {
 #
 function set-version() {
 
+    debug-arguments "$@"
+
     local version=$1
     [ -z "${version}" ] && fail "'version' not specified"
 
@@ -280,9 +282,13 @@ function set-version() {
     # replace the first occurrence of <version>...</version> with our version
     #
 
+    debug "inserting version ${version}"
+
     local tmp_file=./.tmp
-    sed -e '1,/^ *<version>.*<\/version> *$/s/^\( *<version>\).*\(<\/version> *\)$/\1'${version}'\2/' ${pom_file} > ${tmp_file} || \
+
+    sed -e '1,/^ *<version>.*<\/version> */s/^\( *<version>\).*\(<\/version> *\)/\1'${version}'\2/' ${pom_file} > ${tmp_file} || \
         fail "failed to perform sed replacement"
+
     diff -q ${pom_file} ${tmp_file} > /dev/null && fail "no replacement was made in ${pom_file}"
     mv ${tmp_file} ${pom_file} || fail "failed to restore ${pom_file} from ${tmp_file}"
 }
