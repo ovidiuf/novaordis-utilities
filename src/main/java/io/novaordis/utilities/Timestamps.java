@@ -17,6 +17,7 @@
 package io.novaordis.utilities;
 
 import java.text.DateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -27,8 +28,10 @@ public class Timestamps {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final int LOWEST_VALID_TIMEZONE_OFFSET_HOURS = -12;
-    private static final int HIGHEST_VALID_TIMEZONE_OFFSET_HOURS = 14;
+    public static final int LOWEST_VALID_TIMEZONE_OFFSET_HOURS = -12;
+    public static final int HIGHEST_VALID_TIMEZONE_OFFSET_HOURS = 14;
+
+    public static final int MILLISECONDS_IN_AN_HOUR = 1000 * 3600;
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -38,6 +41,9 @@ public class Timestamps {
     }
 
     /**
+     * Designed to be lenient, and return a null if no timezone offset is found, unless we're clearly dealing with
+     * an improperly formatted timezone offset, in which case it throws Exception.
+     *
      * @return the explicitly specified timezone offset (in hours) or null if not specified.
      *
      * @throws IllegalArgumentException in case of improperly formatted timestamp string
@@ -75,7 +81,7 @@ public class Timestamps {
 
         int crt = digitsStart;
         int offset = 0;
-        int multiplier = 1000;
+        int multiplier = 10;
 
         while(crt - digitsStart < 4) {
 
@@ -93,7 +99,14 @@ public class Timestamps {
                         "invalid timezone fragment \"" + timestamp.substring(digitsStart - 1) + "\"");
             }
 
-            offset += multiplier * ((int)c - 48);
+            int digitIntValue = (int)c - 48;
+
+            if (multiplier == 0 && digitIntValue != 0) {
+
+                throw new IllegalArgumentException("fractional timezones not supported (yet)");
+            }
+
+            offset += multiplier * digitIntValue;
 
             multiplier /= 10;
             crt ++;
@@ -116,17 +129,30 @@ public class Timestamps {
         }
 
         if (offsetHours < -9) {
-            return "-00" + (-offsetHours);
+            return "" + offsetHours + "00";
         }
         else if (offsetHours < 0) {
-            return "-000" + (-offsetHours);
+            return "-0" + (-offsetHours) + "00";
         }
         else if (offsetHours < 10) {
-            return "+000" + offsetHours;
+            return "+0" + offsetHours + "00";
         }
         else {
-            return "+00" + offsetHours;
+            return "+" + offsetHours + "00";
         }
+    }
+
+    /**
+     * Returns true if the specified date format includes a timezone specification.
+     */
+    public static boolean doesIncludeTimezoneSpecification(DateFormat dateFormat) {
+
+        if (dateFormat == null) {
+            return false;
+        }
+
+        String reference = dateFormat.format(new Date());
+        return reference.contains(" +") || reference.contains(" -");
     }
 
     /**
@@ -169,23 +195,29 @@ public class Timestamps {
             throw new IllegalArgumentException("invalid source time zone offset value " + sourceTimeZoneOffsetHours);
         }
 
-        if (sourceTimeZoneOffsetHours == null) {
+        if (sourceTimeZoneOffsetHours == null || doesIncludeTimezoneSpecification(targetFormat)) {
 
             //
-            // simply apply the target pattern
+            // the source time stamp did not contain an explicitly specified timezone offset, so both source and
+            // target calculations are done in the local timezone, the format will be the same, simply apply the target
+            // pattern
             //
 
             return targetFormat.format(timestamp);
         }
 
         //
-        // if the target format does not specify a timezone offset, we want to apply the source offset, so we
-        // can get the same hour information
+        // at this point we know the source specifies a timezone offset; if the target format does not specify a timezone
+        // offset, we want to compensate for the source offset so the timestamp looks the same.
         //
 
-        int diff = TimeZone.getDefault().getRawOffset() / (1000 * 3600) - sourceTimeZoneOffsetHours;
+        TimeZone defaultTimeZone = TimeZone.getDefault();
 
-        long offsetTimestamp = timestamp - 1000L * 3600 * diff;
+        int defaultTimezoneOffsetHours =
+                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings()) / MILLISECONDS_IN_AN_HOUR;
+
+        long offsetTimestamp =
+                timestamp - (defaultTimezoneOffsetHours - sourceTimeZoneOffsetHours) * MILLISECONDS_IN_AN_HOUR;
 
         return targetFormat.format(offsetTimestamp);
     }

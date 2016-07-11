@@ -62,7 +62,7 @@ public class TimestampsTest {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0001 -0002 something");
+            Timestamps.getTimeZoneOffsetHours("something +0100 -0200 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -76,9 +76,16 @@ public class TimestampsTest {
     @Test
     public void getTimeZoneOffsetHours_Negative() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something -0012 something");
+        Integer result = Timestamps.getTimeZoneOffsetHours("something -1200 something");
         assertNotNull(result);
         assertEquals(-12, result.intValue());
+    }
+    @Test
+    public void getTimeZoneOffsetHours_SmallNegative() throws Exception {
+
+        Integer result = Timestamps.getTimeZoneOffsetHours("something -0100 something");
+        assertNotNull(result);
+        assertEquals(-1, result.intValue());
     }
 
     @Test
@@ -100,7 +107,7 @@ public class TimestampsTest {
     @Test
     public void getTimeZoneOffsetHours_Positive() throws Exception {
 
-        Integer result = Timestamps.getTimeZoneOffsetHours("something +0014 something");
+        Integer result = Timestamps.getTimeZoneOffsetHours("something +1400 something");
         assertNotNull(result);
         assertEquals(14, result.intValue());
     }
@@ -110,7 +117,7 @@ public class TimestampsTest {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something -0013 something");
+            Timestamps.getTimeZoneOffsetHours("something -1300 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -124,12 +131,14 @@ public class TimestampsTest {
 
         try {
 
-            Timestamps.getTimeZoneOffsetHours("something +0015 something");
+            Timestamps.getTimeZoneOffsetHours("something +1500 something");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
 
-            log.info(e.getMessage());
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("invalid timezone offset value 15", msg);
         }
     }
 
@@ -197,6 +206,39 @@ public class TimestampsTest {
         }
     }
 
+    @Test
+    public void getTimeZoneOffsetHours_FractionalTimeZone() throws Exception {
+
+        try {
+
+            Timestamps.getTimeZoneOffsetHours("something +0110");
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertEquals(msg, "fractional timezones not supported (yet)");
+            log.info(msg);
+        }
+    }
+
+    @Test
+    public void getTimeZoneOffsetHours_FractionalTimeZone2() throws Exception {
+
+        try {
+
+            Timestamps.getTimeZoneOffsetHours("something +0101");
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertEquals(msg, "fractional timezones not supported (yet)");
+            log.info(msg);
+        }
+    }
+
+
     // isValidTimeZoneOffset() -----------------------------------------------------------------------------------------
 
     @Test
@@ -215,6 +257,7 @@ public class TimestampsTest {
     public void toTimezoneOffsetString() throws Exception {
 
         try {
+
             Timestamps.toTimezoneOffsetString(-13);
             fail("should have thrown exception");
         }
@@ -222,11 +265,11 @@ public class TimestampsTest {
             log.info(e.getMessage());
         }
 
-        assertEquals("-0010", Timestamps.toTimezoneOffsetString(-10));
-        assertEquals("-0009", Timestamps.toTimezoneOffsetString(-9));
+        assertEquals("-1000", Timestamps.toTimezoneOffsetString(-10));
+        assertEquals("-0900", Timestamps.toTimezoneOffsetString(-9));
         assertEquals("+0000", Timestamps.toTimezoneOffsetString(0));
-        assertEquals("+0009", Timestamps.toTimezoneOffsetString(9));
-        assertEquals("+0014", Timestamps.toTimezoneOffsetString(14));
+        assertEquals("+0900", Timestamps.toTimezoneOffsetString(9));
+        assertEquals("+1400", Timestamps.toTimezoneOffsetString(14));
 
         try {
             Timestamps.toTimezoneOffsetString(15);
@@ -327,19 +370,99 @@ public class TimestampsTest {
     }
 
     @Test
-    public void format_DifferentTimezone() throws Exception {
+    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_DifferentTimezone() throws Exception {
 
-        int ourTimezoneOffsetHours = TimeZone.getDefault().getRawOffset() / (1000 * 3600);
-        int sourceTimezoneOffset = ourTimezoneOffsetHours - 1;
-        DateFormat sourceFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss Z");
-        String sourceTimestamp = "16/12/31 01:01:01 " + Timestamps.toTimezoneOffsetString(sourceTimezoneOffset);
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        int ourTimezoneOffsetHours =
+                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
+        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4;
+        if (sourceTimezoneOffset < Timestamps.LOWEST_VALID_TIMEZONE_OFFSET_HOURS) {
+            sourceTimezoneOffset = Timestamps.HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+        }
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.toTimezoneOffsetString(sourceTimezoneOffset);
+
         Date timestamp = sourceFormat.parse(sourceTimestamp);
 
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
         String result = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, targetFormat, null);
 
-        assertEquals("12/31/16 01:01:01", result);
+        assertEquals("07/11/15 11:00:00", result);
+    }
+
+    @Test
+    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_SameTimezone() throws Exception {
+
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        int ourTimezoneOffsetHours =
+                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.toTimezoneOffsetString(ourTimezoneOffsetHours);
+
+        Date timestamp = sourceFormat.parse(sourceTimestamp);
+
+        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        String result = Timestamps.format(timestamp.getTime(), ourTimezoneOffsetHours, targetFormat, null);
+
+        assertEquals("07/11/15 11:00:00", result);
+    }
+
+    @Test
+    public void format_SourceHasTimezoneOffset_TargetHasTimezoneOffset() throws Exception {
+
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        int ourTimezoneOffsetHours =
+                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
+
+        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4;
+        if (sourceTimezoneOffset < Timestamps.LOWEST_VALID_TIMEZONE_OFFSET_HOURS) {
+            sourceTimezoneOffset = Timestamps.HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+        }
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        DateFormat targetFormat = new SimpleDateFormat("yy/dd/MM HH:mm:ss Z");
+        DateFormat referenceFormatNoTimezone = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        String timestampString = "07/10/15 10:00:00 " + Timestamps.toTimezoneOffsetString(sourceTimezoneOffset);
+
+        Date timestamp = sourceFormat.parse(timestampString);
+
+        String result = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, targetFormat, null);
+        String reference = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, referenceFormatNoTimezone, null);
+
+        String resultHourFragment = extractHourFragment(result);
+        String referenceHourFragment = extractHourFragment(reference);
+
+        assertFalse(resultHourFragment.equals(referenceHourFragment));
+    }
+
+    // doesIncludeTimezoneSpecification() ------------------------------------------------------------------------------
+
+    @Test
+    public void doesIncludeTimezoneSpecification_ItDoes() throws Exception {
+
+        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        assertTrue(Timestamps.doesIncludeTimezoneSpecification(f));
+    }
+
+    @Test
+    public void doesIncludeTimezoneSpecification_ItDoesNot() throws Exception {
+
+        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        assertFalse(Timestamps.doesIncludeTimezoneSpecification(f));
+    }
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    private String extractHourFragment(String s) {
+
+        int i = s.indexOf(' ');
+        int j = s.indexOf(':');
+        return s.substring(i + 1, j);
     }
 
 }
