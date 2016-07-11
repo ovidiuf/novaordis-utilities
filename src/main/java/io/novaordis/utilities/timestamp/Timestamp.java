@@ -39,6 +39,9 @@ public interface Timestamp {
      * the original event timestamp was "12/31/16 10:00:00 -0800" in the log, then the timezone offset is
      * -8 * 3600 * 1000 ms. Null if no timezone offset specified by the source of the event. We need this information
      * to produce timestamps similar to the original ones, when the processing is done in an arbitrary timezone.
+     *
+     * Valid values are integers between -12 * 3600 * 1000 and 14 * 3600 * 1000 (these values have been obtained by
+     * querying all time zones known by Java, with TimeZone.getAvailableIDs()).
      */
     Integer getTimezoneOffsetMs();
 

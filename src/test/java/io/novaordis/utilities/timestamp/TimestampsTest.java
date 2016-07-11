@@ -238,17 +238,26 @@ public class TimestampsTest {
         }
     }
 
-
-    // isValidTimeZoneOffset() -----------------------------------------------------------------------------------------
+    // isValidTimeZoneOffset -------------------------------------------------------------------------------------------
 
     @Test
-    public void isValidTimeZoneOffset() throws Exception {
+    public void isValidTimeZoneOffsetHours() throws Exception {
 
-        assertFalse(Timestamps.isValidTimeZoneOffset(-13));
-        assertTrue(Timestamps.isValidTimeZoneOffset(-12));
-        assertTrue(Timestamps.isValidTimeZoneOffset(0));
-        assertTrue(Timestamps.isValidTimeZoneOffset(14));
-        assertFalse(Timestamps.isValidTimeZoneOffset(15));
+        assertFalse(Timestamps.isValidTimeZoneOffsetHours(-13));
+        assertTrue(Timestamps.isValidTimeZoneOffsetHours(-12));
+        assertTrue(Timestamps.isValidTimeZoneOffsetHours(0));
+        assertTrue(Timestamps.isValidTimeZoneOffsetHours(14));
+        assertFalse(Timestamps.isValidTimeZoneOffsetHours(15));
+    }
+
+    @Test
+    public void isValidTimeZoneOffsetMs() throws Exception {
+
+        assertFalse(Timestamps.isValidTimeZoneOffsetMs(-13 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertTrue(Timestamps.isValidTimeZoneOffsetMs(-12 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertTrue(Timestamps.isValidTimeZoneOffsetMs(0));
+        assertTrue(Timestamps.isValidTimeZoneOffsetMs(14 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        assertFalse(Timestamps.isValidTimeZoneOffsetMs(15 * Timestamps.MILLISECONDS_IN_AN_HOUR));
     }
 
     // timezoneOffsetHoursToString() -----------------------------------------------------------------------------------
@@ -312,64 +321,11 @@ public class TimestampsTest {
     // format() --------------------------------------------------------------------------------------------------------
 
     @Test
-    public void format_InvalidSourceTimeZoneOffsetValue() throws Exception {
-
-        try {
-
-            Timestamps.format(1L, -14, new SimpleDateFormat("yy/MM/dd HH:mm:ss"), "N/A");
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-
-            log.info(e.getMessage());
-        }
-
-        try {
-
-            Timestamps.format(1L, -13, new SimpleDateFormat("yy/MM/dd HH:mm:ss"), "N/A");
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-
-            log.info(e.getMessage());
-        }
-
-        for(int i = -12; i < 15; i ++) {
-
-            //
-            // make sure it does not fail
-            //
-            Timestamps.format(1L, i, new SimpleDateFormat("HH"), null);
-        }
-
-        try {
-
-            Timestamps.format(1L, 15, new SimpleDateFormat("yy/MM/dd HH:mm:ss"), "N/A");
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-
-            log.info(e.getMessage());
-        }
-
-        try {
-
-            Timestamps.format(1L, 16, new SimpleDateFormat("yy/MM/dd HH:mm:ss"), "N/A");
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-
-            log.info(e.getMessage());
-        }
-
-    }
-
-    @Test
     public void format_NullTargetFormat() throws Exception {
 
         try {
 
-            Timestamps.format(1L, 0, null, "N/A");
+            Timestamps.format(new TimestampImpl(1L, 0), null, "N/A");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -381,7 +337,7 @@ public class TimestampsTest {
     @Test
     public void format_NullTimestamp() throws Exception {
 
-        String result = Timestamps.format(null, null, new SimpleDateFormat("yyyy"), "n6w3");
+        String result = Timestamps.format(null, new SimpleDateFormat("yyyy"), "n6w3");
         assertEquals("n6w3", result);
     }
 
@@ -393,7 +349,7 @@ public class TimestampsTest {
 
         Date timestamp = sourceFormat.parse("16/12/31 01:01:01");
 
-        String result = Timestamps.format(timestamp.getTime(), null, targetFormat, null);
+        String result = Timestamps.format(new TimestampImpl(timestamp.getTime(), null), targetFormat, null);
 
         assertEquals("12/31/16 01:01:01", result);
     }
@@ -416,7 +372,9 @@ public class TimestampsTest {
 
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        String result = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, targetFormat, null);
+        String result = Timestamps.format(
+                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
+                targetFormat, null);
 
         assertEquals("07/11/15 11:00:00", result);
     }
@@ -435,7 +393,9 @@ public class TimestampsTest {
 
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        String result = Timestamps.format(timestamp.getTime(), ourTimezoneOffsetHours, targetFormat, null);
+        String result = Timestamps.format(
+                new TimestampImpl(timestamp.getTime(), ourTimezoneOffsetHours * Timestamps.MILLISECONDS_IN_AN_HOUR),
+                targetFormat, null);
 
         assertEquals("07/11/15 11:00:00", result);
     }
@@ -460,8 +420,12 @@ public class TimestampsTest {
 
         Date timestamp = sourceFormat.parse(timestampString);
 
-        String result = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, targetFormat, null);
-        String reference = Timestamps.format(timestamp.getTime(), sourceTimezoneOffset, referenceFormatNoTimezone, null);
+        String result = Timestamps.format(
+                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
+                targetFormat, null);
+        String reference = Timestamps.format(
+                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
+                referenceFormatNoTimezone, null);
 
         String resultHourFragment = extractHourFragment(result);
         String referenceHourFragment = extractHourFragment(reference);

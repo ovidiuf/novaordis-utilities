@@ -39,9 +39,14 @@ public class Timestamps {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    public static boolean isValidTimeZoneOffset(int offset) {
+    public static boolean isValidTimeZoneOffsetHours(int hours) {
 
-        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= offset && offset <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+    }
+
+    public static boolean isValidTimeZoneOffsetMs(int offsetMs) {
+
+        return isValidTimeZoneOffsetHours(offsetMs / MILLISECONDS_IN_AN_HOUR);
     }
 
     /**
@@ -118,7 +123,7 @@ public class Timestamps {
 
         offset = positive ? offset : -offset;
 
-        if (!isValidTimeZoneOffset(offset)) {
+        if (!isValidTimeZoneOffsetHours(offset)) {
 
             throw new IllegalArgumentException("invalid timezone offset value " + offset);
         }
@@ -128,7 +133,7 @@ public class Timestamps {
 
     public static String timezoneOffsetHoursToString(int offsetHours) {
 
-        if (!isValidTimeZoneOffset(offsetHours)) {
+        if (!isValidTimeZoneOffsetHours(offsetHours)) {
             throw new IllegalArgumentException("invalid timezone offset value " + offsetHours);
         }
 
@@ -172,16 +177,12 @@ public class Timestamps {
      * This behavior is useful when parsing and translating logs, we want the source and target log hour part of the
      * timestamp to be identical, irrespective of the timezone in which the translation is done.
      *
-     * @param timestamp may be null. If not null, a timestamp, in milliseconds, relative to GMT.
-     *
-     * @param sourceTimeZoneOffsetHours - the time zone offset, in hours, if explicitly specified by the timestamp
-     *                                  source representation, or null if the source representation does not
-     *                                  explicitly specify a time zone. Valid values are integers between -12 and 14
-     *                                  (these values have been obtained by querying all time zones known by Java,
-     *                                  with TimeZone.getAvailableIDs()).
-     *                                  The method will throw an IllegalArgumentException if it gets an invalid value.
+     * @param timestamp may be null. If not null, it contains a GMT timestamp and possibly the time zone offset,
+     *                  in millisecond, if explicitly specified by the timestamp source representation, or null if the
+     *                  source representation does not explicitly specify a time zone.
      *
      * @see Timestamps#getTimeZoneOffsetHours(String)
+     * @see Timestamp
      *
      * @param targetFormat the target format. Cannot be null.
      *
@@ -189,8 +190,7 @@ public class Timestamps {
      *
      * @throws IllegalArgumentException if the sourceTimeZoneOffsetHours is not a valid value (null or -12 ... 14).
      */
-    public static String format(Long timestamp, Integer sourceTimeZoneOffsetHours,
-                         DateFormat targetFormat, String noTimestampString) {
+    public static String format(Timestamp timestamp, DateFormat targetFormat, String noTimestampString) {
 
         if (targetFormat == null) {
             throw new IllegalArgumentException("null target format");
@@ -200,11 +200,9 @@ public class Timestamps {
             return noTimestampString;
         }
 
-        if (sourceTimeZoneOffsetHours != null && !isValidTimeZoneOffset(sourceTimeZoneOffsetHours)) {
-            throw new IllegalArgumentException("invalid source time zone offset value " + sourceTimeZoneOffsetHours);
-        }
+        Integer sourceTimeZoneOffset = timestamp.getTimezoneOffsetMs();
 
-        if (sourceTimeZoneOffsetHours == null || doesIncludeTimezoneSpecification(targetFormat)) {
+        if (sourceTimeZoneOffset == null || doesIncludeTimezoneSpecification(targetFormat)) {
 
             //
             // the source time stamp did not contain an explicitly specified timezone offset, so both source and
@@ -212,7 +210,7 @@ public class Timestamps {
             // pattern
             //
 
-            return targetFormat.format(timestamp);
+            return targetFormat.format(timestamp.getTimestampGMT());
         }
 
         //
@@ -222,11 +220,9 @@ public class Timestamps {
 
         TimeZone defaultTimeZone = TimeZone.getDefault();
 
-        int defaultTimezoneOffsetHours =
-                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings()) / MILLISECONDS_IN_AN_HOUR;
+        int defaultTimezoneOffset = defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings();
 
-        long offsetTimestamp =
-                timestamp - (defaultTimezoneOffsetHours - sourceTimeZoneOffsetHours) * MILLISECONDS_IN_AN_HOUR;
+        long offsetTimestamp = timestamp.getTimestampGMT() - defaultTimezoneOffset + sourceTimeZoneOffset;
 
         return targetFormat.format(offsetTimestamp);
     }

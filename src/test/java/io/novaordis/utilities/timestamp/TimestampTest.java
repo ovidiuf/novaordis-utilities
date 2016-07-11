@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -66,6 +67,68 @@ public abstract class TimestampTest {
         }
         catch(IllegalArgumentException e) {
             log.info(e.getMessage());
+        }
+    }
+
+    @Test
+    public void illegalTimezoneOffsetValue() throws Exception {
+
+        try {
+            getTimestampToTest(1L, 100 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("invalid timezone offset value"));
+        }
+
+        try {
+            getTimestampToTest(1L, -14 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("invalid timezone offset value"));
+        }
+
+        try {
+            getTimestampToTest(1L, -13 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("invalid timezone offset value"));
+        }
+
+        for(int i = -12; i < 15; i ++) {
+
+            //
+            // make sure it does not fail
+            //
+            getTimestampToTest(1L, i * Timestamps.MILLISECONDS_IN_AN_HOUR);
+        }
+
+        try {
+            getTimestampToTest(1L, 15 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("invalid timezone offset value"));
+        }
+
+        try {
+            getTimestampToTest(1L, 16 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("invalid timezone offset value"));
         }
     }
 
