@@ -3,7 +3,6 @@ package io.novaordis.utilities;
 import io.novaordis.utilities.testing.FileTestBase;
 import io.novaordis.utilities.testing.Tests;
 import org.apache.log4j.Logger;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.PrintWriter;
