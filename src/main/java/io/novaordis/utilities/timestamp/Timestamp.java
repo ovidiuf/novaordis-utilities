@@ -17,6 +17,12 @@
 package io.novaordis.utilities.timestamp;
 
 /**
+ * An interface that binds together a timestamp expressed in milliseconds from the GMT epoch, and optionally a
+ * timezone offset.
+ *
+ * @see Timestamp#getTimestampGMT()
+ * @see Timestamp#getTimezoneOffsetMs() 
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/11/16
  */
