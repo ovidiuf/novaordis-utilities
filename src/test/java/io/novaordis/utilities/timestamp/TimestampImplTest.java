@@ -73,6 +73,18 @@ public class TimestampImplTest extends TimestampTest {
         assertNull(t.getTimezoneOffsetMs());
     }
 
+    @Test
+    public void syntheticConstructor() throws Exception {
+
+        TimestampImpl ts = new TimestampImpl(0L);
+        assertEquals(0L, ts.getTimestampGMT());
+        assertEquals(null, ts.getTimezoneOffsetMs());
+
+        assertEquals("" + ts.getDay(), new SimpleDateFormat("dd").format(0L));
+        assertEquals("" + ts.getMonth(), new SimpleDateFormat("MM").format(0L));
+        assertEquals("" + ts.getYear(), new SimpleDateFormat("yy").format(0L));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

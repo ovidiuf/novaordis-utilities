@@ -46,6 +46,19 @@ public class TimestampImpl implements Timestamp {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
+     * Used for synthetic events.
+     */
+    public TimestampImpl(long timestampGMT) {
+
+        this.timestampGMT = timestampGMT;
+        this.timezoneOffsetMs = null;
+
+        day = Integer.parseInt(DAY.format(timestampGMT));
+        month = Integer.parseInt(MONTH.format(timestampGMT));
+        year = Integer.parseInt(YEAR.format(timestampGMT));
+    }
+
+    /**
      * To get 0 GMT with a +3600 timezone offset, use:
      *
      * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
