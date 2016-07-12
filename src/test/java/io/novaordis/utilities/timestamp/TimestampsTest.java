@@ -49,6 +49,15 @@ public class TimestampsTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    // getDefaultTimezoneMs() ------------------------------------------------------------------------------------------
+
+    @Test
+    public void getDefaultTimezoneMs() throws Exception {
+
+        int t = Timestamps.getDefaultTimezoneMs();
+        assertEquals(t, TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings());
+    }
+
     // getTimeZoneOffsetHours() ----------------------------------------------------------------------------------------
 
     @Test

@@ -16,9 +16,7 @@
 
 package io.novaordis.utilities.timestamp;
 
-import java.sql.Time;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -40,6 +38,15 @@ public class Timestamps {
     public static final int MILLISECONDS_IN_AN_HOUR = 1000 * 3600;
 
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * Accounts for the timezone offset and the daylight saving time.
+     */
+    public static int getDefaultTimezoneMs() {
+
+        TimeZone defaultTimezone = TimeZone.getDefault();
+        return defaultTimezone.getRawOffset() + defaultTimezone.getDSTSavings();
+    }
 
     //
     // timezone offset conversion methods ------------------------------------------------------------------------------
@@ -270,6 +277,8 @@ public class Timestamps {
      * long theOtherTimeToCompare = Timestamps.adjustForTimezone(timestampToCompare, currentTimezoneOffset);
      *
      * ... compare timeToCompare and timeToCompare
+     *
+     * @param timezoneOffsetMs the timezone offset the event we want to compare with was parsed in.
      */
     public static long adjustForTimezone(Timestamp t, int timezoneOffsetMs) {
 
