@@ -48,6 +48,14 @@ public class Timestamps {
         return defaultTimezone.getRawOffset() + defaultTimezone.getDSTSavings();
     }
 
+    /**
+     * Accounts for the timezone offset and the daylight saving time.
+     */
+    public static int getDefaultTimezoneHours() {
+
+        return getDefaultTimezoneMs() / MILLISECONDS_IN_AN_HOUR;
+    }
+
     //
     // timezone offset conversion methods ------------------------------------------------------------------------------
     //

@@ -49,7 +49,7 @@ public class TimestampsTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // getDefaultTimezoneMs() ------------------------------------------------------------------------------------------
+    // getDefaultTimezoneMs/Hours --------------------------------------------------------------------------------------
 
     @Test
     public void getDefaultTimezoneMs() throws Exception {
@@ -57,6 +57,15 @@ public class TimestampsTest {
         int t = Timestamps.getDefaultTimezoneMs();
         assertEquals(t, TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings());
     }
+
+    @Test
+    public void getDefaultTimezoneHours() throws Exception {
+
+        int t = Timestamps.getDefaultTimezoneHours();
+        assertEquals(t, (TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings()) /
+                Timestamps.MILLISECONDS_IN_AN_HOUR);
+    }
+
 
     // getTimeZoneOffsetHours() ----------------------------------------------------------------------------------------
 
