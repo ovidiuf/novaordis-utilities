@@ -59,6 +59,21 @@ public class TimestampImpl implements Timestamp {
     }
 
     /**
+     * Used for synthetic events.
+     */
+    public TimestampImpl(long timestampGMT, Integer timezoneOffsetMs) {
+
+        this.timestampGMT = timestampGMT;
+        this.timezoneOffsetMs = timezoneOffsetMs;
+
+        // TODO these values are not correct under some circumstances, add boundary condition testing
+
+        day = Integer.parseInt(DAY.format(timestampGMT));
+        month = Integer.parseInt(MONTH.format(timestampGMT));
+        year = Integer.parseInt(YEAR.format(timestampGMT));
+    }
+
+    /**
      * To get 0 GMT with a +3600 timezone offset, use:
      *
      * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
