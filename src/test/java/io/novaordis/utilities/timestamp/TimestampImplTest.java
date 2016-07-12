@@ -78,11 +78,6 @@ public class TimestampImplTest extends TimestampTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected Timestamp getTimestampToTest(long timestampGMT, Integer timezoneOffsetMs) {
-        return new TimestampImpl(timestampGMT, timezoneOffsetMs);
-    }
-
-    @Override
     protected Timestamp getTimestampToTest(String timestampAsString, DateFormat dateFormat) throws Exception {
 
         return new TimestampImpl(timestampAsString, dateFormat);

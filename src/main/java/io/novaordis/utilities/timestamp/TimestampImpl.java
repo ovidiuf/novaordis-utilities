@@ -46,22 +46,11 @@ public class TimestampImpl implements Timestamp {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * @param timestampGMT - the timestamp in milliseconds from the GMT epoch, not accounting for timezone and daylight
-     *                     saving offsets. Negative values are illegal.
-     * @param timezoneOffsetMs the timezone offset, in milliseconds, as specified by the source of the event (logs, for
-     *                         example). If the original event timestamp was "12/31/16 10:00:00 -0800" in the log, then
-     *                         the timezone offset is -8 * 3600 * 1000 ms. Null if no timezone offset specified by the
-     *                         source of the event. We need this information to produce timestamps similar to the
-     *                         original ones, when the processing is done in an arbitrary timezone. The  constructor
-     *                         will throw an IllegalArgumentException if it gets an invalid value.
-     */
-    public TimestampImpl(long timestampGMT, Integer timezoneOffsetMs) {
-
-        setTimestampGMT(timestampGMT);
-        setTimezoneOffsetMs(timezoneOffsetMs);
-    }
-
-    /**
+     * To get 0 GMT with a +3600 timezone offset, use:
+     *
+     * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+     * Timestamp t = getTimestampToTest("01/01/1970 01:00:00 +0100", df);
+     *
      * @throws ParseException if the string cannot be parsed into a date using the given format.
      * @throws IllegalArgumentException on invalid arguments.
      */

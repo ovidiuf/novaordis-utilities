@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import static org.junit.Assert.assertEquals;
@@ -46,92 +47,40 @@ public abstract class TimestampTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void accessors() throws Exception {
+    public void constructor_TimezoneOffset() throws Exception {
 
-        Timestamp t = getTimestampToTest(1L, 2);
-        assertEquals(1L, t.getTimestampGMT());
-        assertEquals(2, t.getTimezoneOffsetMs().intValue());
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        Timestamp t = getTimestampToTest("01/01/1970 01:00:01 +0100", df);
+
+        assertEquals(1000L, t.getTimestampGMT());
+
+        //noinspection PointlessArithmeticExpression
+        assertEquals(1 * Timestamps.MILLISECONDS_IN_AN_HOUR, t.getTimezoneOffsetMs().intValue());
     }
 
     @Test
-    public void noTimezoneOffset() throws Exception {
+    public void constructor_NoTimezoneOffset() throws Exception {
 
-        Timestamp t = getTimestampToTest(1L, null);
-        assertEquals(1L, t.getTimestampGMT());
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        Timestamp t = getTimestampToTest("01/03/1970 00:00:00", df);
+
+        long gmt = t.getTimestampGMT();
+        assertTrue(gmt > 0);
         assertNull(t.getTimezoneOffsetMs());
-    }
-
-    @Test
-    public void illegalTimestampGMTValue() throws Exception {
-
-        try {
-            getTimestampToTest(-1L, null);
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-            log.info(e.getMessage());
-        }
     }
 
     @Test
     public void illegalTimezoneOffsetValue() throws Exception {
 
-        try {
-            getTimestampToTest(1L, 100 * Timestamps.MILLISECONDS_IN_AN_HOUR);
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertTrue(msg.startsWith("invalid timezone offset value"));
-        }
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
 
         try {
-            getTimestampToTest(1L, -14 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+            getTimestampToTest("12/01/16 10:00:00 +2500", df);
             fail("should have thrown exception");
         }
-        catch(IllegalArgumentException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertTrue(msg.startsWith("invalid timezone offset value"));
-        }
+        catch(ParseException e) {
 
-        try {
-            getTimestampToTest(1L, -13 * Timestamps.MILLISECONDS_IN_AN_HOUR);
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertTrue(msg.startsWith("invalid timezone offset value"));
-        }
-
-        for(int i = -12; i < 15; i ++) {
-
-            //
-            // make sure it does not fail
-            //
-            getTimestampToTest(1L, i * Timestamps.MILLISECONDS_IN_AN_HOUR);
-        }
-
-        try {
-            getTimestampToTest(1L, 15 * Timestamps.MILLISECONDS_IN_AN_HOUR);
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertTrue(msg.startsWith("invalid timezone offset value"));
-        }
-
-        try {
-            getTimestampToTest(1L, 16 * Timestamps.MILLISECONDS_IN_AN_HOUR);
-            fail("should have thrown exception");
-        }
-        catch(IllegalArgumentException e) {
-            String msg = e.getMessage();
-            log.info(msg);
-            assertTrue(msg.startsWith("invalid timezone offset value"));
+            log.info(e.getMessage());
         }
     }
 
@@ -164,8 +113,6 @@ public abstract class TimestampTest {
     }
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    protected abstract Timestamp getTimestampToTest(long timestampGMT, Integer timezoneOffsetMs) throws Exception;
 
     protected abstract Timestamp getTimestampToTest(String timestampAsString, DateFormat dateFormat) throws Exception;
 

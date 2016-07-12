@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -349,14 +348,17 @@ public class TimestampsTest {
     @Test
     public void format_NullTargetFormat() throws Exception {
 
-        try {
+        Timestamp ts = new TimestampImpl("01/01/16 00:00:00", new SimpleDateFormat("MM/dd/yy HH:mm:ss"));
 
-            Timestamps.format(new TimestampImpl(1L, 0), null, "N/A");
+        try {
+            Timestamps.format(ts, null, "N/A");
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
 
-            log.info(e.getMessage());
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("null target format"));
         }
     }
 
@@ -373,9 +375,9 @@ public class TimestampsTest {
         DateFormat sourceFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        Date timestamp = sourceFormat.parse("16/12/31 01:01:01");
+        Timestamp ts = new TimestampImpl("16/12/31 01:01:01", sourceFormat);
 
-        String result = Timestamps.format(new TimestampImpl(timestamp.getTime(), null), targetFormat, null);
+        String result = Timestamps.format(ts, targetFormat, null);
 
         assertEquals("12/31/16 01:01:01", result);
     }
@@ -394,13 +396,11 @@ public class TimestampsTest {
         DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
         String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
 
-        Date timestamp = sourceFormat.parse(sourceTimestamp);
-
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        String result = Timestamps.format(
-                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
-                targetFormat, null);
+        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
+
+        String result = Timestamps.format(ts, targetFormat, null);
 
         assertEquals("07/11/15 11:00:00", result);
     }
@@ -415,13 +415,11 @@ public class TimestampsTest {
         DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
         String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(ourTimezoneOffsetHours);
 
-        Date timestamp = sourceFormat.parse(sourceTimestamp);
-
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
-        String result = Timestamps.format(
-                new TimestampImpl(timestamp.getTime(), ourTimezoneOffsetHours * Timestamps.MILLISECONDS_IN_AN_HOUR),
-                targetFormat, null);
+        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
+
+        String result = Timestamps.format(ts, targetFormat, null);
 
         assertEquals("07/11/15 11:00:00", result);
     }
@@ -444,14 +442,11 @@ public class TimestampsTest {
 
         String timestampString = "07/10/15 10:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
 
-        Date timestamp = sourceFormat.parse(timestampString);
+        Timestamp ts = new TimestampImpl(timestampString, sourceFormat);
 
-        String result = Timestamps.format(
-                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
-                targetFormat, null);
-        String reference = Timestamps.format(
-                new TimestampImpl(timestamp.getTime(), sourceTimezoneOffset * Timestamps.MILLISECONDS_IN_AN_HOUR),
-                referenceFormatNoTimezone, null);
+        String result = Timestamps.format(ts, targetFormat, null);
+
+        String reference = Timestamps.format(ts, referenceFormatNoTimezone, null);
 
         String resultHourFragment = extractHourFragment(result);
         String referenceHourFragment = extractHourFragment(reference);
@@ -480,39 +475,50 @@ public class TimestampsTest {
     @Test
     public void adjustForTimezone_SameTimezone() throws Exception {
 
-        Timestamp t = new TimestampImpl(1L, 0);
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        Timestamp t = new TimestampImpl("01/01/1970 00:00:01 +0000",df);
 
-        assertEquals(1L, Timestamps.adjustForTimezone(t, 0));
+        assertEquals(1000L, Timestamps.adjustForTimezone(t, 0));
 
     }
 
     @Test
     public void adjustForTimezone_SameTimezone2() throws Exception {
 
-        Timestamp t = new TimestampImpl(1L, 3600);
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        Timestamp t = new TimestampImpl("01/01/1970 01:00:01 +0100",df);
 
-        assertEquals(1L, Timestamps.adjustForTimezone(t, 3600));
+        //noinspection PointlessArithmeticExpression
+        assertEquals(1000L, Timestamps.adjustForTimezone(t, 1 * Timestamps.MILLISECONDS_IN_AN_HOUR));
 
     }
 
     @Test
     public void adjustForTimezone_IncomingTimestampHasNoTimezoneOffset() throws Exception {
 
-        Timestamp t = new TimestampImpl(1L, null);
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        Timestamp t = new TimestampImpl("01/05/1970 01:00:01",df);
 
-        assertEquals(1L, Timestamps.adjustForTimezone(t, -1));
-        assertEquals(1L, Timestamps.adjustForTimezone(t, 0));
-        assertEquals(1L, Timestamps.adjustForTimezone(t, 1));
+        long gmt = t.getTimestampGMT();
+        assertNull(t.getTimezoneOffsetMs());
+
+        assertEquals(gmt, Timestamps.adjustForTimezone(t, -1 * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        //noinspection PointlessArithmeticExpression
+        assertEquals(gmt, Timestamps.adjustForTimezone(t, 0  * Timestamps.MILLISECONDS_IN_AN_HOUR));
+        //noinspection PointlessArithmeticExpression
+        assertEquals(gmt, Timestamps.adjustForTimezone(t, 1 * Timestamps.MILLISECONDS_IN_AN_HOUR));
     }
 
     @Test
     public void adjustForTimezone_DifferentTimezones() throws Exception {
 
-        Timestamp t = new TimestampImpl(0L, 0);
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        Timestamp t = new TimestampImpl("01/01/1970 00:00:00 +0000",df);
 
-        long result = Timestamps.adjustForTimezone(t, 3600);
+        //noinspection PointlessArithmeticExpression
+        long result = Timestamps.adjustForTimezone(t, 1 * Timestamps.MILLISECONDS_IN_AN_HOUR);
 
-        assertEquals(-3600L, result);
+        assertEquals(-1 * Timestamps.MILLISECONDS_IN_AN_HOUR, result);
     }
 
     @Test
