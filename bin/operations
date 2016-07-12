@@ -1097,7 +1097,14 @@ function do-release() {
 
     local tag=release-${next_version}
 
-    git tag -m "release ${next_version}" "${tag}" && info "git tag ok, tagged with ${tag}" || fail "git tag failed"
+    if [[ ${tag} =~ SNAPSHOT ]]; then
+        #
+        # only tag repository if we're not a snapshot
+        #
+        info "current release is a snapshot, won't tag the repository"
+    else
+        git tag -m "release ${next_version}" "${tag}" && info "git tag ok, tagged with ${tag}" || fail "git tag failed"
+    fi
 
     git push --follow-tags && info "git push ok" || fail "git push failed"
 
