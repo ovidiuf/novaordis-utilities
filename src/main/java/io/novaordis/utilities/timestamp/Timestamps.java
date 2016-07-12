@@ -291,11 +291,18 @@ public class Timestamps {
     public static long adjustForTimezone(Timestamp t, int timezoneOffsetMs) {
 
         Integer timestampTimezoneOffsetMs = t.getTimezoneOffsetMs();
+        long gmt = t.getTimestampGMT();
+
         if (timestampTimezoneOffsetMs == null) {
-            timestampTimezoneOffsetMs = 0;
+
+            //
+            // the incoming timestamp was not parsed in the contest of a specific timestamp, which means it
+            // used the default one, so adjustment is a noop
+            //
+            return gmt;
         }
 
-        return t.getTimestampGMT() + timestampTimezoneOffsetMs - timezoneOffsetMs;
+        return gmt + timestampTimezoneOffsetMs - timezoneOffsetMs;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------

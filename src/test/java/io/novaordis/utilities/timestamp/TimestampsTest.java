@@ -496,6 +496,16 @@ public class TimestampsTest {
     }
 
     @Test
+    public void adjustForTimezone_IncomingTimestampHasNoTimezoneOffset() throws Exception {
+
+        Timestamp t = new TimestampImpl(1L, null);
+
+        assertEquals(1L, Timestamps.adjustForTimezone(t, -1));
+        assertEquals(1L, Timestamps.adjustForTimezone(t, 0));
+        assertEquals(1L, Timestamps.adjustForTimezone(t, 1));
+    }
+
+    @Test
     public void adjustForTimezone_DifferentTimezones() throws Exception {
 
         Timestamp t = new TimestampImpl(0L, 0);
