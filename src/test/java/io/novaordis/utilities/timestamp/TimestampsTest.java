@@ -457,6 +457,49 @@ public class TimestampsTest {
         assertFalse(Timestamps.doesIncludeTimezoneSpecification(f));
     }
 
+    // adjustForTimezone() ---------------------------------------------------------------------------------------------
+
+    @Test
+    public void adjustForTimezone_SameTimezone() throws Exception {
+
+        Timestamp t = new TimestampImpl(1L, 0);
+
+        assertEquals(1L, Timestamps.adjustForTimezone(t, 0));
+
+    }
+
+    @Test
+    public void adjustForTimezone_SameTimezone2() throws Exception {
+
+        Timestamp t = new TimestampImpl(1L, 3600);
+
+        assertEquals(1L, Timestamps.adjustForTimezone(t, 3600));
+
+    }
+
+    @Test
+    public void adjustForTimezone_DifferentTimezones() throws Exception {
+
+        Timestamp t = new TimestampImpl(0L, 0);
+
+        long result = Timestamps.adjustForTimezone(t, 3600);
+
+        assertEquals(-3600L, result);
+    }
+
+    @Test
+    public void adjustForTimezone_DifferentTimezones2() throws Exception {
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:dd Z");
+
+        Timestamp ts = new TimestampImpl("01/01/16 10:00:00 -0800", df);
+
+        long t = df.parse("01/01/16 10:00:00 -0600").getTime();
+        long result = Timestamps.adjustForTimezone(ts, -6 * Timestamps.MILLISECONDS_IN_AN_HOUR);
+
+        assertEquals(result, t);
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     private String extractHourFragment(String s) {

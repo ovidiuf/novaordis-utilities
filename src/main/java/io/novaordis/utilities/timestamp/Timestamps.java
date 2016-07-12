@@ -16,7 +16,9 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.sql.Time;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -252,6 +254,31 @@ public class Timestamps {
         long offsetTimestamp = timestamp.getTimestampGMT() - defaultTimezoneOffset + sourceTimeZoneOffset;
 
         return targetFormat.format(offsetTimestamp);
+    }
+
+
+    /**
+     * Calculates a new GMT-relative timestamp offset for timezone. The value returned allows for correct comparison
+     * of the given log timestamp with a value parsed in the given timezone.
+     *
+     * Example:
+     *
+     * int currentTimezoneOffset = TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset();
+     *
+     * long timeToCompare = (new SimpleDateFormat("MM/dd/yy HH:mm:ss").parse().getTime();
+     *
+     * long theOtherTimeToCompare = Timestamps.adjustForTimezone(timestampToCompare, currentTimezoneOffset);
+     *
+     * ... compare timeToCompare and timeToCompare
+     */
+    public static long adjustForTimezone(Timestamp t, int timezoneOffsetMs) {
+
+        Integer timestampTimezoneOffsetMs = t.getTimezoneOffsetMs();
+        if (timestampTimezoneOffsetMs == null) {
+            timestampTimezoneOffsetMs = 0;
+        }
+
+        return t.getTimestampGMT() + timestampTimezoneOffsetMs - timezoneOffsetMs;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
