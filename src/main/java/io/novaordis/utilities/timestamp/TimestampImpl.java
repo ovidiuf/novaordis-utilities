@@ -18,6 +18,7 @@ package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -27,12 +28,20 @@ public class TimestampImpl implements Timestamp {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    public static final DateFormat DAY = new SimpleDateFormat("dd");
+    public static final DateFormat MONTH = new SimpleDateFormat("MM");
+    public static final DateFormat YEAR = new SimpleDateFormat("yy");
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private long timestampGMT;
     private Integer timezoneOffsetMs;
+
+    private int day;
+    private int month;
+    private int year;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -68,6 +77,10 @@ public class TimestampImpl implements Timestamp {
 
         Integer toMs = Timestamps.timezoneOffsetMsFromString(timestampAsString);
         setTimezoneOffsetMs(toMs);
+
+        day = Integer.parseInt(DAY.format(tsGMT));
+        month = Integer.parseInt(MONTH.format(tsGMT));
+        year = Integer.parseInt(YEAR.format(tsGMT));
     }
 
     // Timestamp implementation ----------------------------------------------------------------------------------------
@@ -83,6 +96,25 @@ public class TimestampImpl implements Timestamp {
 
         return timezoneOffsetMs;
     }
+
+    @Override
+    public int getDay() {
+
+        return day;
+    }
+
+    @Override
+    public int getMonth() {
+
+        return month;
+    }
+
+    @Override
+    public int getYear() {
+
+        return year;
+    }
+
 
     // Public ----------------------------------------------------------------------------------------------------------
 

@@ -18,7 +18,7 @@ package io.novaordis.utilities.timestamp;
 
 /**
  * An interface that binds together a timestamp expressed in milliseconds from the GMT epoch, and optionally a
- * timezone offset.
+ * timezone offset, as specified in the original string representation of the timestamp.
  *
  * @see Timestamp#getTimestampGMT()
  * @see Timestamp#getTimezoneOffsetMs()
@@ -50,6 +50,24 @@ public interface Timestamp {
      * querying all time zones known by Java, with TimeZone.getAvailableIDs()).
      */
     Integer getTimezoneOffsetMs();
+
+    /**
+     * @return the "day in month" information from the original string representation of the timestamp. If the
+     * timestamp was represented in a log as "12/31/16 10:00:00 -0800", then getDay() returns 31.
+     */
+    int getDay();
+
+    /**
+     * @return the "month in year" information from the original string representation of the timestamp. If the
+     * timestamp was represented in a log as "12/31/16 10:00:00 -0800", then getMonth() returns 12.
+     */
+    int getMonth();
+
+    /**
+     * @return the year information from the original string representation of the timestamp. If the timestamp was
+     * represented in a log as "12/31/16 10:00:00 -0800", then getYear() returns 16.
+     */
+    int getYear();
 
 }
 

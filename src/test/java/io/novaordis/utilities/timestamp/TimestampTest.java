@@ -19,6 +19,9 @@ package io.novaordis.utilities.timestamp;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -132,9 +135,39 @@ public abstract class TimestampTest {
         }
     }
 
+    // getDay()/getMonth()/getYear() -----------------------------------------------------------------------------------
+
+    @Test
+    public void dayMonthYear_TimeZoneOffset() throws Exception {
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        String s = "07/30/16 10:00:00 -0200";
+
+        Timestamp ts = getTimestampToTest(s, df);
+
+        assertEquals(30, ts.getDay());
+        assertEquals(7, ts.getMonth());
+        assertEquals(16, ts.getYear());
+    }
+
+    @Test
+    public void dayMonthYear_NoTimeZoneOffset() throws Exception {
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        String s = "07/30/16 10:00:00";
+
+        Timestamp ts = getTimestampToTest(s, df);
+
+        assertEquals(30, ts.getDay());
+        assertEquals(7, ts.getMonth());
+        assertEquals(16, ts.getYear());
+    }
+
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected abstract Timestamp getTimestampToTest(long timestampGMT, Integer timezoneOffsetMs);
+    protected abstract Timestamp getTimestampToTest(long timestampGMT, Integer timezoneOffsetMs) throws Exception;
+
+    protected abstract Timestamp getTimestampToTest(String timestampAsString, DateFormat dateFormat) throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 
