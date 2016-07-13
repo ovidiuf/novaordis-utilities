@@ -128,7 +128,7 @@ public class Timestamps {
      */
     public static String format(Timestamp timestamp, DateFormat targetFormat, String noTimestampString) {
 
-        throw new RuntimeException("NOT YET IMPLEMENTED");
+        throw new RuntimeException("Timestamps.format() NOT YET IMPLEMENTED");
 
 //        if (targetFormat == null) {
 //            throw new IllegalArgumentException("null target format");
@@ -206,39 +206,6 @@ public class Timestamps {
 
         return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
     }
-
-
-
-
-
-
-
-
-//
-//
-//    public static String timezoneOffsetMsToString(int offsetMs) {
-//
-//        return timezoneOffsetHoursToString(offsetMs/MILLISECONDS_IN_AN_HOUR);
-//    }
-//
-//    public static boolean isValidTimeZoneOffsetMs(int offsetMs) {
-//
-//        return isValidTimeZoneOffsetHours(offsetMs / MILLISECONDS_IN_AN_HOUR);
-//    }
-//
-//    /**
-//     * Returns true if the specified date format includes a timezone specification.
-//     */
-//    public static boolean doesIncludeTimezoneSpecification(DateFormat dateFormat) {
-//
-//        if (dateFormat == null) {
-//            return false;
-//        }
-//
-//        String reference = dateFormat.format(new Date());
-//        return reference.contains(" +") || reference.contains(" -");
-//    }
-//
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
