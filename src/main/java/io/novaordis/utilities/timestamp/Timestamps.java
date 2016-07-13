@@ -165,55 +165,60 @@ public class Timestamps {
 //        return targetFormat.format(offsetTimestamp);
     }
 
+    /**
+     * Accounts for the timezone offset and the daylight saving time.
+     */
+    public static int getDefaultTimezoneHours() {
+
+        return getDefaultTimezoneMs() / MILLISECONDS_IN_AN_HOUR;
+    }
+
+    /**
+     * Accounts for the timezone offset and the daylight saving time.
+     */
+    public static int getDefaultTimezoneMs() {
+
+        TimeZone defaultTimezone = TimeZone.getDefault();
+        return defaultTimezone.getRawOffset() + defaultTimezone.getDSTSavings();
+    }
+
+    public static String timezoneOffsetHoursToString(int offsetHours) {
+
+        if (!isValidTimeZoneOffsetHours(offsetHours)) {
+            throw new IllegalArgumentException("invalid timezone offset value " + offsetHours);
+        }
+
+        if (offsetHours < -9) {
+            return "" + offsetHours + "00";
+        }
+        else if (offsetHours < 0) {
+            return "-0" + (-offsetHours) + "00";
+        }
+        else if (offsetHours < 10) {
+            return "+0" + offsetHours + "00";
+        }
+        else {
+            return "+" + offsetHours + "00";
+        }
+    }
+
+    public static boolean isValidTimeZoneOffsetHours(int hours) {
+
+        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
+    }
 
 
 
 
-//    /**
-//     * Accounts for the timezone offset and the daylight saving time.
-//     */
-//    public static int getDefaultTimezoneMs() {
+
+
+
+
 //
-//        TimeZone defaultTimezone = TimeZone.getDefault();
-//        return defaultTimezone.getRawOffset() + defaultTimezone.getDSTSavings();
-//    }
-//
-//    /**
-//     * Accounts for the timezone offset and the daylight saving time.
-//     */
-//    public static int getDefaultTimezoneHours() {
-//
-//        return getDefaultTimezoneMs() / MILLISECONDS_IN_AN_HOUR;
-//    }
-//
-//    public static String timezoneOffsetHoursToString(int offsetHours) {
-//
-//        if (!isValidTimeZoneOffsetHours(offsetHours)) {
-//            throw new IllegalArgumentException("invalid timezone offset value " + offsetHours);
-//        }
-//
-//        if (offsetHours < -9) {
-//            return "" + offsetHours + "00";
-//        }
-//        else if (offsetHours < 0) {
-//            return "-0" + (-offsetHours) + "00";
-//        }
-//        else if (offsetHours < 10) {
-//            return "+0" + offsetHours + "00";
-//        }
-//        else {
-//            return "+" + offsetHours + "00";
-//        }
-//    }
 //
 //    public static String timezoneOffsetMsToString(int offsetMs) {
 //
 //        return timezoneOffsetHoursToString(offsetMs/MILLISECONDS_IN_AN_HOUR);
-//    }
-//
-//    public static boolean isValidTimeZoneOffsetHours(int hours) {
-//
-//        return LOWEST_VALID_TIMEZONE_OFFSET_HOURS <= hours && hours <= HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
 //    }
 //
 //    public static boolean isValidTimeZoneOffsetMs(int offsetMs) {
