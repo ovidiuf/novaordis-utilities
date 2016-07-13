@@ -20,13 +20,11 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -47,70 +45,53 @@ public abstract class TimestampTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void constructor_TimezoneOffset() throws Exception {
+    public void parsingConstructorAndAccessors_TimezoneOffset() throws Exception {
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-        Timestamp t = getTimestampToTest("01/01/1970 01:00:01 +0100", df);
+        Timestamp t = getTimestampToTest("01/01/1970 00:00:00 +0000", df);
 
-        assertEquals(1000L, t.getTimestampGMT());
+        assertEquals(0L, t.getTimestampGMT());
+        assertEquals(TimeZone.getTimeZone("+0000"), t.getTimeZone());
+        assertEquals("1", t.getTimestampElement("d"));
+        assertEquals("01", t.getTimestampElement("dd"));
+        assertEquals("1", t.getTimestampElement("M"));
+        assertEquals("01", t.getTimestampElement("MM"));
+        assertEquals("70", t.getTimestampElement("yy"));
+        assertEquals("1970", t.getTimestampElement("yyyy"));
 
-        //noinspection PointlessArithmeticExpression
-        assertEquals(1 * Timestamps.MILLISECONDS_IN_AN_HOUR, t.getTimezoneOffsetMs().intValue());
+        log.debug(".");
     }
 
     @Test
-    public void constructor_NoTimezoneOffset() throws Exception {
+    public void parsingConstructorAndAccessors_NoTimezoneOffset() throws Exception {
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-        Timestamp t = getTimestampToTest("01/03/1970 00:00:00", df);
+        String ts = "07/12/15 10:00:00";
+        Timestamp t = getTimestampToTest(ts, df);
 
         long gmt = t.getTimestampGMT();
-        assertTrue(gmt > 0);
-        assertNull(t.getTimezoneOffsetMs());
+        assertEquals(TimeZone.getDefault(), t.getTimeZone());
+        assertEquals("12", t.getTimestampElement("d"));
+        assertEquals("12", t.getTimestampElement("dd"));
+        assertEquals("7", t.getTimestampElement("M"));
+        assertEquals("07", t.getTimestampElement("MM"));
+        assertEquals("15", t.getTimestampElement("yy"));
+        assertEquals("2015", t.getTimestampElement("yyyy"));
+
+        //
+        // make sure the GMT timestamp is correctly calculated
+        //
+
+        DateFormat referenceDf = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        String reference = referenceDf.format(new Date());
+        reference = reference.substring(reference.lastIndexOf(' ') + 1);
+        reference = ts + " " + reference;
+
+        long referenceGmt = referenceDf.parse(reference).getTime();
+
+        assertEquals(gmt, referenceGmt);
     }
 
-    @Test
-    public void illegalTimezoneOffsetValue() throws Exception {
-
-        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-
-        try {
-            getTimestampToTest("12/01/16 10:00:00 +2500", df);
-            fail("should have thrown exception");
-        }
-        catch(ParseException e) {
-
-            log.info(e.getMessage());
-        }
-    }
-
-    // getDay()/getMonth()/getYear() -----------------------------------------------------------------------------------
-
-    @Test
-    public void dayMonthYear_TimeZoneOffset() throws Exception {
-
-        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-        String s = "07/30/16 10:00:00 -0200";
-
-        Timestamp ts = getTimestampToTest(s, df);
-
-        assertEquals(30, ts.getDay());
-        assertEquals(7, ts.getMonth());
-        assertEquals(16, ts.getYear());
-    }
-
-    @Test
-    public void dayMonthYear_NoTimeZoneOffset() throws Exception {
-
-        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-        String s = "07/30/16 10:00:00";
-
-        Timestamp ts = getTimestampToTest(s, df);
-
-        assertEquals(30, ts.getDay());
-        assertEquals(7, ts.getMonth());
-        assertEquals(16, ts.getYear());
-    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

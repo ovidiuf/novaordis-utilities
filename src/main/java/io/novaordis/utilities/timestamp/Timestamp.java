@@ -16,12 +16,14 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.util.TimeZone;
+
 /**
- * An interface that binds together a timestamp expressed in milliseconds from the GMT epoch, and optionally a
- * timezone offset, as specified in the original string representation of the timestamp.
+ * An interface that binds together a timestamp expressed in milliseconds from 01/01/1972 00:00:00 GNT, and optionally
+ * a timezone offset, as specified in the original string representation of the timestamp, or the default timezone
+ * at the time of the parsing, if no timezone offset is specified in the original string representation.
  *
  * @see Timestamp#getTimestampGMT()
- * @see Timestamp#getTimezoneOffsetMs()
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/11/16
@@ -41,33 +43,22 @@ public interface Timestamp {
     long getTimestampGMT();
 
     /**
-     * @return the timezone offset, in milliseconds, as specified by the source of the event (logs, for example). If
-     * the original event timestamp was "12/31/16 10:00:00 -0800" in the log, then the timezone offset is
-     * -8 * 3600 * 1000 ms. Null if no timezone offset specified by the source of the event. We need this information
-     * to produce timestamps similar to the original ones, when the processing is done in an arbitrary timezone.
+     * @return the TimeZone instance corresponding to the timezone offset specification from the original timestamp
+     * representation, or the default JVM timezone at the time of the parsing, if no timezone specification was found
+     * in the timestamp representation.
      *
-     * Valid values are integers between -12 * 3600 * 1000 and 14 * 3600 * 1000 (these values have been obtained by
-     * querying all time zones known by Java, with TimeZone.getAvailableIDs()).
+     * Never returns null.
      */
-    Integer getTimezoneOffsetMs();
+    TimeZone getTimeZone();
 
     /**
-     * @return the "day in month" information from the original string representation of the timestamp. If the
-     * timestamp was represented in a log as "12/31/16 10:00:00 -0800", then getDay() returns 31.
+     * @param formatElement a valid SimpleDateFormat format element.
+     *
+     * @return the specified fragment corresponding to the timestamp in its original timezone (the one returned
+     * by getTimezone()). For example, if the timestamp was represented in a log as "12/31/16 10:00:00 -0800", then
+     * getTimestampElement("d") returns "31", getTimestampElement("M") returns "12", etc.
      */
-    int getDay();
-
-    /**
-     * @return the "month in year" information from the original string representation of the timestamp. If the
-     * timestamp was represented in a log as "12/31/16 10:00:00 -0800", then getMonth() returns 12.
-     */
-    int getMonth();
-
-    /**
-     * @return the year information from the original string representation of the timestamp. If the timestamp was
-     * represented in a log as "12/31/16 10:00:00 -0800", then getYear() returns 16.
-     */
-    int getYear();
+    String getTimestampElement(String formatElement);
 
 }
 

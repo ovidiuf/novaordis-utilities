@@ -19,6 +19,7 @@ package io.novaordis.utilities.timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -28,49 +29,22 @@ public class TimestampImpl implements Timestamp {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    public static final DateFormat DAY = new SimpleDateFormat("dd");
-    public static final DateFormat MONTH = new SimpleDateFormat("MM");
-    public static final DateFormat YEAR = new SimpleDateFormat("yy");
-
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private long timestampGMT;
-    private Integer timezoneOffsetMs;
-
-    private int day;
-    private int month;
-    private int year;
+    private TimeZone timeZone;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * Used for synthetic events.
+     * Use this constructor for synthetic events.
      */
-    public TimestampImpl(long timestampGMT) {
+    public TimestampImpl(long timestampGMT, TimeZone timeZone) {
 
         this.timestampGMT = timestampGMT;
-        this.timezoneOffsetMs = null;
-
-        day = Integer.parseInt(DAY.format(timestampGMT));
-        month = Integer.parseInt(MONTH.format(timestampGMT));
-        year = Integer.parseInt(YEAR.format(timestampGMT));
-    }
-
-    /**
-     * Used for synthetic events.
-     */
-    public TimestampImpl(long timestampGMT, Integer timezoneOffsetMs) {
-
-        this.timestampGMT = timestampGMT;
-        this.timezoneOffsetMs = timezoneOffsetMs;
-
-        // TODO these values are not correct under some circumstances, add boundary condition testing
-
-        day = Integer.parseInt(DAY.format(timestampGMT));
-        month = Integer.parseInt(MONTH.format(timestampGMT));
-        year = Integer.parseInt(YEAR.format(timestampGMT));
+        this.timeZone = timeZone;
     }
 
     /**
@@ -88,16 +62,12 @@ public class TimestampImpl implements Timestamp {
             throw new IllegalArgumentException("null format");
         }
 
-        long tsGMT = format.parse(timestampAsString).getTime();
+        this.timestampGMT = format.parse(timestampAsString).getTime();
+        this.timeZone = Timestamps.timezoneOffsetFromString(timestampAsString);
 
-        setTimestampGMT(tsGMT);
-
-        Integer toMs = Timestamps.timezoneOffsetMsFromString(timestampAsString);
-        setTimezoneOffsetMs(toMs);
-
-        day = Integer.parseInt(DAY.format(tsGMT));
-        month = Integer.parseInt(MONTH.format(tsGMT));
-        year = Integer.parseInt(YEAR.format(tsGMT));
+        if (this.timeZone == null) {
+            this.timeZone = TimeZone.getDefault();
+        }
     }
 
     // Timestamp implementation ----------------------------------------------------------------------------------------
@@ -109,57 +79,32 @@ public class TimestampImpl implements Timestamp {
     }
 
     @Override
-    public Integer getTimezoneOffsetMs() {
-
-        return timezoneOffsetMs;
+    public TimeZone getTimeZone() {
+        return timeZone;
     }
 
+    /**
+     * @param s a valid SimpleDateFormat format element.
+     */
     @Override
-    public int getDay() {
+    public String getTimestampElement(String s) {
 
-        return day;
+        DateFormat format = new SimpleDateFormat(s);
+        format.setTimeZone(timeZone);
+        return format.format(timestampGMT);
     }
-
-    @Override
-    public int getMonth() {
-
-        return month;
-    }
-
-    @Override
-    public int getYear() {
-
-        return year;
-    }
-
 
     // Public ----------------------------------------------------------------------------------------------------------
-
-    public void setTimestampGMT(long l) {
-
-        if (l < 0 ) {
-            throw new IllegalArgumentException("illegal timestamp negative value");
-        }
-
-        this.timestampGMT = l;
-    }
-
-    public void setTimezoneOffsetMs(Integer timezoneOffsetMs) {
-
-        if (timezoneOffsetMs != null && !Timestamps.isValidTimeZoneOffsetMs(timezoneOffsetMs)) {
-            throw new IllegalArgumentException("invalid timezone offset value");
-        }
-
-        this.timezoneOffsetMs = timezoneOffsetMs;
-    }
 
     @Override
     public String toString() {
 
-        return "" +
-                timestampGMT +
-                (timezoneOffsetMs == null ? "" : ":" + Timestamps.timezoneOffsetMsToString(timezoneOffsetMs));
+        String s = "" + timestampGMT;
 
+        if (timeZone != null) {
+            s += ":" + timeZone.getID();
+        }
+        return s;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
