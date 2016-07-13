@@ -16,6 +16,7 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.text.DateFormat;
 import java.util.TimeZone;
 
 /**
@@ -105,6 +106,69 @@ public class Timestamps {
         return TimeZone.getTimeZone(timeZoneOffset);
     }
 
+    /**
+     * Formats a timestamp. It must get the timezone offset that was used in the original string representation, or null
+     * if no timezone offset was used, and uses this information to format the timestamp using the target format,
+     * making sure the hour part is identical, even if the timezone information is missing from the target format.
+     *
+     * This behavior is useful when parsing and translating logs, we want the source and target log hour part of the
+     * timestamp to be identical, irrespective of the timezone in which the translation is done.
+     *
+     * @param timestamp may be null. If not null, it contains a GMT timestamp and possibly the time zone offset,
+     *                  in millisecond, if explicitly specified by the timestamp source representation, or null if the
+     *                  source representation does not explicitly specify a time zone.
+     *
+     * @see Timestamp
+     *
+     * @param targetFormat the target format. Cannot be null.
+     *
+     * @param noTimestampString the string representation to use when the timestamp is null.
+     *
+     * @throws IllegalArgumentException if the sourceTimeZoneOffsetHours is not a valid value (null or -12 ... 14).
+     */
+    public static String format(Timestamp timestamp, DateFormat targetFormat, String noTimestampString) {
+
+        throw new RuntimeException("NOT YET IMPLEMENTED");
+
+//        if (targetFormat == null) {
+//            throw new IllegalArgumentException("null target format");
+//        }
+//
+//        if (timestamp == null) {
+//            return noTimestampString;
+//        }
+//
+//        Integer sourceTimeZoneOffset = timestamp.getTimezoneOffsetMs();
+//
+//        if (sourceTimeZoneOffset == null || doesIncludeTimezoneSpecification(targetFormat)) {
+//
+//            //
+//            // the source time stamp did not contain an explicitly specified timezone offset, so both source and
+//            // target calculations are done in the local timezone, the format will be the same, simply apply the target
+//            // pattern
+//            //
+//
+//            return targetFormat.format(timestamp.getTimestampGMT());
+//        }
+//
+//        //
+//        // at this point we know the source specifies a timezone offset; if the target format does not specify a timezone
+//        // offset, we want to compensate for the source offset so the timestamp looks the same.
+//        //
+//
+//        TimeZone defaultTimeZone = TimeZone.getDefault();
+//
+//        int defaultTimezoneOffset = defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings();
+//
+//        long offsetTimestamp = timestamp.getTimestampGMT() - defaultTimezoneOffset + sourceTimeZoneOffset;
+//
+//        return targetFormat.format(offsetTimestamp);
+    }
+
+
+
+
+
 //    /**
 //     * Accounts for the timezone offset and the daylight saving time.
 //     */
@@ -169,65 +233,6 @@ public class Timestamps {
 //        String reference = dateFormat.format(new Date());
 //        return reference.contains(" +") || reference.contains(" -");
 //    }
-//
-//    /**
-//     * Formats a timestamp. It must get the timezone offset that was used in the original string representation, or null
-//     * if no timezone offset was used, and uses this information to format the timestamp using the target format,
-//     * making sure the hour part is identical, even if the timezone information is missing from the target format.
-//     *
-//     * This behavior is useful when parsing and translating logs, we want the source and target log hour part of the
-//     * timestamp to be identical, irrespective of the timezone in which the translation is done.
-//     *
-//     * @param timestamp may be null. If not null, it contains a GMT timestamp and possibly the time zone offset,
-//     *                  in millisecond, if explicitly specified by the timestamp source representation, or null if the
-//     *                  source representation does not explicitly specify a time zone.
-//     *
-//     * @see Timestamps#timezoneOffsetHoursFromString(String)
-//     * @see Timestamp
-//     *
-//     * @param targetFormat the target format. Cannot be null.
-//     *
-//     * @param noTimestampString the string representation to use when the timestamp is null.
-//     *
-//     * @throws IllegalArgumentException if the sourceTimeZoneOffsetHours is not a valid value (null or -12 ... 14).
-//     */
-//    public static String format(Timestamp timestamp, DateFormat targetFormat, String noTimestampString) {
-//
-//        if (targetFormat == null) {
-//            throw new IllegalArgumentException("null target format");
-//        }
-//
-//        if (timestamp == null) {
-//            return noTimestampString;
-//        }
-//
-//        Integer sourceTimeZoneOffset = timestamp.getTimezoneOffsetMs();
-//
-//        if (sourceTimeZoneOffset == null || doesIncludeTimezoneSpecification(targetFormat)) {
-//
-//            //
-//            // the source time stamp did not contain an explicitly specified timezone offset, so both source and
-//            // target calculations are done in the local timezone, the format will be the same, simply apply the target
-//            // pattern
-//            //
-//
-//            return targetFormat.format(timestamp.getTimestampGMT());
-//        }
-//
-//        //
-//        // at this point we know the source specifies a timezone offset; if the target format does not specify a timezone
-//        // offset, we want to compensate for the source offset so the timestamp looks the same.
-//        //
-//
-//        TimeZone defaultTimeZone = TimeZone.getDefault();
-//
-//        int defaultTimezoneOffset = defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings();
-//
-//        long offsetTimestamp = timestamp.getTimestampGMT() - defaultTimezoneOffset + sourceTimeZoneOffset;
-//
-//        return targetFormat.format(offsetTimestamp);
-//    }
-//
 //
 
     // Attributes ------------------------------------------------------------------------------------------------------
