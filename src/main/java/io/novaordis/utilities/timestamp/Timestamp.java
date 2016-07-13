@@ -42,6 +42,8 @@ public interface Timestamp {
      */
     long getTimestampGMT();
 
+    long adjustForTimeZone(TimeZone timeZone);
+
     /**
      * @return the TimeZone instance corresponding to the timezone offset specification from the original timestamp
      * representation, or the default JVM timezone at the time of the parsing, if no timezone specification was found
