@@ -17,7 +17,6 @@
 package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -33,56 +32,56 @@ public class TimestampImpl implements Timestamp {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private long timestampGMT;
-    private TimeZone timeZone;
+    private long time;
+    private int timeOffsetMs;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    /**
-     * Use this constructor for synthetic events.
-     */
-    public TimestampImpl(long timestampGMT, TimeZone timeZone) {
-
-        this.timestampGMT = timestampGMT;
-        this.timeZone = timeZone;
-    }
-
-    /**
-     * To get 0 GMT with a +3600 timezone offset, use:
-     *
-     * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-     * Timestamp t = getTimestampToTest("01/01/1970 01:00:00 +0100", df);
-     *
-     * @throws ParseException if the string cannot be parsed into a date using the given format.
-     * @throws IllegalArgumentException on invalid arguments.
-     */
-    public TimestampImpl(String timestampAsString, DateFormat format) throws ParseException {
-
-        if (format == null) {
-            throw new IllegalArgumentException("null format");
-        }
-
-        this.timestampGMT = format.parse(timestampAsString).getTime();
-        this.timeZone = Timestamps.timezoneOffsetFromString(timestampAsString);
-
-        if (this.timeZone == null) {
-            this.timeZone = TimeZone.getDefault();
-        }
-    }
+//    /**
+//     * Use this constructor for synthetic events.
+//     */
+//    public TimestampImpl(long timestampGMT, TimeZone timeZone) {
+//
+//        this.timestampGMT = timestampGMT;
+//        this.timeZone = timeZone;
+//    }
+//
+//    /**
+//     * To get 0 GMT with a +3600 timezone offset, use:
+//     *
+//     * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+//     * Timestamp t = getTimestampToTest("01/01/1970 01:00:00 +0100", df);
+//     *
+//     * @throws ParseException if the string cannot be parsed into a date using the given format.
+//     * @throws IllegalArgumentException on invalid arguments.
+//     */
+//    public TimestampImpl(String timestampAsString, DateFormat format) throws ParseException {
+//
+//        if (format == null) {
+//            throw new IllegalArgumentException("null format");
+//        }
+//
+//        this.timestampGMT = format.parse(timestampAsString).getTime();
+//        this.timeZone = TimeZoneUtil.fromRFC822String(timestampAsString);
+//
+//        if (this.timeZone == null) {
+//            this.timeZone = TimeZone.getDefault();
+//        }
+//    }
 
     // Timestamp implementation ----------------------------------------------------------------------------------------
 
     @Override
-    public long getTimestampGMT() {
+    public long getTime() {
 
-        return timestampGMT;
+        return time;
     }
 
-    @Override
-    public long adjustForTimeZone(TimeZone timeZone) {
-
-        throw new RuntimeException("adjustForTimeZone() NOT YET IMPLEMENTED");
-
+//    @Override
+//    public long getOffsetFor(TimeZone timeZone) {
+//
+//        throw new RuntimeException("adjustForTimeZone() NOT YET IMPLEMENTED");
+//
 //    /**
 //     * Calculates a new GMT-relative timestamp offset for timezone. The value returned allows for correct comparison
 //     * of the given log timestamp with a value parsed in the given timezone.
@@ -115,36 +114,32 @@ public class TimestampImpl implements Timestamp {
 //
 //        return gmt + timestampTimezoneOffsetMs - timezoneOffsetMs;
 //    }
+//
+//    }
+//
+//    @Override
+//    public String format(DateFormat format, TimeZone timeZone) {
+//
+//        return format.format(getTime());
+//    }
 
-    }
-
-    @Override
-    public TimeZone getTimeZone() {
-        return timeZone;
-    }
-
-    /**
-     * @param s a valid SimpleDateFormat format element.
-     */
-    @Override
-    public String getTimestampElement(String s) {
-
-        DateFormat format = new SimpleDateFormat(s);
-        format.setTimeZone(timeZone);
-        return format.format(timestampGMT);
-    }
+//    /**
+//     * @param s a valid SimpleDateFormat format element.
+//     */
+//    @Override
+//    public String getTimestampElement(String s) {
+//
+//        DateFormat format = new SimpleDateFormat(s);
+//        format.setTimeZone(timeZone);
+//        return format.format(time);
+//    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Override
     public String toString() {
 
-        String s = "" + timestampGMT;
-
-        if (timeZone != null) {
-            s += ":" + timeZone.getID();
-        }
-        return s;
+        return time + ":" + TimestampUtil.timeOffsetToString(timeOffsetMs);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -16,14 +16,16 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.text.DateFormat;
 import java.util.TimeZone;
 
 /**
- * An interface that binds together a timestamp expressed in milliseconds from 01/01/1972 00:00:00 GNT, and optionally
- * a timezone offset, as specified in the original string representation of the timestamp, or the default timezone
- * at the time of the parsing, if no timezone offset is specified in the original string representation.
+ * An interface that binds together a UTC timestamp (a universal time timestamp, expressed in milliseconds from
+ * 01/01/1972 00:00:00 GMT and not accounting for daylight saving), and optionally a time offset, as specified in the
+ * original timestamp string representation (or, if the explicit time offset is absent, the effective time offset of
+ * the default time zone at the time of the parsing.
  *
- * @see Timestamp#getTimestampGMT()
+ * @see Timestamp#getTime()
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/11/16
@@ -37,30 +39,32 @@ public interface Timestamp {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * @return the timestamp in milliseconds from the GMT epoch, not accounting for timezone and daylight saving
-     * offsets. It is illegal to return a negative value.
+     * @return a UTC timestamp (a Universal Time timestamp, expressed in milliseconds from 01/01/1972 00:00:00 GMT and
+     * not accounting for daylight saving). Similar in semantics to Date.getTime()
      */
-    long getTimestampGMT();
-
-    long adjustForTimeZone(TimeZone timeZone);
+    long getTime();
 
     /**
-     * @return the TimeZone instance corresponding to the timezone offset specification from the original timestamp
-     * representation, or the default JVM timezone at the time of the parsing, if no timezone specification was found
-     * in the timestamp representation.
+     * @return the time offset explicitly specified by the date string, or, if no explicit time offset was present in
+     * the timestamp string, the effective time offset of the default time zone at the time of the parsing.
      *
-     * Never returns null.
+     * This information is needed to correctly process timestamps when we mix timestamps parsed from string
+     * representations that use explicit time offset and those that do not (and thus imply the time offset of the
+     * time zone the parsing occurred in).
      */
-    TimeZone getTimeZone();
+    TimeOffset getTimeOffset();
 
-    /**
-     * @param formatElement a valid SimpleDateFormat format element.
-     *
-     * @return the specified fragment corresponding to the timestamp in its original timezone (the one returned
-     * by getTimezone()). For example, if the timestamp was represented in a log as "12/31/16 10:00:00 -0800", then
-     * getTimestampElement("d") returns "31", getTimestampElement("M") returns "12", etc.
-     */
-    String getTimestampElement(String formatElement);
+//    /**
+//     * @param formatElement a valid SimpleDateFormat format element.
+//     *
+//     * @return the specified fragment corresponding to the timestamp in its original timezone (the one returned
+//     * by getTimezone()). For example, if the timestamp was represented in a log as "12/31/16 10:00:00 -0800", then
+//     * getTimestampElement("d") returns "31", getTimestampElement("M") returns "12", etc.
+//     */
+//    String getTimestampElement(String formatElement);
+
+//    String format(DateFormat dateFormat, int timeOffset);
+//
 
 }
 

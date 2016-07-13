@@ -50,7 +50,7 @@ public abstract class TimestampTest {
         DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
         Timestamp t = getTimestampToTest("01/01/1970 00:00:00 +0000", df);
 
-        assertEquals(0L, t.getTimestampGMT());
+        assertEquals(0L, t.getTime());
         assertEquals(TimeZone.getTimeZone("+0000"), t.getTimeZone());
         assertEquals("1", t.getTimestampElement("d"));
         assertEquals("01", t.getTimestampElement("dd"));
@@ -69,7 +69,7 @@ public abstract class TimestampTest {
         String ts = "07/12/15 10:00:00";
         Timestamp t = getTimestampToTest(ts, df);
 
-        long gmt = t.getTimestampGMT();
+        long gmt = t.getTime();
         assertEquals(TimeZone.getDefault(), t.getTimeZone());
         assertEquals("12", t.getTimestampElement("d"));
         assertEquals("12", t.getTimestampElement("dd"));
@@ -92,6 +92,56 @@ public abstract class TimestampTest {
         assertEquals(gmt, referenceGmt);
     }
 
+    // format() --------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void format() throws Exception {
+
+        TimeZone dt = TimeZone.getDefault();
+        String s = TimeZoneUtil.toRFC822String(dt);
+
+        // our reference timezone is one hour apart from the default timezone
+        TimeZone reference = TimeZoneUtil.shift(dt, 1);
+        String offset = TimeZoneUtil.toRFC822String(reference);
+        String timestamp = "07/01/15 10:00:00 " + offset;
+
+        Timestamp ts = getTimestampToTest(timestamp , new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        TimeZone target = TimeZoneUtil.shift(reference, 1);
+        DateFormat targetFormat = new SimpleDateFormat("HH:mm:ss");
+
+        String result = ts.format(targetFormat, target);
+
+        //
+        // we expect an hour difference
+        //
+        assertEquals("08:00:00", result);
+    }
+
+    @Test
+    public void test() throws Exception {
+
+        Date d = new Date();
+
+
+        String s = "01/01/16 10:00:00";
+
+        TimeZone tz = TimeZone.getTimeZone("GMT-0400");
+        TimeZone.setDefault(tz);
+        System.out.println("# current time zone: " + TimeZone.getDefault());
+
+        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        System.out.println("#                  : " + df.parse(s).getTime());
+
+        TimeZone tz2 = TimeZone.getTimeZone("GMT-0800");
+        TimeZone.setDefault(tz2);
+        System.out.println("# current time zone: " + TimeZone.getDefault());
+
+        DateFormat df2 = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        System.out.println("#                  : " + df2.parse(s).getTime());
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 
