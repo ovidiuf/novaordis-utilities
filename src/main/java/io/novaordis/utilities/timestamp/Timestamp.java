@@ -17,7 +17,6 @@
 package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
-import java.util.TimeZone;
 
 /**
  * An interface that binds together a UTC timestamp (a universal time timestamp, expressed in milliseconds from
@@ -35,41 +34,6 @@ public interface Timestamp {
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    /**
-     * Review usage, figure out whether I can refactor.
-     *
-     * Formats a timestamp using the target format, making sure the hour part is identical, even if the timezone
-     * information is missing from the target format.
-     *
-     * This behavior is useful when parsing and translating logs, we want the source and target log hour part of the
-     * timestamp to be identical, irrespective of the timezone in which the translation is done.
-     *
-     * @param t may be null. If not null, it contains a UTC timestamp and a time offset.
-     *
-     * @see Timestamp
-     *
-     * @param targetFormat the target format. Cannot be null.
-     * @param nullTimestampString the string representation to use when the timestamp is null.
-     *
-     */
-    @Deprecated
-    public static String format(Timestamp t, DateFormat targetFormat, String nullTimestampString) {
-
-        if (targetFormat == null) {
-            throw new IllegalArgumentException("null target format");
-        }
-
-        if (t == null) {
-            return nullTimestampString;
-        }
-
-        long offsetTimestamp =
-                t.getTime() -
-                        TimeZone.getDefault().getOffset(System.currentTimeMillis()) + t.getTimeOffset().getOffset();
-
-        return targetFormat.format(offsetTimestamp);
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
@@ -102,10 +66,30 @@ public interface Timestamp {
     String elementToString(String formatElement);
 
     /**
-     * Review usage, figure out whether I can refactor.
+     * Formats this timestamp using the given DateFormat, while applying all necessary transformations so the resulted
+     * string representation will be identical with the original representation. Simply attempting to format getTime()
+     * will result in a different representation than the original, if the original included a different time offset
+     * than the current time zone offset.
+     *
+     * An equivalent behavior would be obtained if we did:
+     *
+     * format.format(timestamp.adjustTime(TimeOffset.getDefault())
+     *
+     * This behavior is useful when parsing and translating logs, we want the source and target timestamp
+     * representation to be identical, irrespective of the timezone in which the translation is done.
+     *
+     * @param format the target format. Cannot be null.
      */
-    @Deprecated
-    long adjustForTimeOffset(int timeOffset);
+    String format(DateFormat format);
+
+    /**
+     *
+     * @return an adjusted UTC timestamp that, once formatted within a time zone with the given time offset, results in
+     * the same string representation as the original representation. The value thus returned also allows for correct
+     * comparison this timestamp with a value parsed in a time zone with the given time offset.
+     */
+    long adjustTime(TimeOffset timeOffset);
 
 }
+
 

@@ -116,16 +116,23 @@ public class TimestampImpl implements Timestamp {
         return format.format(time);
     }
 
-    /**
-     * Calculates a new UTC time value for this timestamp, adjusted for the given time offset. The value thus returned
-     * allows for correct comparison this timestamp with a value parsed in a time zone with the given time offset.
-     *
-     * @param timeOffsetMs the time offset to adjust to, specified in milliseconds.
-     */
     @Override
-    public long adjustForTimeOffset(int timeOffsetMs) {
+    public String format(DateFormat format) {
 
-        return time + this.timeOffset.getOffset() - timeOffsetMs;
+        if (format == null) {
+            throw new IllegalArgumentException("null target format");
+        }
+
+        long adjustedTimestamp =
+                time - TimeZone.getDefault().getOffset(System.currentTimeMillis()) + timeOffset.getOffset();
+
+        return format.format(adjustedTimestamp);
+    }
+
+    @Override
+    public long adjustTime(TimeOffset timeOffset) {
+
+        return time + this.timeOffset.getOffset() - timeOffset.getOffset();
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

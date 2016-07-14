@@ -94,6 +94,12 @@ public class TimeOffset {
         return new TimeOffset(TimeZone.getDefault().getOffset(System.currentTimeMillis()));
     }
 
+    public static boolean isValidOffset(int timeOffsetMs) {
+
+        return LOWEST_VALID_TIME_OFFSET <= timeOffsetMs && timeOffsetMs <= HIGHEST_VALID_TIME_OFFSET;
+
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private int timeOffsetMs;
@@ -192,7 +198,7 @@ public class TimeOffset {
 
     public void setOffset(int offset) throws InvalidTimeOffsetException {
 
-        if (offset < LOWEST_VALID_TIME_OFFSET || offset > HIGHEST_VALID_TIME_OFFSET) {
+        if (!isValidOffset(offset)) {
             throw new InvalidTimeOffsetException(
                     "time offset not within expected limits " +
                             new TimeOffset(LOWEST_VALID_TIME_OFFSET).toRFC822String() + "..." +

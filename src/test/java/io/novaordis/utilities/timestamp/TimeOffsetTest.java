@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -571,6 +572,38 @@ public class TimeOffsetTest {
 
         TimeOffset d = TimeOffset.getDefault();
         assertEquals(TimeZone.getDefault().getOffset(System.currentTimeMillis()), d.getOffset());
+    }
+
+    // isValidOffset ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void isValidOffset() throws Exception {
+
+        assertFalse(TimeOffset.isValidOffset(TimeOffset.LOWEST_VALID_TIME_OFFSET - 1));
+    }
+
+    @Test
+    public void isValidOffset2() throws Exception {
+
+        assertTrue(TimeOffset.isValidOffset(TimeOffset.LOWEST_VALID_TIME_OFFSET));
+    }
+
+    @Test
+    public void isValidOffset3() throws Exception {
+
+        assertTrue(TimeOffset.isValidOffset(0));
+    }
+
+    @Test
+    public void isValidOffset4() throws Exception {
+
+        assertTrue(TimeOffset.isValidOffset(TimeOffset.HIGHEST_VALID_TIME_OFFSET));
+    }
+
+    @Test
+    public void isValidOffset5() throws Exception {
+
+        assertFalse(TimeOffset.isValidOffset(TimeOffset.HIGHEST_VALID_TIME_OFFSET + 1));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
