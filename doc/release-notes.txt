@@ -1,2 +1,0 @@
-
-Introduced Timestamp API, which contains interfaces and static tools that can be used in timestamped log processing.
