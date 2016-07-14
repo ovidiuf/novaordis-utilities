@@ -63,7 +63,7 @@ public class TimestampImplTest extends TimestampTest {
 
         DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
         TimestampImpl t = new TimestampImpl("07/01/16 10:00:00 -0800", f);
-        assertEquals(-8 * Timestamps.MILLISECONDS_IN_AN_HOUR, t.getTimeOffset().getOffset());
+        assertEquals(-8 * 3600 * 1000, t.getTimeOffset().getOffset());
     }
 
     @Test

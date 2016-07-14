@@ -16,6 +16,9 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.text.DateFormat;
+import java.util.TimeZone;
+
 /**
  * An interface that binds together a UTC timestamp (a universal time timestamp, expressed in milliseconds from
  * 01/01/1972 00:00:00 GMT and not accounting for daylight saving), and optionally a time offset, as specified in the
@@ -32,6 +35,41 @@ public interface Timestamp {
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * Review usage, figure out whether I can refactor.
+     *
+     * Formats a timestamp using the target format, making sure the hour part is identical, even if the timezone
+     * information is missing from the target format.
+     *
+     * This behavior is useful when parsing and translating logs, we want the source and target log hour part of the
+     * timestamp to be identical, irrespective of the timezone in which the translation is done.
+     *
+     * @param t may be null. If not null, it contains a UTC timestamp and a time offset.
+     *
+     * @see Timestamp
+     *
+     * @param targetFormat the target format. Cannot be null.
+     * @param nullTimestampString the string representation to use when the timestamp is null.
+     *
+     */
+    @Deprecated
+    public static String format(Timestamp t, DateFormat targetFormat, String nullTimestampString) {
+
+        if (targetFormat == null) {
+            throw new IllegalArgumentException("null target format");
+        }
+
+        if (t == null) {
+            return nullTimestampString;
+        }
+
+        long offsetTimestamp =
+                t.getTime() -
+                        TimeZone.getDefault().getOffset(System.currentTimeMillis()) + t.getTimeOffset().getOffset();
+
+        return targetFormat.format(offsetTimestamp);
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
@@ -63,11 +101,11 @@ public interface Timestamp {
      */
     String elementToString(String formatElement);
 
+    /**
+     * Review usage, figure out whether I can refactor.
+     */
+    @Deprecated
     long adjustForTimeOffset(int timeOffset);
-
-//
-//    String format(DateFormat dateFormat, int timeOffset);
-//
 
 }
 
