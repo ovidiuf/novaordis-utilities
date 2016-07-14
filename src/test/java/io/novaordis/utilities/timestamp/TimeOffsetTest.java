@@ -19,6 +19,8 @@ package io.novaordis.utilities.timestamp;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import java.util.TimeZone;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -555,94 +557,14 @@ public class TimeOffsetTest {
         assertEquals("+1400", result);
     }
 
-//    // shift() ----------------------------------------------------------------------------------------------------------
-//
-//    @Test
-//    public void shift_ZeroOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
-//        TimeZone timeZone2 = TimeZoneUtil.shift(timeZone, 0);
-//
-//        assertEquals(timeZone, timeZone2);
-//
-//        int difference = timeZone2.getOffset(0) - timeZone.getOffset(0);
-//        assertEquals(0, difference);
-//    }
-//
-//    @Test
-//    public void shift_PositiveReference_PositiveOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
-//        TimeZone result = TimeZoneUtil.shift(timeZone, 1);
-//
-//        assertFalse(timeZone.equals(result));
-//
-//        String s = TimeZoneUtil.toRFC822String(result);
-//        assertEquals("+0300", s);
-//    }
-//
-//    @Test
-//    public void shift_PositiveReference_NegativeOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
-//        TimeZone result = TimeZoneUtil.shift(timeZone, -1);
-//
-//        assertFalse(timeZone.equals(result));
-//
-//        String s = TimeZoneUtil.toRFC822String(result);
-//        assertEquals("+0100", s);
-//    }
-//
-//    @Test
-//    public void shift_NegativeReference_PositiveOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT-0200");
-//        TimeZone result = TimeZoneUtil.shift(timeZone, 1);
-//
-//        assertFalse(timeZone.equals(result));
-//
-//        String s = TimeZoneUtil.toRFC822String(result);
-//        assertEquals("-0100", s);
-//    }
-//
-//    @Test
-//    public void shift_NegativeReference_NegativeOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT-0200");
-//        TimeZone result = TimeZoneUtil.shift(timeZone, -1);
-//
-//        assertFalse(timeZone.equals(result));
-//
-//        String s = TimeZoneUtil.toRFC822String(result);
-//        assertEquals("-0300", s);
-//    }
-//
-//    @Test
-//    public void shift_InvalidOffset() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
-//
-//        try {
-//
-//            TimeZoneUtil.shift(timeZone, 1000);
-//            fail("should have thrown exception");
-//        }
-//        catch(IllegalArgumentException e) {
-//            String msg = e.getMessage();
-//            log.info(msg);
-//            assertTrue(msg.startsWith("no timezone"));
-//        }
-//    }
-//
-//    @Test
-//    public void shift_DefaultTimezone() throws Exception {
-//
-//        TimeZone timeZone = TimeZone.getDefault();
-//
-//        TimeZone t = TimeZoneUtil.shift(timeZone, 1);
-//        TimeZone t2 = TimeZoneUtil.shift(timeZone, -1);
-//
-//    }
+    // getDefault() ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getDefault() throws Exception {
+
+        TimeOffset d = TimeOffset.getDefault();
+        assertEquals(TimeZone.getDefault().getOffset(System.currentTimeMillis()), d.getOffset());
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

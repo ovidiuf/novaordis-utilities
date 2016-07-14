@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.timestamp;
 
+import java.util.TimeZone;
+
 /**
  * A time offset is an amount of time, in milliseconds, subtracted from or added to UTC to get the current wall clock
  * time – whether it's standard time or daylight saving time. For a time zone where the daylight saving time is not in
@@ -73,11 +75,29 @@ public class TimeOffset {
         return new TimeOffset(s);
     }
 
+    /**
+     * @return the default time offset, the one corresponding to the local time zone in this moment in time.
+     */
+    public static TimeOffset getDefault() {
+
+        return new TimeOffset(TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private int timeOffsetMs;
 
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    /**
+     * The UTC time offset. We're not exposing this publicly to avoid confusion with the value returned by
+     * TimeOffset.getDefault(). If we want an UTC time offset, build it explicitly with new TimeOffset(0)
+     */
+    @SuppressWarnings("unused")
+    private TimeOffset() {
+
+        this(0);
+    }
 
     /**
      * @param offset the time offset in milliseconds.
