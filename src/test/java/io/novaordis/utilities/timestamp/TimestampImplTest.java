@@ -17,8 +17,11 @@
 package io.novaordis.utilities.timestamp;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import java.text.DateFormat;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -38,18 +41,18 @@ public class TimestampImplTest extends TimestampTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-//    @Test
-//    public void parsingConstructor_NullFormat() throws Exception {
-//
-//        try {
-//            new TimestampImpl("something", null);
-//            fail("Should have thrown exception");
-//        }
-//        catch(IllegalArgumentException e) {
-//            String msg = e.getMessage();
-//            log.info(msg);
-//        }
-//    }
+    @Test
+    public void parsingConstructor_NullFormat() throws Exception {
+
+        try {
+            new TimestampImpl("something", null);
+            fail("Should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+        }
+    }
 //
 //    @Test
 //    public void parsingConstructor_TimezoneOffset() throws Exception {

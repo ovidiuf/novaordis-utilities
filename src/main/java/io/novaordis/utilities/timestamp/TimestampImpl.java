@@ -17,7 +17,7 @@
 package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.TimeZone;
 
 /**
@@ -33,7 +33,7 @@ public class TimestampImpl implements Timestamp {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private long time;
-    private int timeOffsetMs;
+    private TimeOffset timeOffset;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -46,28 +46,30 @@ public class TimestampImpl implements Timestamp {
 //        this.timeZone = timeZone;
 //    }
 //
-//    /**
-//     * To get 0 GMT with a +3600 timezone offset, use:
-//     *
-//     * DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//     * Timestamp t = getTimestampToTest("01/01/1970 01:00:00 +0100", df);
-//     *
-//     * @throws ParseException if the string cannot be parsed into a date using the given format.
-//     * @throws IllegalArgumentException on invalid arguments.
-//     */
-//    public TimestampImpl(String timestampAsString, DateFormat format) throws ParseException {
-//
-//        if (format == null) {
-//            throw new IllegalArgumentException("null format");
-//        }
-//
-//        this.timestampGMT = format.parse(timestampAsString).getTime();
-//        this.timeZone = TimeZoneUtil.fromRFC822String(timestampAsString);
-//
-//        if (this.timeZone == null) {
-//            this.timeZone = TimeZone.getDefault();
-//        }
-//    }
+    /**
+     * @throws ParseException if the string cannot be parsed into a date using the given format.
+     *
+     * @throws InvalidTimeOffsetException on invalid time offset
+     * @throws IllegalArgumentException on invalid arguments.
+     */
+    public TimestampImpl(String timestampAsString, DateFormat format) throws ParseException {
+
+        if (format == null) {
+            throw new IllegalArgumentException("null format");
+        }
+
+        this.time = format.parse(timestampAsString).getTime();
+        this.timeOffset = TimeOffset.fromRFC822String(timestampAsString);
+
+        if (this.timeOffset == null) {
+
+            //
+            // get ehe offset for the default timezone
+            //
+            int offset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
+            this.timeOffset = new TimeOffset(offset);
+        }
+    }
 
     // Timestamp implementation ----------------------------------------------------------------------------------------
 
@@ -76,6 +78,13 @@ public class TimestampImpl implements Timestamp {
 
         return time;
     }
+
+    @Override
+    public TimeOffset getTimeOffset() {
+
+        return timeOffset;
+    }
+
 
 //    @Override
 //    public long getOffsetFor(TimeZone timeZone) {
@@ -139,7 +148,7 @@ public class TimestampImpl implements Timestamp {
     @Override
     public String toString() {
 
-        return time + ":" + TimestampUtil.timeOffsetToString(timeOffsetMs);
+        return time + ":" + (timeOffset == null ? null : timeOffset.toRFC822String());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

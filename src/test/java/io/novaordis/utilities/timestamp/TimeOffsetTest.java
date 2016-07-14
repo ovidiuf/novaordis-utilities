@@ -16,6 +16,17 @@
 
 package io.novaordis.utilities.timestamp;
 
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import static io.novaordis.utilities.timestamp.TimeOffset.fromRFC822String;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/13/16
@@ -24,6 +35,8 @@ public class TimeOffsetTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = Logger.getLogger(TimeOffsetTest.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -31,6 +44,605 @@ public class TimeOffsetTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // fromRFC822String() ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void fromRFC822String_InvalidLowValue() throws Exception {
+
+        String s = "-1201";
+
+        try {
+            fromRFC822String(s);
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    @Test
+    public void fromRFC822String1() throws Exception {
+
+        String s = "blah blah -1200";
+
+        TimeOffset to = fromRFC822String(s);
+        assertNotNull(to);
+        assertEquals("-1200", to.toRFC822String());
+        assertEquals(-12 * 3600 * 1000, to.getOffset());
+    }
+
+    @Test
+    public void fromRFC822String2() throws Exception {
+
+        String s = "+0800";
+
+        TimeOffset to = fromRFC822String(s);
+        assertNotNull(to);
+        assertEquals(s, to.toRFC822String());
+        assertEquals(8 * 3600 * 1000, to.getOffset());
+    }
+
+    @Test
+    public void fromRFC822String3() throws Exception {
+
+        String s = "+0800something";
+
+        TimeOffset to = fromRFC822String(s);
+        assertNotNull(to);
+        assertEquals("+0800", to.toRFC822String());
+        assertEquals(8 * 3600 * 1000, to.getOffset());
+    }
+
+    @Test
+    public void fromRFC822String4() throws Exception {
+
+        String s = "something+0800something";
+
+        TimeOffset to = fromRFC822String(s);
+        assertNotNull(to);
+        assertEquals("+0800", to.toRFC822String());
+        assertEquals(8 * 3600 * 1000, to.getOffset());
+    }
+
+    @Test
+    public void fromRFC822String_InvalidHighValue() throws Exception {
+
+        String s = "+1401";
+
+        try {
+            fromRFC822String(s);
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    // fromRFC822String() exceptional conditions -----------------------------------------------------------------------
+
+    @Test
+    public void fromRFC822String_NoOffset() throws Exception {
+
+        TimeOffset to = fromRFC822String("something lacking known separators");
+        assertNull(to);
+    }
+
+    @Test
+    public void fromRFC822String_IncompleteTimeOffset() throws Exception {
+
+        try {
+
+            fromRFC822String("+");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e)  {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("incomplete RFC822 time offset fragment \"+\"", msg);
+        }
+    }
+
+    @Test
+    public void fromRFC822String_IncompleteTimeOffset2() throws Exception {
+
+        try {
+
+            fromRFC822String("+1");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e)  {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("incomplete RFC822 time offset fragment \"+1\"", msg);
+        }
+    }
+
+    @Test
+    public void fromRFC822String_IncompleteTimeOffset3() throws Exception {
+
+        try {
+
+            fromRFC822String("-12");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e)  {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("incomplete RFC822 time offset fragment \"-12\"", msg);
+        }
+    }
+
+    @Test
+    public void fromRFC822String_IncompleteTimeOffset4() throws Exception {
+
+        try {
+
+            fromRFC822String("+123");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e)  {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("incomplete RFC822 time offset fragment \"+123\"", msg);
+        }
+    }
+
+    @Test
+    public void fromRFC822String_InvalidTimeZoneOffset() throws Exception {
+
+        try {
+
+            fromRFC822String("+a");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e)  {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("invalid RFC822 time offset"));
+            assertTrue(msg.contains("not a digit"));
+        }
+    }
+
+
+    // constructors ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void constructor_NumericArgument_InvalidLowValue() throws Exception {
+
+        try {
+            new TimeOffset(-12 * 3600 * 1000 - 1);
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    @Test
+    public void constructor_NumericArgument_NegativeOffset() throws Exception {
+
+        TimeOffset to = new TimeOffset(-8 * 3600 * 1000);
+        assertEquals(-8 * 3600 * 1000, to.getOffset());
+        assertEquals("-0800", to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_NumericArgument_Zero() throws Exception {
+
+        TimeOffset to = new TimeOffset(0);
+        assertEquals(0, to.getOffset());
+        assertEquals("+0000", to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_NumericArgument_PositiveOffset() throws Exception {
+
+        TimeOffset to = new TimeOffset(2 * 3600 * 1000);
+        assertEquals(2 * 3600 * 1000, to.getOffset());
+        assertEquals("+0200", to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_NumericArgument_InvalidHighValue() throws Exception {
+
+        try {
+            new TimeOffset(14 * 3600 * 1000 +1);
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    @Test
+    public void constructor_StringArgument_InvalidFirstChar() throws Exception {
+
+        try {
+            new TimeOffset("something");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.equals("time offset representation must start with + or -"));
+        }
+    }
+
+    @Test
+    public void constructor_StringArgument() throws Exception {
+
+        try {
+            new TimeOffset("-1201");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    @Test
+    public void constructor_StringArgument2() throws Exception {
+
+        String s = "-1200";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(-12 * 3600 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument3() throws Exception {
+
+        String s = "-0200";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(-2 * 3600 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument4() throws Exception {
+
+        String s = "-0159";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(-1 * 3600 * 1000 - 59 * 60 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument5() throws Exception {
+
+        String s = "-0001";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(-60 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument6() throws Exception {
+
+        String s = "0000";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(0, to.getOffset());
+        assertEquals("+" + s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument7() throws Exception {
+
+        String s = "+0000";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(0, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument8() throws Exception {
+
+        String s = "+0001";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(60 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument9() throws Exception {
+
+        String s = "+0010";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(10 * 60 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument10() throws Exception {
+
+        String s = "+0100";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(3600 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument11() throws Exception {
+
+        String s = "+1000";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(10 * 3600 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument12() throws Exception {
+
+        String s = "+1400";
+        TimeOffset to = new TimeOffset(s);
+        assertEquals(14 * 3600 * 1000, to.getOffset());
+        assertEquals(s, to.toRFC822String());
+    }
+
+    @Test
+    public void constructor_StringArgument13() throws Exception {
+
+        try {
+            new TimeOffset("+1401");
+            fail("should have thrown exception");
+        }
+        catch(InvalidTimeOffsetException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
+        }
+    }
+
+    // toRFC822String() ------------------------------------------------------------------------------------------------
+
+    @Test
+    public void toRFC822String() throws Exception {
+
+        TimeOffset to = new TimeOffset(-12 * 3600 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-1200", result);
+    }
+
+    @Test
+    public void toRFC822String2() throws Exception {
+
+        TimeOffset to = new TimeOffset(-12 * 3600 * 1000 + 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-1159", result);
+    }
+
+    @Test
+    public void toRFC822String3() throws Exception {
+
+        TimeOffset to = new TimeOffset(-10 * 3600 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-1000", result);
+    }
+
+    @Test
+    public void toRFC822String4() throws Exception {
+
+        TimeOffset to = new TimeOffset(-10 * 3600 * 1000 + 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-0959", result);
+    }
+
+    @Test
+    public void toRFC822String5() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1 * 3600 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-0100", result);
+    }
+
+    @Test
+    public void toRFC822String6() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1 * 3600 * 1000 + 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-0059", result);
+    }
+
+    @Test
+    public void toRFC822String7() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1 * 9 * 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-0009", result);
+    }
+
+    @Test
+    public void toRFC822String8() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1 * 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("-0001", result);
+    }
+
+    @Test
+    public void toRFC822String9() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1 * 60 * 1000 + 1);
+        String result = to.toRFC822String();
+        assertEquals("-0000", result);
+    }
+
+    @Test
+    public void toRFC822String10() throws Exception {
+
+        TimeOffset to = new TimeOffset(-1);
+        String result = to.toRFC822String();
+        assertEquals("-0000", result);
+    }
+
+    @Test
+    public void toRFC822String11() throws Exception {
+
+        TimeOffset to = new TimeOffset(0);
+        String result = to.toRFC822String();
+        assertEquals("+0000", result);
+    }
+
+    @Test
+    public void toRFC822String12() throws Exception {
+
+        TimeOffset to = new TimeOffset(1);
+        String result = to.toRFC822String();
+        assertEquals("+0000", result);
+    }
+
+    @Test
+    public void toRFC822String13() throws Exception {
+
+        TimeOffset to = new TimeOffset(60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+0001", result);
+    }
+
+    @Test
+    public void toRFC822String14() throws Exception {
+
+        TimeOffset to = new TimeOffset(11 * 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+0011", result);
+    }
+
+    @Test
+    public void toRFC822String15() throws Exception {
+
+        TimeOffset to = new TimeOffset(3600 * 1000 + 11 * 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+0111", result);
+    }
+
+    @Test
+    public void toRFC822String16() throws Exception {
+
+        TimeOffset to = new TimeOffset(11 * 3600 * 1000 + 11 * 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+1111", result);
+    }
+
+    @Test
+    public void toRFC822String17() throws Exception {
+
+        TimeOffset to = new TimeOffset(14 * 3600 * 1000 - 60 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+1359", result);
+    }
+
+    @Test
+    public void toRFC822String18() throws Exception {
+
+        TimeOffset to = new TimeOffset(14 * 3600 * 1000);
+        String result = to.toRFC822String();
+        assertEquals("+1400", result);
+    }
+
+//    // shift() ----------------------------------------------------------------------------------------------------------
+//
+//    @Test
+//    public void shift_ZeroOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
+//        TimeZone timeZone2 = TimeZoneUtil.shift(timeZone, 0);
+//
+//        assertEquals(timeZone, timeZone2);
+//
+//        int difference = timeZone2.getOffset(0) - timeZone.getOffset(0);
+//        assertEquals(0, difference);
+//    }
+//
+//    @Test
+//    public void shift_PositiveReference_PositiveOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
+//        TimeZone result = TimeZoneUtil.shift(timeZone, 1);
+//
+//        assertFalse(timeZone.equals(result));
+//
+//        String s = TimeZoneUtil.toRFC822String(result);
+//        assertEquals("+0300", s);
+//    }
+//
+//    @Test
+//    public void shift_PositiveReference_NegativeOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
+//        TimeZone result = TimeZoneUtil.shift(timeZone, -1);
+//
+//        assertFalse(timeZone.equals(result));
+//
+//        String s = TimeZoneUtil.toRFC822String(result);
+//        assertEquals("+0100", s);
+//    }
+//
+//    @Test
+//    public void shift_NegativeReference_PositiveOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT-0200");
+//        TimeZone result = TimeZoneUtil.shift(timeZone, 1);
+//
+//        assertFalse(timeZone.equals(result));
+//
+//        String s = TimeZoneUtil.toRFC822String(result);
+//        assertEquals("-0100", s);
+//    }
+//
+//    @Test
+//    public void shift_NegativeReference_NegativeOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT-0200");
+//        TimeZone result = TimeZoneUtil.shift(timeZone, -1);
+//
+//        assertFalse(timeZone.equals(result));
+//
+//        String s = TimeZoneUtil.toRFC822String(result);
+//        assertEquals("-0300", s);
+//    }
+//
+//    @Test
+//    public void shift_InvalidOffset() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getTimeZone("GMT+0200");
+//
+//        try {
+//
+//            TimeZoneUtil.shift(timeZone, 1000);
+//            fail("should have thrown exception");
+//        }
+//        catch(IllegalArgumentException e) {
+//            String msg = e.getMessage();
+//            log.info(msg);
+//            assertTrue(msg.startsWith("no timezone"));
+//        }
+//    }
+//
+//    @Test
+//    public void shift_DefaultTimezone() throws Exception {
+//
+//        TimeZone timeZone = TimeZone.getDefault();
+//
+//        TimeZone t = TimeZoneUtil.shift(timeZone, 1);
+//        TimeZone t2 = TimeZoneUtil.shift(timeZone, -1);
+//
+//    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

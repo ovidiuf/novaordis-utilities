@@ -48,6 +48,8 @@ public interface Timestamp {
      * @return the time offset explicitly specified by the date string, or, if no explicit time offset was present in
      * the timestamp string, the effective time offset of the default time zone at the time of the parsing.
      *
+     * It never returns null.
+     *
      * This information is needed to correctly process timestamps when we mix timestamps parsed from string
      * representations that use explicit time offset and those that do not (and thus imply the time offset of the
      * time zone the parsing occurred in).

@@ -16,33 +16,23 @@
 
 package io.novaordis.utilities.timestamp;
 
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
-import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/13/16
  */
-public class TimestampUtilTest {
+public class InvalidTimeOffsetException extends RuntimeException {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    private static final Logger log = Logger.getLogger(TimestampUtilTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    public InvalidTimeOffsetException(String message) {
+        super(message);
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
