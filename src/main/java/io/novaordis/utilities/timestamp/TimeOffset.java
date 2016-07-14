@@ -67,6 +67,17 @@ public class TimeOffset {
                 negativeIndex < 0 ? positiveIndex :
                         (positiveIndex < 0 ? negativeIndex : Math.max(positiveIndex, negativeIndex));
 
+        //
+        // in order to qualify, the separator must be either at the beginning of the string, or it must follow
+        // after a space
+        //
+
+        if (separatorIndex != 0 && s.charAt(separatorIndex - 1) != ' ') {
+            //
+            // does not qualify
+            //
+            return null;
+        }
 
         int end = separatorIndex + 5;
         end = end > s.length() ? s.length() : end;

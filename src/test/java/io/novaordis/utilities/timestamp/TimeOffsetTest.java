@@ -101,7 +101,7 @@ public class TimeOffsetTest {
     @Test
     public void fromRFC822String4() throws Exception {
 
-        String s = "something+0800something";
+        String s = "something +0800something";
 
         TimeOffset to = fromRFC822String(s);
         assertNotNull(to);
@@ -123,6 +123,13 @@ public class TimeOffsetTest {
             log.info(msg);
             assertTrue(msg.contains("time offset not within expected limits -1200...+1400"));
         }
+    }
+
+    @Test
+    public void fromRFC822String_Production() throws Exception {
+
+        String s = "Jan-01 2016 12:01:01";
+        assertNull(fromRFC822String(s));
     }
 
     // fromRFC822String() exceptional conditions -----------------------------------------------------------------------
