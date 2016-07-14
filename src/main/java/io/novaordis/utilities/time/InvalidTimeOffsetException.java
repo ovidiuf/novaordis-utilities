@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.timestamp;
+package io.novaordis.utilities.time;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>

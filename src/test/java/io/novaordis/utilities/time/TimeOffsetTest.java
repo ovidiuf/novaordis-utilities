@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.timestamp;
+package io.novaordis.utilities.time;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import static io.novaordis.utilities.timestamp.TimeOffset.fromRFC822String;
+import static io.novaordis.utilities.time.TimeOffset.fromRFC822String;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
