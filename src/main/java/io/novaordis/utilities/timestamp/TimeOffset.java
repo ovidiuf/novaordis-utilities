@@ -209,6 +209,27 @@ public class TimeOffset {
         return s;
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof TimeOffset)) {
+            return false;
+        }
+
+        TimeOffset that = (TimeOffset)o;
+        return timeOffsetMs == that.timeOffsetMs;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 17 + 7 * timeOffsetMs;
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

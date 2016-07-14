@@ -38,15 +38,32 @@ public class TimestampImpl implements Timestamp {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-//    /**
-//     * Use this constructor for synthetic events.
-//     */
-//    public TimestampImpl(long timestampGMT, TimeZone timeZone) {
-//
-//        this.timestampGMT = timestampGMT;
-//        this.timeZone = timeZone;
-//    }
-//
+    /**
+     * Use this constructor for synthetic events. It will default to the current time offset
+     * TimeZone.getDefault().getOffset(System.currentTimeMillis())
+     */
+    public TimestampImpl(long timestampUTC) {
+
+        this(timestampUTC, new TimeOffset(TimeZone.getDefault().getOffset(System.currentTimeMillis())));
+    }
+
+    /**
+     * Use this constructor for synthetic events.
+     *
+     * @param timeOffset cannot be null
+     *
+     * @exception IllegalArgumentException on null time offset.
+     */
+    public TimestampImpl(long timestampUTC, TimeOffset timeOffset) {
+
+        if (timeOffset == null) {
+            throw new IllegalArgumentException("null time offset");
+        }
+
+        this.time = timestampUTC;
+        this.timeOffset = timeOffset;
+    }
+
     /**
      * @throws ParseException if the string cannot be parsed into a date using the given format.
      *
@@ -135,14 +152,6 @@ public class TimestampImpl implements Timestamp {
 //        }
 //
 //        return gmt + timestampTimezoneOffsetMs - timezoneOffsetMs;
-//    }
-//
-//    }
-//
-//    @Override
-//    public String format(DateFormat format, TimeZone timeZone) {
-//
-//        return format.format(getTime());
 //    }
 
     // Public ----------------------------------------------------------------------------------------------------------

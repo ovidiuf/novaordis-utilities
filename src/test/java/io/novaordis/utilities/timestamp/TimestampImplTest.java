@@ -20,7 +20,11 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -53,64 +57,78 @@ public class TimestampImplTest extends TimestampTest {
             log.info(msg);
         }
     }
-//
-//    @Test
-//    public void parsingConstructor_TimezoneOffset() throws Exception {
-//
-//        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        TimestampImpl t = new TimestampImpl("07/01/16 10:00:00 -0800", f);
-//        assertEquals(-8 * Timestamps.MILLISECONDS_IN_AN_HOUR, t.getTimezoneOffsetMs().intValue());
-//    }
-//
-//    @Test
-//    public void parsingConstructor_NoTimezoneOffset() throws Exception {
-//
-//        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//        TimestampImpl t = new TimestampImpl("07/01/16 10:00:00", f);
-//        assertNull(t.getTimezoneOffsetMs());
-//    }
-//
-//    // synthetic constructors ------------------------------------------------------------------------------------------
-//
-//    @Test
-//    public void syntheticConstructor() throws Exception {
-//
-//        TimestampImpl ts = new TimestampImpl(0L);
-//        assertEquals(0L, ts.getTimestampGMT());
-//        assertEquals(null, ts.getTimezoneOffsetMs());
-//
-////        assertEquals("" + ts.getDay(), new SimpleDateFormat("dd").format(0L));
-////        assertEquals("" + ts.getMonth(), new SimpleDateFormat("MM").format(0L));
-////        assertEquals("" + ts.getYear(), new SimpleDateFormat("yy").format(0L));
-//    }
-//
-//    @Test
-//    public void syntheticConstructor_WithTimezoneOffset() throws Exception {
-//
-//        String s = "01/01/1970 00:00:00 +0000";
-//
-//        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//
-//        long d = df.parse(s).getTime();
-//
-//        DateFormat day = new SimpleDateFormat("dd");
-//
-//        day.setTimeZone(TimeZone.getTimeZone("+0100"));
-//
-//        String dayS = day.format(d);
-//
-//
-//        TimestampImpl ts = new TimestampImpl(0L, -8 * Timestamps.MILLISECONDS_IN_AN_HOUR);
-//        assertEquals(0L, ts.getTimestampGMT());
-//        assertEquals(-8 * Timestamps.MILLISECONDS_IN_AN_HOUR, ts.getTimezoneOffsetMs().intValue());
-//
-//        fail("return here");
-//
-////        assertEquals("" + ts.getDay(), new SimpleDateFormat("dd").format(0L));
-////        assertEquals("" + ts.getMonth(), new SimpleDateFormat("MM").format(0L));
-////        assertEquals("" + ts.getYear(), new SimpleDateFormat("yy").format(0L));
-//    }
-//
+
+    @Test
+    public void parsingConstructor_TimezoneOffset() throws Exception {
+
+        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        TimestampImpl t = new TimestampImpl("07/01/16 10:00:00 -0800", f);
+        assertEquals(-8 * Timestamps.MILLISECONDS_IN_AN_HOUR, t.getTimeOffset().getOffset());
+    }
+
+    @Test
+    public void parsingConstructor_NoTimezoneOffset() throws Exception {
+
+        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+        TimestampImpl t = new TimestampImpl("07/01/16 10:00:00", f);
+        assertEquals(
+                TimeZone.getDefault().getOffset(System.currentTimeMillis()),
+                t.getTimeOffset().getOffset());
+    }
+
+    // synthetic constructors ------------------------------------------------------------------------------------------
+
+    @Test
+    public void syntheticConstructor_NullTimeOffset() throws Exception {
+
+        try {
+            new TimestampImpl(0L, null);
+        }
+        catch(IllegalArgumentException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("null time offset"));
+        }
+    }
+
+    @Test
+    public void syntheticConstructor_ExplicitTimeOffset() throws Exception {
+
+        TimestampImpl ts = new TimestampImpl(0L, new TimeOffset(0));
+
+        assertEquals(0L, ts.getTime());
+        assertEquals(new TimeOffset(0), ts.getTimeOffset());
+
+        assertEquals("01", ts.elementToString("dd"));
+        assertEquals("01", ts.elementToString("MM"));
+        assertEquals("70", ts.elementToString("yy"));
+    }
+
+    @Test
+    public void syntheticConstructor() throws Exception {
+
+        TimestampImpl ts = new TimestampImpl(0L);
+
+        assertEquals(0L, ts.getTime());
+
+        TimeOffset defaultTimeOffset = new TimeOffset(TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+        assertEquals(defaultTimeOffset, ts.getTimeOffset());
+
+        if (defaultTimeOffset.getOffset() > 0) {
+
+            assertEquals("01", ts.elementToString("dd"));
+            assertEquals("01", ts.elementToString("MM"));
+            assertEquals("70", ts.elementToString("yy"));
+        }
+        else {
+            //
+            // we're still in 1969
+            //
+            assertEquals("31", ts.elementToString("dd"));
+            assertEquals("12", ts.elementToString("MM"));
+            assertEquals("69", ts.elementToString("yy"));
+        }
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
