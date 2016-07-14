@@ -43,7 +43,16 @@ Commands:
         version. The repository can be the local Maven repository, a directory, a remote server,
         etc.
 
+        Upon release, the changes will be checked into the source repository, and a
+        'release-<version>' tag will be applied, unless the release is a snapshot, in which case the
+        repository won't be tagged. The changes will be pushed into the remote repository.
+
         Also see https://kb.novaordis.com/index.php/Public_Release_Procedure_for_Projects
+
+        Options:
+
+        --no-push - changes won't be pushed into the remote repository. Useful when the release
+          process takes place offline. The changes will have to be manually pushed later.
 
      test - internal release tools testing shortcut. Advanced users only.
 
@@ -1047,6 +1056,14 @@ function do-release() {
 
     local mode # 'snapshot'|'minor'|'major'|'patch' or version string
 
+    #
+    # options:
+    #
+    #  --no-push
+    #
+
+    local do_push_option=true
+
     local i=0
     while [ ${i} -lt ${#arguments[*]} ]; do
         local arg=${arguments[${i}]}
@@ -1054,8 +1071,17 @@ function do-release() {
         if [ -z "${mode}" ]; then
             mode=${arg}
         fi
+        if [ "${arg:0:2}" = "--" ]; then
+            if [ "--no-push" = ${arg} ]; then
+                do_push_option=false
+            else
+                fail "unknown option: ${arg}"
+            fi
+        fi
         ((i++))
     done
+
+    debug "do_push_option: ${do_push_option}"
 
     #
     # checking pre-requisites
@@ -1109,7 +1135,11 @@ function do-release() {
         tagged=true
     fi
 
-    git push --follow-tags && info "git push ok" || fail "git push failed"
+    if ${do_push_option}; then
+        git push --follow-tags && info "git push ok" || fail "git push failed"
+    else
+        info "got --no-push, we don't push to the remote repository"
+    fi
 
     #
     # If we release externally (as a zip file), we only need to create the JAR locally in the project, so we package.

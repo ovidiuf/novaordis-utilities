@@ -209,41 +209,6 @@ public class TimeOffset {
         return s;
     }
 
-//    public static TimeZone shift(TimeZone reference, int hours) {
-//
-//        if (hours == 0) {
-//            return reference;
-//        }
-//
-//        int offset = reference.getRawOffset();
-//        offset += hours * 3600 * 1000;
-//        String[] candidates = TimeZone.getAvailableIDs(offset);
-//
-//        if (candidates.length == 0) {
-//            throw new IllegalArgumentException(
-//                    "no timezone " + hours + " hours apart from " + reference.getDisplayName());
-//        }
-//
-//        //
-//        // pick the first that includes GMT in its name, if not, pick the first one
-//        //
-//
-//        String candidate = null;
-//
-//        for(String s: candidates) {
-//            if (s.toUpperCase().contains("GMT")) {
-//                candidate = s;
-//                break;
-//            }
-//        }
-//
-//        if (candidate == null) {
-//            candidate = candidates[0];
-//        }
-//
-//        return TimeZone.getTimeZone(candidate);
-//    }
-
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

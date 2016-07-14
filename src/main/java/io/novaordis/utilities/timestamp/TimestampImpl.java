@@ -18,6 +18,7 @@ package io.novaordis.utilities.timestamp;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 /**
@@ -85,6 +86,18 @@ public class TimestampImpl implements Timestamp {
         return timeOffset;
     }
 
+    @Override
+    public String elementToString(String s) {
+
+        DateFormat format = new SimpleDateFormat(s);
+        TimeZone synthetic = TimeZone.getTimeZone("UTC");
+
+        // we verified that setting an offset on a TimeZone instance does not have lateral effects on other TimeZone
+        // of the same time returned by TimeZone.getTimeZone().
+        synthetic.setRawOffset(timeOffset.getOffset());
+        format.setTimeZone(synthetic);
+        return format.format(time);
+    }
 
 //    @Override
 //    public long getOffsetFor(TimeZone timeZone) {
@@ -130,17 +143,6 @@ public class TimestampImpl implements Timestamp {
 //    public String format(DateFormat format, TimeZone timeZone) {
 //
 //        return format.format(getTime());
-//    }
-
-//    /**
-//     * @param s a valid SimpleDateFormat format element.
-//     */
-//    @Override
-//    public String getTimestampElement(String s) {
-//
-//        DateFormat format = new SimpleDateFormat(s);
-//        format.setTimeZone(timeZone);
-//        return format.format(time);
 //    }
 
     // Public ----------------------------------------------------------------------------------------------------------

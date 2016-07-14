@@ -21,10 +21,10 @@ import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -44,6 +44,8 @@ public abstract class TimestampTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // time offset never null ------------------------------------------------------------------------------------------
 
     @Test
     public void timeOffsetNeverNull_NoTimeOffsetInTimestampString() throws Exception {
@@ -69,55 +71,136 @@ public abstract class TimestampTest {
         assertNotNull(to);
     }
 
+    // accessors -------------------------------------------------------------------------------------------------------
 
-//    @Test
-//    public void parsingConstructorAndAccessors_TimezoneOffset() throws Exception {
-//
-//        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        Timestamp t = getTimestampToTest("01/01/1970 00:00:00 +0000", df);
-//
-//        assertEquals(0L, t.getTime());
-//        assertEquals(TimeZone.getTimeZone("+0000"), t.getTimeZone());
-//        assertEquals("1", t.getTimestampElement("d"));
-//        assertEquals("01", t.getTimestampElement("dd"));
-//        assertEquals("1", t.getTimestampElement("M"));
-//        assertEquals("01", t.getTimestampElement("MM"));
-//        assertEquals("70", t.getTimestampElement("yy"));
-//        assertEquals("1970", t.getTimestampElement("yyyy"));
-//
-//        log.debug(".");
-//    }
-//
-//    @Test
-//    public void parsingConstructorAndAccessors_NoTimezoneOffset() throws Exception {
-//
-//        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//        String ts = "07/12/15 10:00:00";
-//        Timestamp t = getTimestampToTest(ts, df);
-//
-//        long gmt = t.getTime();
-//        assertEquals(TimeZone.getDefault(), t.getTimeZone());
-//        assertEquals("12", t.getTimestampElement("d"));
-//        assertEquals("12", t.getTimestampElement("dd"));
-//        assertEquals("7", t.getTimestampElement("M"));
-//        assertEquals("07", t.getTimestampElement("MM"));
-//        assertEquals("15", t.getTimestampElement("yy"));
-//        assertEquals("2015", t.getTimestampElement("yyyy"));
-//
-//        //
-//        // make sure the GMT timestamp is correctly calculated
-//        //
-//
-//        DateFormat referenceDf = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        String reference = referenceDf.format(new Date());
-//        reference = reference.substring(reference.lastIndexOf(' ') + 1);
-//        reference = ts + " " + reference;
-//
-//        long referenceGmt = referenceDf.parse(reference).getTime();
-//
-//        assertEquals(gmt, referenceGmt);
-//    }
-//
+    @Test
+    public void accessors_NoTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00", new SimpleDateFormat("MM/dd/yy HH:mm:ss"));
+
+        long time = t.getTime();
+        TimeOffset to = t.getTimeOffset();
+
+        assertEquals(time, new SimpleDateFormat("MM/dd/yy HH:mm:ss").parse("07/01/16 10:00:00").getTime());
+
+        //
+        // the time offset should be the default one at the time of the parsing
+        //
+
+        int offset = to.getOffset();
+        assertEquals(offset, TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+
+        String s = to.toRFC822String();
+        log.info(s);
+    }
+
+    @Test
+    public void accessors_ZeroTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00 +0000", new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        long time = t.getTime();
+        TimeOffset to = t.getTimeOffset();
+
+        assertEquals(time, new SimpleDateFormat("MM/dd/yy HH:mm:ss Z").parse("07/01/16 10:00:00 +0000").getTime());
+
+        int offset = to.getOffset();
+        assertEquals(0, offset);
+
+        String s = to.toRFC822String();
+        assertEquals("+0000", s);
+    }
+
+    @Test
+    public void accessors_UTC() throws Exception {
+
+        Timestamp t = getTimestampToTest("01/01/70 00:00:00 +0000", new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        long time = t.getTime();
+        TimeOffset to = t.getTimeOffset();
+
+        assertEquals(0, time);
+
+        int offset = to.getOffset();
+        assertEquals(0, offset);
+
+        String s = to.toRFC822String();
+        assertEquals("+0000", s);
+    }
+
+    @Test
+    public void accessors_NonZeroTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00 +1100", new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        long time = t.getTime();
+        TimeOffset to = t.getTimeOffset();
+
+        assertEquals(time, new SimpleDateFormat("MM/dd/yy HH:mm:ss Z").parse("07/01/16 10:00:00 +1100").getTime());
+
+        int offset = to.getOffset();
+        assertEquals(11 * 3600 * 1000, offset);
+
+        String s = to.toRFC822String();
+        assertEquals("+1100", s);
+    }
+
+    // elementToString() -----------------------------------------------------------------------------------------------
+
+    /**
+     * elementToString() only works if we have the possiblity to modify a TimeZone instance without affecting the
+     * same type of TimeZone. We test that.
+     */
+    @Test
+    public void testTimeZoneInstancesIsolated() throws Exception {
+
+        TimeZone synthetic = TimeZone.getTimeZone("UTC");
+
+        assertEquals(0L, synthetic.getRawOffset());
+
+        synthetic.setRawOffset(7200);
+
+        assertEquals(7200, synthetic.getRawOffset());
+
+        assertFalse(synthetic.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("12/20/16")));
+        assertFalse(synthetic.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("06/20/16")));
+
+        TimeZone otherUtc = TimeZone.getTimeZone("UTC");
+
+        //
+        // make sure that setting offset on the UTC time zone did not affect other instances
+        //
+        assertEquals(0, otherUtc.getRawOffset());
+    }
+
+    @Test
+    public void elementToString_NoTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00", new SimpleDateFormat("MM/dd/yy HH:mm:ss"));
+
+        String s = t.elementToString("MM/dd/yy HH:mm:ss");
+        assertEquals("07/01/16 10:00:00", s);
+    }
+
+    @Test
+    public void elementToString_ZeroTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00 +0000", new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        String s = t.elementToString("MM/dd/yy HH:mm:ss");
+        assertEquals("07/01/16 10:00:00", s);
+    }
+
+    @Test
+    public void elementToString_NonZeroTimeOffsetInTimestampString() throws Exception {
+
+        Timestamp t = getTimestampToTest("07/01/16 10:00:00 +1100", new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        String s = t.elementToString("MM/dd/yy HH:mm:ss");
+        assertEquals("07/01/16 10:00:00", s);
+    }
+
+
 //    // format() --------------------------------------------------------------------------------------------------------
 //
 //    @Test
@@ -144,31 +227,6 @@ public abstract class TimestampTest {
 //        assertEquals("08:00:00", result);
 //    }
 //
-//    @Test
-//    public void test() throws Exception {
-//
-//        Date d = new Date();
-//
-//
-//        String s = "01/01/16 10:00:00";
-//
-//        TimeZone tz = TimeZone.getTimeZone("GMT-0400");
-//        TimeZone.setDefault(tz);
-//        System.out.println("# current time zone: " + TimeZone.getDefault());
-//
-//        DateFormat df = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        System.out.println("#                  : " + df.parse(s).getTime());
-//
-//        TimeZone tz2 = TimeZone.getTimeZone("GMT-0800");
-//        TimeZone.setDefault(tz2);
-//        System.out.println("# current time zone: " + TimeZone.getDefault());
-//
-//        DateFormat df2 = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        System.out.println("#                  : " + df2.parse(s).getTime());
-//    }
-
     // Protected -------------------------------------------------------------------------------------------------------
 
     protected abstract Timestamp getTimestampToTest(String timestampAsString, DateFormat dateFormat) throws Exception;

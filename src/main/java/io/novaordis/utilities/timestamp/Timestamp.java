@@ -16,9 +16,6 @@
 
 package io.novaordis.utilities.timestamp;
 
-import java.text.DateFormat;
-import java.util.TimeZone;
-
 /**
  * An interface that binds together a UTC timestamp (a universal time timestamp, expressed in milliseconds from
  * 01/01/1972 00:00:00 GMT and not accounting for daylight saving), and optionally a time offset, as specified in the
@@ -56,15 +53,17 @@ public interface Timestamp {
      */
     TimeOffset getTimeOffset();
 
-//    /**
-//     * @param formatElement a valid SimpleDateFormat format element.
-//     *
-//     * @return the specified fragment corresponding to the timestamp in its original timezone (the one returned
-//     * by getTimezone()). For example, if the timestamp was represented in a log as "12/31/16 10:00:00 -0800", then
-//     * getTimestampElement("d") returns "31", getTimestampElement("M") returns "12", etc.
-//     */
-//    String getTimestampElement(String formatElement);
+    /**
+     * @param formatElement a valid SimpleDateFormat format element ("M") or a combination of elements ("MM/dd/yy").
+     *
+     * @return the specified fragment corresponding to the timestamp in its original string representation - the
+     * way it was read from the logs. For example, if the timestamp was represented in a log as
+     * "12/31/16 10:00:00 -0800", then getTimestampElement("d") returns "31", getTimestampElement("M") returns "12",
+     * etc.
+     */
+    String elementToString(String formatElement);
 
+//
 //    String format(DateFormat dateFormat, int timeOffset);
 //
 
