@@ -116,43 +116,17 @@ public class TimestampImpl implements Timestamp {
         return format.format(time);
     }
 
-//    @Override
-//    public long getOffsetFor(TimeZone timeZone) {
-//
-//        throw new RuntimeException("adjustForTimeZone() NOT YET IMPLEMENTED");
-//
-//    /**
-//     * Calculates a new GMT-relative timestamp offset for timezone. The value returned allows for correct comparison
-//     * of the given log timestamp with a value parsed in the given timezone.
-//     *
-//     * Example:
-//     *
-//     * int currentTimezoneOffset = TimeZone.getDefault().getDSTSavings() + TimeZone.getDefault().getRawOffset();
-//     *
-//     * long timeToCompare = (new SimpleDateFormat("MM/dd/yy HH:mm:ss").parse().getTime();
-//     *
-//     * long theOtherTimeToCompare = Timestamps.adjustForTimezone(timestampToCompare, currentTimezoneOffset);
-//     *
-//     * ... compare timeToCompare and timeToCompare
-//     *
-//     * @param timezoneOffsetMs the timezone offset the event we want to compare with was parsed in.
-//     */
-//    public static long adjustForTimezone(Timestamp t, int timezoneOffsetMs) {
-//
-//        Integer timestampTimezoneOffsetMs = t.getTimezoneOffsetMs();
-//        long gmt = t.getTimestampGMT();
-//
-//        if (timestampTimezoneOffsetMs == null) {
-//
-//            //
-//            // the incoming timestamp was not parsed in the contest of a specific timestamp, which means it
-//            // used the default one, so adjustment is a noop
-//            //
-//            return gmt;
-//        }
-//
-//        return gmt + timestampTimezoneOffsetMs - timezoneOffsetMs;
-//    }
+    /**
+     * Calculates a new UTC time value for this timestamp, adjusted for the given time offset. The value thus returned
+     * allows for correct comparison this timestamp with a value parsed in a time zone with the given time offset.
+     *
+     * @param timeOffsetMs the time offset to adjust to, specified in milliseconds.
+     */
+    @Override
+    public long adjustForTimeOffset(int timeOffsetMs) {
+
+        return time + this.timeOffset.getOffset() - timeOffsetMs;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 

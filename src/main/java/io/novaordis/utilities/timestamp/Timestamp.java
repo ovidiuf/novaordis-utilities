@@ -63,6 +63,8 @@ public interface Timestamp {
      */
     String elementToString(String formatElement);
 
+    long adjustForTimeOffset(int timeOffset);
+
 //
 //    String format(DateFormat dateFormat, int timeOffset);
 //
