@@ -19,6 +19,7 @@ package io.novaordis.utilities.time;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -604,6 +605,68 @@ public class TimeOffsetTest {
     public void isValidOffset5() throws Exception {
 
         assertFalse(TimeOffset.isValidOffset(TimeOffset.HIGHEST_VALID_TIME_OFFSET + 1));
+    }
+
+    // getTimeZone() ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getTimeZone_UTC() throws Exception {
+
+        TimeOffset timeOffset = new TimeOffset("+0000");
+
+        TimeZone timeZone = timeOffset.getTimeZone();
+
+        assertEquals(0, timeZone.getRawOffset());
+        assertEquals(0, timeZone.getDSTSavings());
+        assertFalse(timeZone.observesDaylightTime());
+        assertFalse(timeZone.useDaylightTime());
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("06/20/16")));
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("12/21/16")));
+
+        TimeZone timeZone2 = timeOffset.getTimeZone();
+
+        assertTrue(timeZone.equals(timeZone2));
+        assertTrue(timeZone != timeZone2);
+    }
+
+    @Test
+    public void getTimeZone_Negative() throws Exception {
+
+        TimeOffset timeOffset = new TimeOffset("-0100");
+
+        TimeZone timeZone = timeOffset.getTimeZone();
+
+        assertEquals(-1 * 3600 * 1000, timeZone.getRawOffset());
+        assertEquals(0, timeZone.getDSTSavings());
+        assertFalse(timeZone.observesDaylightTime());
+        assertFalse(timeZone.useDaylightTime());
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("06/20/16")));
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("12/21/16")));
+
+        TimeZone timeZone2 = timeOffset.getTimeZone();
+
+        assertTrue(timeZone.equals(timeZone2));
+        assertTrue(timeZone != timeZone2);
+    }
+
+    @Test
+    public void getTimeZone_Positive() throws Exception {
+
+        TimeOffset timeOffset = new TimeOffset("+0200");
+
+        TimeZone timeZone = timeOffset.getTimeZone();
+
+        assertEquals(2 * 3600 * 1000, timeZone.getRawOffset());
+        assertEquals(0, timeZone.getDSTSavings());
+        assertFalse(timeZone.observesDaylightTime());
+        assertFalse(timeZone.useDaylightTime());
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("06/20/16")));
+        assertFalse(timeZone.inDaylightTime(new SimpleDateFormat("MM/dd/yy").parse("12/21/16")));
+
+        TimeZone timeZone2 = timeOffset.getTimeZone();
+
+        assertTrue(timeZone.equals(timeZone2));
+        assertTrue(timeZone != timeZone2);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

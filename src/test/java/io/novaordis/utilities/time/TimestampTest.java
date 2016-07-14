@@ -295,108 +295,87 @@ public abstract class TimestampTest {
         assertTrue(original.equals(representation));
     }
 
-//
-//    @Test
-//    public void format_NoSourceTimezoneOffset() throws Exception {
-//
-//        DateFormat sourceFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
-//        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        Timestamp ts = new TimestampImpl("16/12/31 01:01:01", sourceFormat);
-//
-//        String result = Timestamps.format(ts, targetFormat, null);
-//
-//        assertEquals("12/31/16 01:01:01", result);
-//    }
-//
-//    @Test
-//    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_DifferentTimezone() throws Exception {
-//
-//        TimeZone defaultTimeZone = TimeZone.getDefault();
-//        int ourTimezoneOffsetHours =
-//                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
-//        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4;
-//        if (sourceTimezoneOffset < Timestamps.LOWEST_VALID_TIMEZONE_OFFSET_HOURS) {
-//            sourceTimezoneOffset = Timestamps.HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
-//        }
-//
-//        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
-//
-//        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
-//
-//        String result = Timestamps.format(ts, targetFormat, null);
-//
-//        assertEquals("07/11/15 11:00:00", result);
-//    }
-//
-//    @Test
-//    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_SameTimezone() throws Exception {
-//
-//        TimeZone defaultTimeZone = TimeZone.getDefault();
-//        int ourTimezoneOffsetHours =
-//                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
-//
-//        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        String sourceTimestamp = "07/11/15 11:00:00 " + Timestamps.timezoneOffsetHoursToString(ourTimezoneOffsetHours);
-//
-//        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
-//
-//        String result = Timestamps.format(ts, targetFormat, null);
-//
-//        assertEquals("07/11/15 11:00:00", result);
-//    }
-//
-//    @Test
-//    public void format_SourceHasTimezoneOffset_TargetHasTimezoneOffset() throws Exception {
-//
-//        TimeZone defaultTimeZone = TimeZone.getDefault();
-//        int ourTimezoneOffsetHours =
-//                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ Timestamps.MILLISECONDS_IN_AN_HOUR;
-//
-//        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4;
-//        if (sourceTimezoneOffset < Timestamps.LOWEST_VALID_TIMEZONE_OFFSET_HOURS) {
-//            sourceTimezoneOffset = Timestamps.HIGHEST_VALID_TIMEZONE_OFFSET_HOURS;
-//        }
-//
-//        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        DateFormat targetFormat = new SimpleDateFormat("yy/dd/MM HH:mm:ss Z");
-//        DateFormat referenceFormatNoTimezone = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//
-//        String timestampString = "07/10/15 10:00:00 " + Timestamps.timezoneOffsetHoursToString(sourceTimezoneOffset);
-//
-//        Timestamp ts = new TimestampImpl(timestampString, sourceFormat);
-//
-//        String result = Timestamps.format(ts, targetFormat, null);
-//
-//        String reference = Timestamps.format(ts, referenceFormatNoTimezone, null);
-//
-//        String resultHourFragment = extractHourFragment(result);
-//        String referenceHourFragment = extractHourFragment(reference);
-//
-//        assertFalse(resultHourFragment.equals(referenceHourFragment));
-//    }
-//
-//    // doesIncludeTimezoneSpecification() ------------------------------------------------------------------------------
-//
-//    @Test
-//    public void doesIncludeTimezoneSpecification_ItDoes() throws Exception {
-//
-//        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
-//        assertTrue(Timestamps.doesIncludeTimezoneSpecification(f));
-//    }
-//
-//    @Test
-//    public void doesIncludeTimezoneSpecification_ItDoesNot() throws Exception {
-//
-//        DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-//        assertFalse(Timestamps.doesIncludeTimezoneSpecification(f));
-//    }
-//
+
+    @Test
+    public void format_NoSourceTimezoneOffset() throws Exception {
+
+        DateFormat sourceFormat = new SimpleDateFormat("yy/MM/dd HH:mm:ss");
+        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        Timestamp ts = new TimestampImpl("16/12/31 01:01:01", sourceFormat);
+
+        String result = ts.format(targetFormat);
+
+        assertEquals("12/31/16 01:01:01", result);
+    }
+
+    @Test
+    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_DifferentTimezone() throws Exception {
+
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        int ourTimezoneOffsetHours =
+                (defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings())/ (3600 * 1000);
+        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4;
+        if (sourceTimezoneOffset < TimeOffset.LOWEST_VALID_TIME_OFFSET / (3600 * 1000)) {
+            sourceTimezoneOffset = TimeOffset.HIGHEST_VALID_TIME_OFFSET / (3600 * 1000);
+        }
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+
+        TimeOffset to = new TimeOffset(sourceTimezoneOffset * 3600 * 1000);
+
+        String sourceTimestamp = "07/11/15 11:00:00 " +  to.toRFC822String();
+
+        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
+
+        String result = ts.format(targetFormat);
+
+        assertEquals("07/11/15 11:00:00", result);
+    }
+
+    @Test
+    public void format_SourceHasTimezoneOffset_TargetDoesNotHaveTimezoneOffset_SameTimezone() throws Exception {
+
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+        int ourTimezoneOffsetHours = defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings();
+        TimeOffset to = new TimeOffset(ourTimezoneOffsetHours);
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        String sourceTimestamp = "07/11/15 11:00:00 " + to.toRFC822String();
+
+        DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        Timestamp ts = new TimestampImpl(sourceTimestamp, sourceFormat);
+
+        String result = ts.format(targetFormat);
+
+        assertEquals("07/11/15 11:00:00", result);
+    }
+
+    @Test
+    public void format_SourceHasTimezoneOffset_TargetHasTimezoneOffset() throws Exception {
+
+        DateFormat sourceFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss Z");
+        DateFormat targetFormat = new SimpleDateFormat("yy/dd/MM HH:mm:ss Z");
+        DateFormat refFormatNoTimeOffset = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        TimeOffset to = getADifferentTimeOffsetThanOurs();
+        String timestampString = "07/10/15 10:00:00 " + to.toRFC822String();
+
+        Timestamp ts = new TimestampImpl(timestampString, sourceFormat);
+
+        String result = ts.format(targetFormat);
+
+        assertEquals("15/10/07 10:00:00 " + to.toRFC822String(), result);
+
+        String reference = ts.format(refFormatNoTimeOffset);
+
+        // it should be identical with the source
+        assertEquals("07/10/15 10:00:00", reference);
+    }
+
     // adjustTime() ---------------------------------------------------------------------------------------------
 
     @Test
@@ -447,5 +426,20 @@ public abstract class TimestampTest {
     protected abstract Timestamp getTimestampToTest(String timestampAsString, DateFormat dateFormat) throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    private TimeOffset getADifferentTimeOffsetThanOurs() {
+
+        TimeZone defaultTimeZone = TimeZone.getDefault();
+
+        int ourTimezoneOffsetHours = defaultTimeZone.getRawOffset() + defaultTimeZone.getDSTSavings();
+
+        int sourceTimezoneOffset = ourTimezoneOffsetHours - 4 * 3600 * 1000;
+
+        if (sourceTimezoneOffset < TimeOffset.LOWEST_VALID_TIME_OFFSET) {
+            sourceTimezoneOffset = TimeOffset.HIGHEST_VALID_TIME_OFFSET - 2 * 3600 * 1000;
+        }
+
+        return new TimeOffset(sourceTimezoneOffset);
+    }
 
 }

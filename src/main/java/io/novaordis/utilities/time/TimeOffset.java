@@ -246,6 +246,15 @@ public class TimeOffset {
         return s;
     }
 
+    /**
+     * @return a TimeZone instance with the same raw time offset as this TimeOffset instance and that does not observe
+     * the daylight saving.
+     */
+    public TimeZone getTimeZone() {
+
+        return TimeZone.getTimeZone("GMT" + toRFC822String());
+    }
+
     @Override
     public boolean equals(Object o) {
 
@@ -265,6 +274,12 @@ public class TimeOffset {
     public int hashCode() {
 
         return 17 + 7 * timeOffsetMs;
+    }
+
+    @Override
+    public String toString() {
+
+        return toRFC822String();
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -123,10 +123,32 @@ public class TimestampImpl implements Timestamp {
             throw new IllegalArgumentException("null target format");
         }
 
-        long adjustedTimestamp =
-                time - TimeZone.getDefault().getOffset(System.currentTimeMillis()) + timeOffset.getOffset();
+        //
+        // we only need to adjust the timestamp to compensate for an implicit default time offset, if the target
+        // format specifies a time offset, use the un-adjusted timestamp and the stored time offset
+        //
 
-        return format.format(adjustedTimestamp);
+        if (DateFormatUtil.hasTimeOffset(format)) {
+
+            //
+            // TODO: inefficient, but I don't see any other way of doing this and not modifying by lateral effect
+            //       the function parameter
+            //
+            DateFormat cloneFormat = (DateFormat)format.clone();
+            cloneFormat.setTimeZone(timeOffset.getTimeZone());
+            return cloneFormat.format(time);
+        }
+        else {
+
+            //
+            // adjust for the difference in the time zone
+            //
+
+            long adjustedTimestamp =
+                    time - TimeZone.getDefault().getOffset(System.currentTimeMillis()) + timeOffset.getOffset();
+
+            return format.format(adjustedTimestamp);
+        }
     }
 
     @Override
