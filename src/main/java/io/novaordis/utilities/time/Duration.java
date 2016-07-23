@@ -66,6 +66,7 @@ public class Duration {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String literal;
     private long durationMs;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -73,11 +74,13 @@ public class Duration {
     public Duration(long durationMs) {
 
         this.durationMs = durationMs;
+        this.literal = durationMs + "ms";
     }
 
     public Duration(String s) throws DurationFormatException {
 
         this.durationMs = stringToMs(s);
+        this.literal = s;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -85,6 +88,12 @@ public class Duration {
     public long getMilliseconds() {
 
         return durationMs;
+    }
+
+    @Override
+    public String toString() {
+
+        return literal;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
