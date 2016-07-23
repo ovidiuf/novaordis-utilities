@@ -1187,9 +1187,9 @@ function do-release() {
 
     git add . && info "git add ok" || fail "git add . failed"
 
-    git commit -m "release ${next_version}" && info "git commit ok" || fail "git commit failed"
+    git commit -m "release ${release_version}" && info "git commit ok" || fail "git commit failed"
 
-    local tag=release-${next_version}
+    local tag=release-${release_version}
     local tagged
 
     if [[ ${tag} =~ SNAPSHOT ]]; then
@@ -1199,7 +1199,7 @@ function do-release() {
         info "current release is a snapshot, won't tag the repository"
         tagged=false
     else
-        git tag -m "release ${next_version}" "${tag}" && info "git tag ok, tagged with ${tag}" || fail "git tag failed"
+        git tag -m "release ${release_version}" "${tag}" && info "git tag ok, tagged with ${tag}" || fail "git tag failed"
         tagged=true
     fi
 
@@ -1239,7 +1239,7 @@ function do-release() {
     yes "setting next local version ${next_local_version}, is this OK?" || return 0;
     set-version ${next_local_version}
 
-    local msg="A new ${mode} version (${next_version}) was released"
+    local msg="A new ${mode} version (${release_version}) was released"
 
     if ${tagged}; then
         msg="${msg}, committed to repository and tagged."
