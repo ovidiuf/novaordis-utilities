@@ -1,0 +1,2 @@
+
+* Moved here UserErrorException from dependencies.
