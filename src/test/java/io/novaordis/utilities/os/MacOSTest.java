@@ -17,43 +17,33 @@
 package io.novaordis.utilities.os;
 
 /**
- * A proxy for the underlying operating system, to be used for native command execution.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
  */
-public interface OS {
+public class MacOSTest extends OSTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    static OS getInstance() {
+    // Attributes ------------------------------------------------------------------------------------------------------
 
-        String osName = System.getProperty("os.name");
-
-        if (osName == null) {
-            throw new IllegalStateException("'os.name' system property not available");
-        }
-
-        String lcOsName = osName.toLowerCase();
-
-        if (lcOsName.contains("mac")) {
-            return new MacOS();
-        }
-        else if (lcOsName.contains("linux")) {
-            return new LinuxOS();
-        }
-        else if (lcOsName.contains("windows")) {
-            return new WindowsOS();
-        }
-        else {
-            throw new IllegalStateException("unrecognized 'os.name' value " + osName);
-        }
-    }
+    // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    NativeExecutionResult execute(String command) throws NativeExecutionException;
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected MacOS getOSToTest() throws Exception {
+
+        return new MacOS();
+    }
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 
 }

@@ -17,43 +17,34 @@
 package io.novaordis.utilities.os;
 
 /**
- * A proxy for the underlying operating system, to be used for native command execution.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
  */
-public interface OS {
+public class WindowsOS extends OSBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    static OS getInstance() {
+    // Attributes ------------------------------------------------------------------------------------------------------
 
-        String osName = System.getProperty("os.name");
+    // Constructors ----------------------------------------------------------------------------------------------------
 
-        if (osName == null) {
-            throw new IllegalStateException("'os.name' system property not available");
-        }
+    // OS implementation -----------------------------------------------------------------------------------------------
 
-        String lcOsName = osName.toLowerCase();
-
-        if (lcOsName.contains("mac")) {
-            return new MacOS();
-        }
-        else if (lcOsName.contains("linux")) {
-            return new LinuxOS();
-        }
-        else if (lcOsName.contains("windows")) {
-            return new WindowsOS();
-        }
-        else {
-            throw new IllegalStateException("unrecognized 'os.name' value " + osName);
-        }
+    @Override
+    public NativeExecutionResult execute(String command) throws NativeExecutionException {
+        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    NativeExecutionResult execute(String command) throws NativeExecutionException;
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 
 }

@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.os;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
@@ -23,6 +25,8 @@ package io.novaordis.utilities.os;
 public class NativeExecutionResultTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = Logger.getLogger(NativeExecutionResultTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 

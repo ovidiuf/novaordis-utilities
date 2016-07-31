@@ -16,6 +16,11 @@
 
 package io.novaordis.utilities.os;
 
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
@@ -24,6 +29,8 @@ public abstract class OSTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = Logger.getLogger(NativeExecutionResultTest.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -31,6 +38,16 @@ public abstract class OSTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // getInstance() ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getInstance() throws Exception {
+
+        OS os = OS.getInstance();
+        log.info(os);
+        assertNotNull(os);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
