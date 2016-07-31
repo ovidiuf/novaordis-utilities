@@ -1206,8 +1206,6 @@ function do-release() {
     next_local_version=$(compute-next-version "${current_version}" snapshot) || exit 1
     debug "next local version ${next_local_version}"
 
-    exit 255
-
     yes "setting next local version ${next_local_version}, is this OK?" || return 0;
     set-version ${next_local_version}
 
