@@ -28,6 +28,10 @@ public interface OS {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    static OS getInstance() {
+        throw new RuntimeException("getInstance NOT YET IMPLEMENTED");
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     NativeExecutionResult execute(String command) throws NativeExecutionException;
