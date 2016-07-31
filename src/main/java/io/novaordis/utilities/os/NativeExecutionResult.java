@@ -28,33 +28,64 @@ public class NativeExecutionResult {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private int exitStatus;
+    private String stdout;
+    private String stderr;
+
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    /**
+     * @param exitStatus an exit status that must be between 0 and 255. Anything else will trigger an
+     *                   IllegalArgumentException.
+     * @param stdoutContent - null is acceptable. Multi-line content is acceptable.
+     * @param stderrContent- null is acceptable. Multi-line content is acceptable.
+     *
+     * @exception IllegalArgumentException
+     */
+    public NativeExecutionResult(int exitStatus, String stdoutContent, String stderrContent) {
+
+        if (exitStatus < 0 || exitStatus > 255) {
+            throw new IllegalArgumentException("illegal exit status " + exitStatus);
+        }
+
+        this.exitStatus = exitStatus;
+        this.stdout = stdoutContent;
+        this.stderr = stderrContent;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * @return true the corresponding command execution was a success - it completed and returned a zero status code.
+     * @return true the corresponding command execution was a success - it completed and returned a zero exit status.
      */
     public boolean isSuccess() {
 
-        throw new RuntimeException("isSuccess() NOT YET IMPLEMENTED");
+        return exitStatus == 0;
     }
 
     /**
-     * @return the content sent by the corresponding command to stdout during the execution.
+     * @return the content sent by the corresponding command to stdout during the execution. May return null.
      */
     public String getStdout() {
 
-        throw new RuntimeException("getStdout() NOT YET IMPLEMENTED");
-
+        return stdout;
     }
 
     /**
-     * @return the content sent by the corresponding command to stderr during the execution.
+     * @return the content sent by the corresponding command to stderr during the execution. May return null.
      */
     public String getStderr() {
 
-        throw new RuntimeException("getStderr() NOT YET IMPLEMENTED");
+        return stderr;
+    }
+
+    /**
+     * @return the corresponding native command exit status. Guaranteed to return a valid value between 0 and 255.
+     */
+    public int getExitStatus() {
+
+        return exitStatus;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
