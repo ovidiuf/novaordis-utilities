@@ -79,7 +79,8 @@ abstract class OSBase implements OS {
             return new NativeExecutionResult(exitCode, input, error);
         }
         catch(Exception e) {
-            throw new NativeExecutionException(e);
+
+            throw new NativeExecutionException("failed to execute command \"" + command + "\"", e);
         }
     }
 
