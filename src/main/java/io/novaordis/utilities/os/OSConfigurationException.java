@@ -17,10 +17,12 @@
 package io.novaordis.utilities.os;
 
 /**
+ * Thrown when a native execution cannot complete.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 1/21/16
  */
-public class MacOS extends OSBase {
+public class OSConfigurationException extends Exception {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,16 +32,12 @@ public class MacOS extends OSBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // OS implementation -----------------------------------------------------------------------------------------------
-
-    @Override
-    public MacOSConfiguration getConfiguration() {
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+    public OSConfigurationException(String message) {
+        super(message);
     }
 
-    @Override
-    public NativeExecutionResult execute(String command) throws NativeExecutionException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+    public OSConfigurationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

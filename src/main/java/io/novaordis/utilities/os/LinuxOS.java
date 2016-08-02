@@ -28,9 +28,34 @@ public class LinuxOS extends OSBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private LinuxOSConfiguration configuration;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    protected LinuxOS() throws Exception {
+
+        //
+        // initialize the configuration
+        //
+
+        configuration = new LinuxOSConfiguration(this);
+    }
+
+    /**
+     * Needed for testing.
+     */
+    protected LinuxOS(LinuxOSConfiguration configuration) throws Exception {
+
+        this.configuration = configuration;
+    }
+
     // OS implementation -----------------------------------------------------------------------------------------------
+
+    @Override
+    public OSConfiguration getConfiguration() {
+
+        return configuration;
+    }
 
     @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {

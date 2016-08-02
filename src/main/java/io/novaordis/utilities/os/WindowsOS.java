@@ -33,6 +33,11 @@ public class WindowsOS extends OSBase {
     // OS implementation -----------------------------------------------------------------------------------------------
 
     @Override
+    public WindowsOSConfiguration getConfiguration() {
+        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+    }
+
+    @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {
         throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }

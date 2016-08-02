@@ -17,10 +17,12 @@
 package io.novaordis.utilities.os;
 
 /**
+ * @see OSConfiguration
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 8/1/16
  */
-public class MacOS extends OSBase {
+public class WindowsOSConfiguration implements OSConfiguration {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,16 +32,19 @@ public class MacOS extends OSBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // OS implementation -----------------------------------------------------------------------------------------------
-
-    @Override
-    public MacOSConfiguration getConfiguration() {
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+    /**
+     * This is where the instance caches all the values, and this is where the instance has a chance to throw an
+     * exception, if something goes wrong.
+     */
+    public WindowsOSConfiguration() throws Exception {
     }
 
+    // OSConfiguration implementation ----------------------------------------------------------------------------------
+
     @Override
-    public NativeExecutionResult execute(String command) throws NativeExecutionException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+    public int getMemoryPageSize() {
+
+        throw new RuntimeException("NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

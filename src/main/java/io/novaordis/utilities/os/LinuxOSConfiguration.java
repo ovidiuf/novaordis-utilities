@@ -17,10 +17,12 @@
 package io.novaordis.utilities.os;
 
 /**
+ * @see OSConfiguration
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 8/1/16
  */
-public class MacOS extends OSBase {
+public class LinuxOSConfiguration implements OSConfiguration {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,18 +30,55 @@ public class MacOS extends OSBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private int memoryPageSize;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // OS implementation -----------------------------------------------------------------------------------------------
+    /**
+     * This is where the instance caches all the values, and this is where the instance has a chance to throw an
+     * exception, if something goes wrong.
+     *
+     * The constructor must be package protected, we are not supposed to invoke it from outside the package. The proper
+     * way to get a LinuxOSConfiguration instance is through LinuxOS.getConfiguration();
+     *
+     * @see LinuxOS#getConfiguration()
+     *
+     * @throws OSConfigurationException if we encounter a problem while trying to read the configuration.
+     */
+    LinuxOSConfiguration(LinuxOS linuxOS) throws OSConfigurationException {
 
-    @Override
-    public MacOSConfiguration getConfiguration() {
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+        NativeExecutionResult result;
+
+        try {
+
+            result = linuxOS.execute("getconf PAGESIZE");
+        }
+        catch (Exception e) {
+            throw new OSConfigurationException("failed to run getconf PAGESIZE", e);
+        }
+
+        if (!result.isSuccess()) {
+            throw new OSConfigurationException("failed to get the system memory page size: " + result.getStderr());
+        }
+
+        String s = result.getStdout().trim();
+
+        try {
+
+            memoryPageSize = Integer.parseInt(s);
+        }
+        catch(Exception e) {
+            throw new OSConfigurationException(
+                    "system memory page size read from the system is not an integer: " + s, e);
+        }
     }
 
+    // OSConfiguration implementation ----------------------------------------------------------------------------------
+
     @Override
-    public NativeExecutionResult execute(String command) throws NativeExecutionException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+    public int getMemoryPageSize() {
+
+        return memoryPageSize;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

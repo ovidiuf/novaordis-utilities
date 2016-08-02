@@ -17,48 +17,28 @@
 package io.novaordis.utilities.os;
 
 /**
- * A proxy for the underlying operating system, to be used for native command execution.
+ *
+ * An instance that give access to underlying O/S configuration values that do not change as long as the system is
+ * not rebooted (an example is the memory page size). The instance reads those values at initialization, and then it
+ * keeps returned the cached values. Instances implementing this interface can only be obtained through the
+ * getConfiguration() method of the OS instance.
+ *
+ * @see OS#getConfiguration()
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 8/1/16
  */
-public interface OS {
+public interface OSConfiguration {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    static OS getInstance() throws Exception {
-
-        String osName = System.getProperty("os.name");
-
-        if (osName == null) {
-            throw new IllegalStateException("'os.name' system property not available");
-        }
-
-        String lcOsName = osName.toLowerCase();
-
-        if (lcOsName.contains("mac")) {
-            return new MacOS();
-        }
-        else if (lcOsName.contains("linux")) {
-            return new LinuxOS();
-        }
-        else if (lcOsName.contains("windows")) {
-            return new WindowsOS();
-        }
-        else {
-            throw new IllegalStateException("unrecognized 'os.name' value " + osName);
-        }
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * @see OSConfiguration
+     * @return the underlying O/S memory page size, in bytes. On Linux, that value is obtained by running
+     * getconf PAGESIZE.
      */
-    OSConfiguration getConfiguration();
-
-    NativeExecutionResult execute(String command) throws NativeExecutionException;
-
+    int getMemoryPageSize();
 }

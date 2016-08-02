@@ -16,11 +16,15 @@
 
 package io.novaordis.utilities.os;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 8/1/16
  */
-public class MacOS extends OSBase {
+public abstract class OSConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,23 +34,23 @@ public class MacOS extends OSBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // OS implementation -----------------------------------------------------------------------------------------------
-
-    @Override
-    public MacOSConfiguration getConfiguration() {
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
-    }
-
-    @Override
-    public NativeExecutionResult execute(String command) throws NativeExecutionException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getMemoryPageSize() throws Exception {
+
+        OSConfiguration c = getOSConfigurationToTest();
+
+        int i = c.getMemoryPageSize();
+
+        assertTrue(i > 0);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected abstract OSConfiguration getOSConfigurationToTest() throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 
