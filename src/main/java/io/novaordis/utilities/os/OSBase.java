@@ -41,13 +41,15 @@ abstract class OSBase implements OS {
         // Linux and MacOS implementations should be identical; for Windows, will override if necessary
         //
 
+        String[] commands = command.split(" +");
+
         try {
 
             //
             // TODO naive implementation, does not account for limited buffers, etc, must revisit
             //
 
-            Process p = new ProcessBuilder().command(command).start();
+            Process p = new ProcessBuilder().command(commands).start();
 
             int exitCode = p.waitFor();
 

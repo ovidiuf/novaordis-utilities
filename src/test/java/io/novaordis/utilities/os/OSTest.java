@@ -19,6 +19,8 @@ package io.novaordis.utilities.os;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -54,6 +56,30 @@ public abstract class OSTest {
 
         OS os = getOSToTest();
         assertNotNull(os);
+    }
+
+    @Test
+    public void execute_OneWord() throws Exception {
+
+        OS os = getOSToTest();
+        NativeExecutionResult ner = os.execute("ls");
+
+        assertEquals(0, ner.getExitStatus());
+        String lsContent = ner.getStdout();
+        log.info(lsContent);
+        assertFalse(lsContent.isEmpty());
+    }
+
+    @Test
+    public void execute_TwoWord() throws Exception {
+
+        OS os = getOSToTest();
+        NativeExecutionResult ner = os.execute("ls .");
+
+        assertEquals(0, ner.getExitStatus());
+        String lsContent = ner.getStdout();
+        log.info(lsContent);
+        assertFalse(lsContent.isEmpty());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
