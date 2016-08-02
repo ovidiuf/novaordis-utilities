@@ -18,9 +18,9 @@ package io.novaordis.utilities.os;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/31/16
+ * @since 8/1/16
  */
-public class LinuxOS extends OSBase {
+public class MockMacOS extends MacOS {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,36 +28,50 @@ public class LinuxOS extends OSBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private LinuxOSConfiguration configuration;
+    private MockOS delegate;
+
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    protected LinuxOS() throws Exception {
+    protected MockMacOS() throws Exception {
 
-        //
-        // initialize the configuration
-        //
-
-        configuration = new LinuxOSConfiguration(this);
+        super(null);
+        delegate = new MockOS();
     }
 
-    /**
-     * Needed for testing.
-     */
-    protected LinuxOS(LinuxOSConfiguration configuration) throws Exception {
-
-        this.configuration = configuration;
-    }
-
-    // OS implementation -----------------------------------------------------------------------------------------------
+    // Overrides -------------------------------------------------------------------------------------------------------
 
     @Override
-    public OSConfiguration getConfiguration() {
+    public NativeExecutionResult execute(String command) throws NativeExecutionException {
 
-        return configuration;
+        return delegate.execute(command);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * @see MockOS#addCommandThatThrowsException(String)
+     */
+    public void addCommandThatThrowsException(String s) {
+
+        delegate.addCommandThatThrowsException(s);
+    }
+
+    /**
+     * @see MockOS#addCommandThatFails(String)
+     */
+    public void addCommandThatFails(String s) {
+
+        delegate.addCommandThatFails(s);
+    }
+
+    /**
+     * @see MockOS#addCommandThatSucceeds(String, String, String)
+     */
+    public void addCommandThatSucceeds(String command, String stdout, String stderr) {
+
+        delegate.addCommandThatSucceeds(command, stdout, stderr);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

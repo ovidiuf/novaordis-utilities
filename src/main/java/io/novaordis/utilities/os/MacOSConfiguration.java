@@ -30,13 +30,47 @@ public class MacOSConfiguration implements OSConfiguration {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private int memoryPageSize;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
      * This is where the instance caches all the values, and this is where the instance has a chance to throw an
      * exception, if something goes wrong.
+     *
+     * The constructor must be package protected, we are not supposed to invoke it from outside the package. The proper
+     * way to get a LinuxOSConfiguration instance is through LinuxOS.getConfiguration();
+     *
+     * @see LinuxOS#getConfiguration()
+     *
+     * @throws OSConfigurationException if we encounter a problem while trying to read the configuration.
      */
-    public MacOSConfiguration() throws Exception {
+    public MacOSConfiguration(MacOS macOS) throws Exception {
+
+        NativeExecutionResult result;
+
+        try {
+
+            result = macOS.execute("pagesize");
+        }
+        catch (Exception e) {
+            throw new OSConfigurationException("failed to run pagesize", e);
+        }
+
+        if (!result.isSuccess()) {
+            throw new OSConfigurationException("failed to get the system memory page size: " + result.getStderr());
+        }
+
+        String s = result.getStdout().trim();
+
+        try {
+
+            memoryPageSize = Integer.parseInt(s);
+        }
+        catch(Exception e) {
+            throw new OSConfigurationException(
+                    "system memory page size read from the system is not an integer: " + s, e);
+        }
     }
 
     // OSConfiguration implementation ----------------------------------------------------------------------------------
@@ -44,7 +78,7 @@ public class MacOSConfiguration implements OSConfiguration {
     @Override
     public int getMemoryPageSize() {
 
-        throw new RuntimeException("NOT YET IMPLEMENTED");
+        return memoryPageSize;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.os;
 
+import java.io.InputStream;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
@@ -29,6 +31,57 @@ abstract class OSBase implements OS {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    // OS implementation -----------------------------------------------------------------------------------------------
+
+    @Override
+    public NativeExecutionResult execute(String command) throws NativeExecutionException {
+
+        //
+        // Linux and MacOS implementations should be identical; for Windows, will override if necessary
+        //
+
+        try {
+
+            //
+            // TODO naive implementation, does not account for limited buffers, etc, must revisit
+            //
+
+            Process p = new ProcessBuilder().command(command).start();
+
+            int exitCode = p.waitFor();
+
+            InputStream is = p.getInputStream();
+            InputStream es = p.getErrorStream();
+
+            StringBuilder inputBuilder = new StringBuilder();
+            StringBuilder errorBuilder = new StringBuilder();
+
+            int c;
+            while((c = is.read()) != -1) {
+                inputBuilder.append((char) c);
+            }
+
+            while((c = es.read()) != -1) {
+                errorBuilder.append((char) c);
+            }
+
+            String input = inputBuilder.toString();
+            if (input.isEmpty()) {
+                input = null;
+            }
+
+            String error = errorBuilder.toString();
+            if (error.isEmpty()) {
+                error = null;
+            }
+
+            return new NativeExecutionResult(exitCode, input, error);
+        }
+        catch(Exception e) {
+            throw new NativeExecutionException(e);
+        }
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 

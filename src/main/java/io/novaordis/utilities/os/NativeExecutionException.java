@@ -36,6 +36,10 @@ public class NativeExecutionException extends Exception {
         super(message);
     }
 
+    public NativeExecutionException(Throwable cause) {
+        super(cause);
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -28,18 +28,33 @@ public class MacOS extends OSBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private MacOSConfiguration configuration;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    protected MacOS() throws Exception {
+
+        //
+        // initialize the configuration
+        //
+
+        configuration = new MacOSConfiguration(this);
+    }
+
+    /**
+     * Needed for testing.
+     */
+    protected MacOS(MacOSConfiguration configuration) throws Exception {
+
+        this.configuration = configuration;
+    }
 
     // OS implementation -----------------------------------------------------------------------------------------------
 
     @Override
     public MacOSConfiguration getConfiguration() {
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
-    }
 
-    @Override
-    public NativeExecutionResult execute(String command) throws NativeExecutionException {
-        throw new RuntimeException("execute() NOT YET IMPLEMENTED");
+        return configuration;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

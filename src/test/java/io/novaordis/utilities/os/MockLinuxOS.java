@@ -16,9 +16,6 @@
 
 package io.novaordis.utilities.os;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/1/16
@@ -31,18 +28,15 @@ public class MockLinuxOS extends LinuxOS {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private List<String> commandsThatThrowException;
-    private List<String> commandsThatFail;
-    private List<MockCommand> commandsThatSucceed;
+    private MockOS delegate;
+
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     protected MockLinuxOS() throws Exception {
 
         super(null);
-        commandsThatThrowException = new ArrayList<>();
-        commandsThatFail = new ArrayList<>();
-        commandsThatSucceed = new ArrayList<>();
+        delegate = new MockOS();
     }
 
     // Overrides -------------------------------------------------------------------------------------------------------
@@ -50,55 +44,33 @@ public class MockLinuxOS extends LinuxOS {
     @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {
 
-        //
-        // first try the commands that throw exceptions
-        //
-
-        if (commandsThatThrowException.contains(command)) {
-            throw new NativeExecutionException("SYNTHETIC");
-        }
-
-        //
-        // ... then try commands that fail
-        //
-
-        if (commandsThatFail.contains(command)) {
-            return new NativeExecutionResult(1, null, "synthetic failure");
-        }
-
-
-        //
-        // these are the commands we mock and succeed
-        //
-        for(MockCommand c: commandsThatSucceed) {
-
-            if (c.getCommand().equals(command)) {
-                return new NativeExecutionResult(0, c.getStdout(), c.getStderr());
-            }
-        }
-
-        throw new RuntimeException("we don't know how to mock command " + command);
+        return delegate.execute(command);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Add command to the list of the commands that "break" - they will throw a NativeExecutionException with the
-     * message "SYNTHETIC".
+     * @see MockOS#addCommandThatThrowsException(String)
      */
     public void addCommandThatThrowsException(String s) {
 
-        commandsThatThrowException.add(s);
+        delegate.addCommandThatThrowsException(s);
     }
 
+    /**
+     * @see MockOS#addCommandThatFails(String)
+     */
     public void addCommandThatFails(String s) {
 
-        commandsThatFail.add(s);
+        delegate.addCommandThatFails(s);
     }
 
+    /**
+     * @see MockOS#addCommandThatSucceeds(String, String, String)
+     */
     public void addCommandThatSucceeds(String command, String stdout, String stderr) {
 
-        commandsThatSucceed.add(new MockCommand(command, stdout, stderr));
+        delegate.addCommandThatSucceeds(command, stdout, stderr);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -106,31 +78,6 @@ public class MockLinuxOS extends LinuxOS {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
-
-    private class MockCommand {
-
-        private String command;
-        private String stderr;
-        private String stdout;
-
-        MockCommand(String command, String stdout, String stderr) {
-            this.command = command;
-            this.stdout = stdout;
-            this.stderr  = stderr;
-        }
-
-        public String getStdout() {
-            return stdout;
-        }
-
-        public String getStderr() {
-            return stderr;
-        }
-
-        public String getCommand() {
-            return command;
-        }
-    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 
