@@ -49,6 +49,13 @@ public abstract class OSTest {
         assertNotNull(os);
     }
 
+    @Test
+    public void constructor() throws Exception {
+
+        OS os = getOSToTest();
+        assertNotNull(os);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
