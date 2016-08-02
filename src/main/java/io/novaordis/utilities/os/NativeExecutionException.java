@@ -17,7 +17,8 @@
 package io.novaordis.utilities.os;
 
 /**
- * Thrown when a native execution cannot complete.
+ * Thrown when a native execution cannot complete. The message is expected to be human readable, as the upper layers
+ * will most likely display it in the logs. If a cause is included, that may be also displayed in the logs.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/21/16
@@ -38,6 +39,10 @@ public class NativeExecutionException extends Exception {
 
     public NativeExecutionException(Throwable cause) {
         super(cause);
+    }
+
+    public NativeExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
