@@ -84,6 +84,11 @@ public class MockOS implements OS {
         throw new RuntimeException("we don't know how to mock command " + command);
     }
 
+    @Override
+    public String getName() {
+        return "MockOS";
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**

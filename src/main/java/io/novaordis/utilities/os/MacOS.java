@@ -57,6 +57,11 @@ public class MacOS extends OSBase {
         return configuration;
     }
 
+    @Override
+    public String getName() {
+        return "MacOS";
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

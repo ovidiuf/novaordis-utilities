@@ -57,6 +57,11 @@ public class LinuxOS extends OSBase {
         return configuration;
     }
 
+    @Override
+    public String getName() {
+        return "Linux";
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

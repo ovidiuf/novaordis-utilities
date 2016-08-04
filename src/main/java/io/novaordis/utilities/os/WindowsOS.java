@@ -42,6 +42,11 @@ public class WindowsOS extends OSBase {
         throw new RuntimeException("execute() NOT YET IMPLEMENTED");
     }
 
+    @Override
+    public String getName() {
+        return "Windows";
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

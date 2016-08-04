@@ -61,4 +61,9 @@ public interface OS {
 
     NativeExecutionResult execute(String command) throws NativeExecutionException;
 
+    /**
+     * "Linux", "MacOS", "Windows".
+     */
+    String getName();
+
 }

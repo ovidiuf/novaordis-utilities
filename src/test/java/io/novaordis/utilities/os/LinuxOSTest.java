@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
  */
-public class MacOSTest extends OSTest {
+public class LinuxOSTest extends OSTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ public class MacOSTest extends OSTest {
 
     @Test
     public void name() throws Exception {
-        assertEquals("MacOS", getOSToTest().getName());
+        assertEquals("Linux", getOSToTest().getName());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -46,9 +46,9 @@ public class MacOSTest extends OSTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected MacOS getOSToTest() throws Exception {
+    protected LinuxOS getOSToTest() throws Exception {
 
-        return new MacOS();
+        return new LinuxOS();
     }
 
     // Private ---------------------------------------------------------------------------------------------------------
