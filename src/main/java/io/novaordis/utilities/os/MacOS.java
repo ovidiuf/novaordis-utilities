@@ -32,6 +32,12 @@ public class MacOS extends OSBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * Must not be invoked from outside the package.
+     * Use OS.getInstance() to create the appropriate instance.
+     *
+     * @see OS#getInstance()
+     */
     protected MacOS() throws Exception {
 
         //
@@ -43,6 +49,11 @@ public class MacOS extends OSBase {
 
     /**
      * Needed for testing.
+     *
+     * Must not be invoked from outside the package.
+     * Use OS.getInstance() to create the appropriate instance.
+     *
+     * @see OS#getInstance()
      */
     protected MacOS(MacOSConfiguration configuration) throws Exception {
 
@@ -59,7 +70,7 @@ public class MacOS extends OSBase {
 
     @Override
     public String getName() {
-        return "MacOS";
+        return OS.MacOS;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

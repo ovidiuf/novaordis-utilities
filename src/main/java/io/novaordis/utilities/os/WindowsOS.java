@@ -30,6 +30,15 @@ public class WindowsOS extends OSBase {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * Must not be invoked from outside the package.
+     * Use OS.getInstance() to create the appropriate instance.
+     *
+     * @see OS#getInstance()
+     */
+    protected WindowsOS() throws Exception {
+    }
+
     // OS implementation -----------------------------------------------------------------------------------------------
 
     @Override

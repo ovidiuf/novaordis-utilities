@@ -19,12 +19,22 @@ package io.novaordis.utilities.os;
 /**
  * A proxy for the underlying operating system, to be used for native command execution.
  *
+ * Implementations must correctly implement equals() and hashCode().
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
  */
 public interface OS {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    //
+    // Conventional OS names
+    //
+
+    String MacOS = "MacOS";
+    String Linux = "Linux";
+    String Windows = "Windows";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -59,10 +69,44 @@ public interface OS {
      */
     OSConfiguration getConfiguration();
 
+    /**
+     * Recommended usage pattern:
+     *
+
+     try {
+
+        NativeExecutionResult result = os.execute(commandName);
+
+        if (result.isSuccess()) {
+            stdout = result.getStdout();
+        }
+        else {
+            log.warn(result.getStderr());
+        }
+     }
+     catch(NativeExecutionException e) {
+
+        String msg = e.getMessage();
+        String warningMsg = msg != null ? msg : "";
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            String causeMsg = cause.getClass().getSimpleName();
+            if (cause.getMessage() != null) {
+                causeMsg += ": " + cause.getMessage();
+            }
+            warningMsg += ", " + causeMsg;
+        }
+        log.warn(warningMsg);
+     }
+     */
     NativeExecutionResult execute(String command) throws NativeExecutionException;
 
     /**
-     * "Linux", "MacOS", "Windows".
+     * "Linux" (OS.Linux), "MacOS" (OS.MacOS), "Windows" (OS.Windows).
+     *
+     * @see OS#Linux
+     * @see OS#MacOS
+     * @see OS#Windows
      */
     String getName();
 

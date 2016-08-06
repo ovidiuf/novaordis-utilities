@@ -38,7 +38,7 @@ public class MacOSTest extends OSTest {
 
     @Test
     public void name() throws Exception {
-        assertEquals("MacOS", getOSToTest().getName());
+        assertEquals(OS.MacOS, getOSToTest().getName());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
