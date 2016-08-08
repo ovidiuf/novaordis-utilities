@@ -16,8 +16,19 @@
 
 package io.novaordis.utilities.logging;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.junit.Test;
 
+import java.util.Enumeration;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -39,8 +50,51 @@ public class StderrVerboseLoggingTest {
     @Test
     public void enable() throws Exception {
 
-        StderrVerboseLogging.enable();
-        fail("return here");
+
+        //
+        // capture the pre-enable() logging configuration to be able to restore it
+        //
+
+        Logger rootLogger = LogManager.getRootLogger();
+        Level currentLevel = rootLogger.getLevel();
+
+        try {
+
+            StderrVerboseLogging.enable();
+
+            Level newLevel = rootLogger.getLevel();
+            assertEquals(Level.DEBUG, newLevel);
+
+            ConsoleAppender stderr = null;
+
+            for(Enumeration e = rootLogger.getAllAppenders(); e.hasMoreElements(); ) {
+                Appender a = (Appender)e.nextElement();
+                if (a instanceof ConsoleAppender && ((ConsoleAppender)a).getTarget().equals("System.err")) {
+                    stderr = (ConsoleAppender)a;
+                    break;
+                }
+            }
+
+            //
+            // we must have a System.err ConsoleAppender
+            //
+            assertNotNull(stderr);
+
+            //
+            // that appender must allow DEBUG
+            //
+
+            Priority p = stderr.getThreshold();
+            assertTrue(p.isGreaterOrEqual(Level.DEBUG));
+        }
+        finally {
+
+            //
+            // restore logging configuration
+            //
+
+            rootLogger.setLevel(currentLevel);
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

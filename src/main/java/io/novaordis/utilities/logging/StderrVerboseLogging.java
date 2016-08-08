@@ -17,12 +17,18 @@
 package io.novaordis.utilities.logging;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.Category;
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Priority;
+import org.apache.log4j.Layout;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+import java.util.Enumeration;
 
 /**
+ * Logic to dynamically enable DEBUG level logging at stderr.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/6/16
  */
@@ -30,32 +36,50 @@ public class StderrVerboseLogging {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = Logger.getLogger(StderrVerboseLogging.class);
-
     // Static ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * Enables DEBUG level logging at stderr, by raising the root's level to DEBUG and adding a STDERR console appender
+     * if necessary.
+     */
     public static void enable() {
 
+        Logger rootLogger = LogManager.getRootLogger();
+
         //
-        // Turn DEBUG on CONSOLE
+        // control logging level and add the appender, if necessary
         //
 
-        Category c = log;
-        Category root = c;
-        if ((c = c.getParent()) != null) {
-            root = c;
+        Level currentLevel = rootLogger.getLevel();
+
+        if (!currentLevel.isGreaterOrEqual(Level.DEBUG)) {
+            rootLogger.setLevel(Level.DEBUG);
         }
 
-        Appender appender = root.getAppender("CONSOLE");
+        ConsoleAppender stderr = null;
 
-        if (appender != null) {
+        for(Enumeration e = rootLogger.getAllAppenders(); e.hasMoreElements(); ) {
 
-            ConsoleAppender console = (ConsoleAppender) appender;
-            //noinspection deprecation
-            console.setThreshold(Priority.DEBUG);
+            Appender a = (Appender)e.nextElement();
+
+            if (a instanceof ConsoleAppender) {
+                ConsoleAppender ca = (ConsoleAppender)a;
+                if ("System.err".equals(ca.getTarget())) {
+                    stderr = ca;
+                }
+            }
         }
 
+        if (stderr == null) {
+            //
+            // no such appender, create and add
+            //
+            Layout layout = new PatternLayout();
+            stderr = new ConsoleAppender(layout, "System.err");
+            rootLogger.addAppender(stderr);
+        }
 
+        stderr.setThreshold(Level.DEBUG);
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
