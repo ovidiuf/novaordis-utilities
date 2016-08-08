@@ -1,4 +1,1 @@
 
-* Moved here UserErrorException from dependencies.
-* Introduced the "os" package (OS, NativeExecutionResult, NativeExecutionException, OS.Linux/MacOS/Widndows, etc.)
-* Introduced StderrVerboseLogging that can be used to turn on DEBUG dynamically on --verbose.
