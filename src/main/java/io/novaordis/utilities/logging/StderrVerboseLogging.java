@@ -36,6 +36,8 @@ public class StderrVerboseLogging {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    public static final String DEFAULT_PATTERN = "@%t %d{ABSOLUTE} %-5p [%c{1}] %m%n";
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     /**
@@ -74,7 +76,7 @@ public class StderrVerboseLogging {
             //
             // no such appender, create and add
             //
-            Layout layout = new PatternLayout();
+            Layout layout = new PatternLayout(DEFAULT_PATTERN);
             stderr = new ConsoleAppender(layout, "System.err");
             rootLogger.addAppender(stderr);
         }

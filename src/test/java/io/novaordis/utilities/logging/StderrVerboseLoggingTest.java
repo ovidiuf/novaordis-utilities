@@ -18,9 +18,11 @@ package io.novaordis.utilities.logging;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.Priority;
 import org.junit.Test;
 
@@ -29,7 +31,6 @@ import java.util.Enumeration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -79,6 +80,13 @@ public class StderrVerboseLoggingTest {
             // we must have a System.err ConsoleAppender
             //
             assertNotNull(stderr);
+
+            Layout layout = stderr.getLayout();
+            assertTrue(layout instanceof PatternLayout);
+            PatternLayout patternLayout = (PatternLayout)layout;
+
+            String pattern = patternLayout.getConversionPattern();
+            assertEquals(StderrVerboseLogging.DEFAULT_PATTERN, pattern);
 
             //
             // that appender must allow DEBUG
