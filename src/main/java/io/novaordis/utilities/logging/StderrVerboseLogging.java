@@ -36,9 +36,23 @@ public class StderrVerboseLogging {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    public static final String VERBOSE_SYSTEM_PROPERTY_NAME = "verbose";
+
     public static final String DEFAULT_PATTERN = "@%t %d{ABSOLUTE} %-5p [%c{1}] %m%n";
 
+    public static final String STDERR_CONSOLE_APPENDER_NAME = "STDERR";
+
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * Enables DEBUG level logging at stderr if the "verbose" system property is set to true.
+     */
+    public static void init() {
+
+        if (Boolean.getBoolean(VERBOSE_SYSTEM_PROPERTY_NAME)) {
+            enable();
+        }
+    }
 
     /**
      * Enables DEBUG level logging at stderr, by raising the root's level to DEBUG and adding a STDERR console appender
@@ -54,7 +68,7 @@ public class StderrVerboseLogging {
 
         Level currentLevel = rootLogger.getLevel();
 
-        if (!currentLevel.isGreaterOrEqual(Level.DEBUG)) {
+        if (currentLevel.isGreaterOrEqual(Level.DEBUG)) {
             rootLogger.setLevel(Level.DEBUG);
         }
 
@@ -66,7 +80,7 @@ public class StderrVerboseLogging {
 
             if (a instanceof ConsoleAppender) {
                 ConsoleAppender ca = (ConsoleAppender)a;
-                if ("System.err".equals(ca.getTarget())) {
+                if (STDERR_CONSOLE_APPENDER_NAME.equals(ca.getName()) && "System.err".equals(ca.getTarget())) {
                     stderr = ca;
                 }
             }
@@ -78,6 +92,7 @@ public class StderrVerboseLogging {
             //
             Layout layout = new PatternLayout(DEFAULT_PATTERN);
             stderr = new ConsoleAppender(layout, "System.err");
+            stderr.setName(STDERR_CONSOLE_APPENDER_NAME);
             rootLogger.addAppender(stderr);
         }
 
