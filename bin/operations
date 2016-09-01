@@ -110,7 +110,7 @@ function main() {
         ((i++))
     done
 
-    [ "${command}" = "" ] && { usage; exit 0; }
+    [ "${command}" = "" -o "${arguments[0]}" = "--help" ] && { usage; exit 0; }
 
     #
     # set project home
@@ -851,6 +851,14 @@ function build-release-zip-file() {
         fail "failed to create zip root directory ${zip_root_dir}/bin"
     cp ${artifact_path} ${zip_root_dir}/lib && \
         debug "copied $(basename ${artifact_path}) in ${zip_root_dir}/lib" || exit 1;
+
+    # copy the processed resource files into lib
+    for i in ${project_home}/src/main/resources/*; do
+        i=$(basename ${i})
+        cp ${project_home}/target/classes/${i} ${zip_root_dir}/lib && \
+            debug "${project_home}/target/classes/${i} in ${zip_root_dir}/lib" || exit 1;
+    done
+
     cp ${project_home}/src/main/bash/* ${zip_root_dir}/bin && \
         debug "copied scripts to ${zip_root_dir}/bin" || exit 1;
     configure-run-wrapper ${zip_root_dir}/bin && \
@@ -1157,7 +1165,11 @@ function do-release() {
 
     git add . && info "git add ok" || fail "git add . failed"
 
-    git commit -m "release ${release_version}" && info "git commit ok" || fail "git commit failed"
+    #
+    # there may be nothing to commit, so we don't fail on commit failure, we just warn
+    #
+
+    git commit -m "release ${release_version}" && info "git commit ok" || warn "git commit did not succeed, maybe because there was nothing to commit"
 
     local tag=release-${release_version}
     local tagged
