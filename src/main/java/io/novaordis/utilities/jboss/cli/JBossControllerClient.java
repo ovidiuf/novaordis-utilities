@@ -18,7 +18,8 @@ package io.novaordis.utilities.jboss.cli;
 
 /**
  * Stateful JBoss controller client, requires connection via the connect() method, and it can be disconnected, thus
- * releasing resources.
+ * releasing resources. Local connection is possible, if the controller is located on the same host, for local
+ * connection username and password should be null. The user should be part of the management realm.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/31/16
@@ -32,16 +33,11 @@ public interface JBossControllerClient {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Connects the client to the controller. Local connection is possible, if the controller is located on the same
-     * host, for local connection username and password should be null.
-     *
-     * @param username an username that is part of the ManagementRealm. null is acceptable, and if null is provided
-     *                 local connection is attempted.
-     * @param password corresponding password. If the username is null, null password is acceptable.
+     * Connects the client to the controller.
      *
      * @throws CliException
      */
-    void connect(String username, char[] password) throws CliException;
+    void connect() throws CliException;
 
     /**
      * Disconnects the client, and releases resources.

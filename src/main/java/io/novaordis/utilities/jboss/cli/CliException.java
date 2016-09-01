@@ -34,6 +34,11 @@ public class CliException extends Exception {
         super(message);
     }
 
+    public CliException(Throwable cause) {
+        super(cause);
+    }
+
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

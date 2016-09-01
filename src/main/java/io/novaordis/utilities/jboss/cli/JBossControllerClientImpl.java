@@ -16,6 +16,15 @@
 
 package io.novaordis.utilities.jboss.cli;
 
+import org.jboss.as.cli.CommandContext;
+import org.jboss.as.cli.CommandContextFactory;
+import org.jboss.as.cli.Util;
+import org.jboss.as.cli.operation.impl.DefaultCallbackHandler;
+import org.jboss.as.cli.parsing.ParserUtil;
+import org.jboss.as.cli.parsing.operation.OperationFormat;
+import org.jboss.as.controller.client.ModelControllerClient;
+import org.jboss.dmr.ModelNode;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/31/16
@@ -28,23 +37,108 @@ public class JBossControllerClientImpl implements JBossControllerClient {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String host;
+    private int port;
+    private String username;
+    private char[] password;
+    private boolean disableLocalAuthentication;
+    private boolean initializeConsole;
+    private int connectionTimeout;
+
+    private CommandContext commandContext;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    public JBossControllerClientImpl() {
+
+        this.username = null;
+        this.password = null;
+        this.disableLocalAuthentication = false;
+        this.initializeConsole = false;
+        this.connectionTimeout = -1;
+    }
 
     // JBossControllerClient implementation ----------------------------------------------------------------------------
 
     @Override
-    public void connect(String username, char[] password) throws CliException {
-        throw new RuntimeException("connect() NOT YET IMPLEMENTED");
+    public void connect() throws CliException {
+
+        try {
+
+            CommandContextFactory factory = CommandContextFactory.getInstance();
+            commandContext = factory.newCommandContext(
+                    host, port, username, password, disableLocalAuthentication, initializeConsole, connectionTimeout);
+            commandContext.connectController();
+        }
+        catch (Exception e) {
+            throw new CliException(e);
+        }
     }
 
     @Override
     public void disconnect() {
-        throw new RuntimeException("disconnect() NOT YET IMPLEMENTED");
+
+        commandContext.disconnectController();
     }
 
     @Override
     public String getAttributeValue(String path, String attributeName) throws CliException {
-        throw new RuntimeException("getAttributeValue() NOT YET IMPLEMENTED");
+
+        String command = path + ":read-attribute(name=" + attributeName + ")";
+
+        boolean validate = true;
+        //noinspection ConstantConditions
+        DefaultCallbackHandler parsedCommand = new DefaultCallbackHandler(validate);
+
+        try {
+            ParserUtil.parse(command, parsedCommand);
+        }
+        catch(Exception e) {
+            throw new CliException(e);
+        }
+
+        if (parsedCommand.getFormat() != OperationFormat.INSTANCE ) {
+
+            //
+            // we got this from the CLI code, what is "INSTANCE"?
+            //
+
+            throw new RuntimeException("NOT YET IMPLEMENTED");
+        }
+
+        ModelNode request;
+
+        try {
+
+            request = parsedCommand.toOperationRequest(commandContext);
+        }
+        catch (Exception e) {
+            throw new CliException(e);
+        }
+
+        ModelControllerClient client = commandContext.getModelControllerClient();
+
+        ModelNode result;
+
+        try {
+
+            result = client.execute(request);
+        }
+        catch (Exception e) {
+            throw new CliException(e);
+        }
+
+        if(Util.isSuccess(result)) {
+
+            System.out.println("success: " + result);
+
+        } else {
+
+            String failureDescription = Util.getFailureDescription(result);
+            System.out.println("failure: " + failureDescription);
+        }
+
+        return "?";
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
