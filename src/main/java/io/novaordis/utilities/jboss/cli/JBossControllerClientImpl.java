@@ -24,6 +24,8 @@ import org.jboss.as.cli.parsing.ParserUtil;
 import org.jboss.as.cli.parsing.operation.OperationFormat;
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.dmr.ModelNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -32,6 +34,8 @@ import org.jboss.dmr.ModelNode;
 public class JBossControllerClientImpl implements JBossControllerClient {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(JBossControllerClientImpl.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -47,6 +51,8 @@ public class JBossControllerClientImpl implements JBossControllerClient {
 
     private CommandContext commandContext;
 
+    private boolean connected;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public JBossControllerClientImpl() {
@@ -56,6 +62,7 @@ public class JBossControllerClientImpl implements JBossControllerClient {
         this.disableLocalAuthentication = false;
         this.initializeConsole = false;
         this.connectionTimeout = -1;
+        this.connected = false;
     }
 
     // JBossControllerClient implementation ----------------------------------------------------------------------------
@@ -63,12 +70,18 @@ public class JBossControllerClientImpl implements JBossControllerClient {
     @Override
     public void connect() throws CliException {
 
+        if (connected) {
+            log.warn(this + " already connected");
+            return;
+        }
+
         try {
 
             CommandContextFactory factory = CommandContextFactory.getInstance();
             commandContext = factory.newCommandContext(
                     host, port, username, password, disableLocalAuthentication, initializeConsole, connectionTimeout);
             commandContext.connectController();
+            connected = true;
         }
         catch (Exception e) {
             throw new CliException(e);
@@ -79,10 +92,22 @@ public class JBossControllerClientImpl implements JBossControllerClient {
     public void disconnect() {
 
         commandContext.disconnectController();
+        connected = false;
+    }
+
+    @Override
+    public boolean isConnected() {
+
+        return connected;
     }
 
     @Override
     public String getAttributeValue(String path, String attributeName) throws CliException {
+
+        if (!connected) {
+
+            throw new CliException(this + " not connected");
+        }
 
         String command = path + ":read-attribute(name=" + attributeName + ")";
 

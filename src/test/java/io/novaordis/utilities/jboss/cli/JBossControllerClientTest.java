@@ -16,6 +16,13 @@
 
 package io.novaordis.utilities.jboss.cli;
 
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/31/16
@@ -24,6 +31,8 @@ public abstract class JBossControllerClientTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = Logger.getLogger(JBossControllerClientTest.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -31,6 +40,25 @@ public abstract class JBossControllerClientTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getAttributeBeforeConnecting() throws Exception {
+
+        JBossControllerClient c = getJBossControllerClientToTest();
+
+        assertFalse(c.isConnected());
+
+        try {
+            c.getAttributeValue("/", "release-version");
+            fail("should have thrown exception");
+        }
+        catch(CliException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.contains("not connected"));
+        }
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

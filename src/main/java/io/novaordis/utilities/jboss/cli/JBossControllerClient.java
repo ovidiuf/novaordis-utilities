@@ -44,6 +44,8 @@ public interface JBossControllerClient {
      */
     void disconnect();
 
+    boolean isConnected();
+
     /**
      * Sends a command into the controller that returns the value of the specified attribute, as String.
      *
