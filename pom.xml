@@ -16,27 +16,7 @@
         <slf4j-version>1.7.12</slf4j-version>
         <test.scratch.directory>target/test-scratch</test.scratch.directory>
         <test.log.directory>target</test.log.directory>
-
-        <!-- required by CLI support -->
-        <!-- on the EAP 6.4.6 BOM -->
-        <jboss.dmr.version>1.2.2.Final-redhat-1</jboss.dmr.version>
-        <jboss.as.cli.version>7.5.6.Final-redhat-2</jboss.as.cli.version>
-        <!-- end of CLI support -->
-
     </properties>
-
-    <!-- required by CLI support -->
-    <repositories>
-        <repository>
-            <id>jboss-eap-6.4.0.GA-maven-repository</id>
-            <url>file:///Users/ovidiu/runtime/jboss-eap-6.4.0.GA-maven-repository</url>
-        </repository>
-        <repository>
-            <id>jboss-eap-6.4.6-incremental-maven-repository</id>
-            <url>file:///Users/ovidiu/runtime/jboss-eap-6.4.6-incremental-maven-repository</url>
-        </repository>
-    </repositories>
-    <!-- end of CLI support -->
 
     <build>
         <pluginManagement>
@@ -141,22 +121,6 @@
                 <artifactId>junit</artifactId>
                 <version>4.11</version>
             </dependency>
-
-            <!-- required by CLI support -->
-            <dependency>
-                <groupId>org.jboss</groupId>
-                <artifactId>jboss-dmr</artifactId>
-                <version>${jboss.dmr.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.as</groupId>
-                <artifactId>jboss-as-cli</artifactId>
-                <version>${jboss.as.cli.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <!-- end of CLI support -->
-
         </dependencies>
     </dependencyManagement>
 
@@ -177,18 +141,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-
-        <!-- required by CLI support -->
-        <dependency>
-            <groupId>org.jboss</groupId>
-            <artifactId>jboss-dmr</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-cli</artifactId>
-        </dependency>
-        <!-- end of CLI support -->
-
     </dependencies>
 
 </project>
