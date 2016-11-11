@@ -32,11 +32,11 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class MutableXMLDocumentTest {
+public class InLineXMLEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(MutableXMLDocumentTest.class);
+    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 

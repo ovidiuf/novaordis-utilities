@@ -23,7 +23,7 @@ import java.io.IOException;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class MutableXMLDocument {
+public class InLineXMLEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ public class MutableXMLDocument {
      *
      * @exception java.io.IOException
      */
-    public MutableXMLDocument(File xmlFile) throws IOException {
+    public InLineXMLEditor(File xmlFile) throws IOException {
 
         if (xmlFile == null) {
             throw new IllegalArgumentException("null xml file");
