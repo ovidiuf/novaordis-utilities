@@ -1,1 +1,2 @@
 
+Added support for in-line XML file updates.

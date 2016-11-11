@@ -19,6 +19,16 @@
     </properties>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>data/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <pluginManagement>
             <plugins>
                 <plugin>
