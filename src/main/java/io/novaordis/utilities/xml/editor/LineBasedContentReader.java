@@ -18,15 +18,16 @@ package io.novaordis.utilities.xml.editor;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
 
 /**
- * An adapter that allows StAX parsing of the cached lines.
+ * An adapter that allows StAX parsing of the cached lines of a LineBasedContent instance.
+ *
+ * @see LineBasedContent
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/11/16
  */
-public class CachedContentReader extends Reader {
+public class LineBasedContentReader extends Reader {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -34,22 +35,22 @@ public class CachedContentReader extends Reader {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private List<Line> externalContent;
+    private LineBasedContent lineBasedContent;
 
     // 0-based
-    int currentLine;
+    private int currentLine;
 
     // the index of the first character that was NOT read yet
-    int currentPositionInLine;
+    private int currentPositionInLine;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
      * Usually the actual content of the editor is passed, no copy is made.
      */
-    public CachedContentReader(List<Line> lines) {
+    public LineBasedContentReader(LineBasedContent lineBasedContent) {
 
-        this.externalContent = lines;
+        this.lineBasedContent = lineBasedContent;
         this.currentLine = 0;
         this.currentPositionInLine = 0;
     }
@@ -57,9 +58,14 @@ public class CachedContentReader extends Reader {
     // Reader implementation -------------------------------------------------------------------------------------------
 
     @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    public int read(@SuppressWarnings("NullableProblems") char[] cbuffer, int off, int len) throws IOException {
 
-        if (currentLine == -1 || currentLine >= externalContent.size()) {
+        if (cbuffer.length < len) {
+            throw new IndexOutOfBoundsException(
+                    "cannot read " + len + " bytes into a " + cbuffer.length + " bytes long buffer");
+        }
+
+        if (currentLine == -1 || currentLine >= lineBasedContent.getLineCount()) {
 
             // we reached the end of stream
             return -1;
@@ -76,11 +82,11 @@ public class CachedContentReader extends Reader {
             //
             // if we ran out of lines, return what we have so far
             //
-            if (currentLine == -1 || currentLine >= externalContent.size()) {
+            if (currentLine == -1 || currentLine >= lineBasedContent.getLineCount()) {
                 return readCharacters;
             }
 
-            Line crtl = externalContent.get(currentLine);
+            Line crtl = lineBasedContent.get(currentLine);
             char[] chars = crtl.getChars();
 
             int availableOnThisLine = chars.length - currentPositionInLine;
@@ -92,7 +98,7 @@ public class CachedContentReader extends Reader {
                 //
 
                 int readFromLine = len - readCharacters;
-                System.arraycopy(chars, currentPositionInLine, cbuf, off + readCharacters, readFromLine);
+                System.arraycopy(chars, currentPositionInLine, cbuffer, off + readCharacters, readFromLine);
                 readCharacters = len;
                 currentPositionInLine += readFromLine;
 
@@ -112,24 +118,22 @@ public class CachedContentReader extends Reader {
 
                 // copy what we have so far on the current line and go to the next line
                 int readFromLine = chars.length - currentPositionInLine;
-                System.arraycopy(chars, currentPositionInLine, cbuf, off + readCharacters, readFromLine);
+                System.arraycopy(chars, currentPositionInLine, cbuffer, off + readCharacters, readFromLine);
                 readCharacters += readFromLine;
                 currentLine ++;
                 currentPositionInLine = 0;
                 identifyEndOfStream();
             }
         }
-
-        //
-        //
-        //
-
-        // TODO len bigger than what fits in cbuf
     }
 
     @Override
     public void close() throws IOException {
-        throw new RuntimeException("close() NOT YET IMPLEMENTED");
+
+        lineBasedContent.clear();
+        lineBasedContent = null;
+        currentLine = -1;
+        currentPositionInLine = -1;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -140,7 +144,6 @@ public class CachedContentReader extends Reader {
      *  Returns -1 if we reached the end of stream.
      */
     public int getCurrentLine() {
-
         return currentLine;
     }
 
@@ -162,7 +165,7 @@ public class CachedContentReader extends Reader {
 
     private void identifyEndOfStream() {
 
-        if (currentLine < externalContent.size()) {
+        if (currentLine < lineBasedContent.getLineCount()) {
             return;
         }
 

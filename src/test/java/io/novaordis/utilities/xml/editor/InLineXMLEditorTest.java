@@ -35,11 +35,11 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class InLineXMLEditorTest {
+public class InLineXmlEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorTest.class);
+    private static final Logger log = LoggerFactory.getLogger(InLineXmlEditorTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -70,6 +70,172 @@ public class InLineXMLEditorTest {
         assertTrue(io.novaordis.utilities.Files.rmdir(scratchDirectory, false));
     }
 
+    // preconditions fail ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void fileDoesNotExist() throws Exception {
+
+        File doesNotExist = new File("/I/am/sure/this/file/does/not/exist.xml");
+
+        try {
+            new InLineXmlEditor(doesNotExist);
+            fail("should throw exception");
+        }
+        catch(IOException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("file /I/am/sure/this/file/does/not/exist.xml does not exist", msg);
+        }
+    }
+
+    @Test
+    public void fileCannotBeWritten() throws Exception {
+
+        File sampleFile =
+                new File(System.getProperty("basedir"), "src/test/resources/data/xml/file-that-cannot-be-written.xml");
+
+        assertTrue(sampleFile.isFile());
+        assertTrue(sampleFile.canRead());
+        assertFalse(sampleFile.canWrite());
+
+        try {
+            new InLineXmlEditor(sampleFile);
+            fail("should throw exception");
+        }
+        catch(IOException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.matches("^file .*src/test/resources/data/xml/file-that-cannot-be-written\\.xml cannot be written"));
+        }
+    }
+
+    // constructor -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void constructor() throws Exception {
+
+        String content =
+                "<test>\n" +
+                "   <something/>\n" +
+                "</test>";
+
+        File f = new File(scratchDirectory, "test.xml");
+        assertTrue(Files.write(f, content));
+
+        InLineXmlEditor editor = new InLineXmlEditor(f);
+
+        assertEquals(3, editor.getLineCount());
+        assertFalse(editor.isDirty());
+        assertEquals(new File(scratchDirectory, "test.xml"), editor.getFile());
+    }
+
+    // save ------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void save_NotDirty() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<root/>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertEquals("<root/>", Files.read(xmlFile));
+
+        assertFalse(editor.isDirty());
+
+        //
+        // change the file on disk, then save. Saving should not have any effect
+        //
+
+        Files.write(xmlFile, "<blah/>");
+
+        assertEquals("<blah/>", Files.read(xmlFile));
+
+        //
+        // save, nothing should happen
+        //
+
+        editor.save();
+
+        assertEquals("<blah/>", Files.read(xmlFile));
+    }
+
+    @Test
+    public void save_Dirty() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<root><a>?</a></root>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+        assertFalse(editor.isDirty());
+
+        //
+        // change the file on disk, then save. It should overwrite.
+        //
+
+        Files.write(xmlFile, "<blah/>");
+        assertEquals("<blah/>", Files.read(xmlFile));
+
+        assertTrue(editor.set("/root/a", "!"));
+
+        editor.save();
+
+        assertEquals("<root><a>!</a></root>", Files.read(xmlFile));
+    }
+
+    // end to end ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void simpleXmlFileEndToEnd() throws Exception {
+
+        File origFile = new File(System.getProperty("basedir"), "src/test/resources/data/xml/simple.xml");
+
+        assertTrue(origFile.isFile());
+
+        //
+        // copy it in the test area
+        //
+
+        File sampleFile = new File(scratchDirectory, "simple-copy.xml");
+
+        assertTrue(Files.cp(origFile, sampleFile));
+
+        InLineXmlEditor editor = new InLineXmlEditor(sampleFile);
+
+        assertFalse(editor.isDirty());
+        assertEquals(3, editor.getLineCount());
+
+        //
+        // attempt to overwrite a value with the same
+        //
+
+        assertFalse(editor.set("/example/color", "red"));
+        assertFalse(editor.isDirty());
+
+        //
+        // attempt to overwrite a value with a different one
+        //
+
+        assertTrue(editor.set("/example/color", "blue"));
+        assertTrue(editor.isDirty());
+
+        editor.save();
+
+        assertFalse(editor.isDirty());
+
+        //
+        // make sure the change went to disk
+        //
+
+        InLineXmlEditor editor2 = new InLineXmlEditor(sampleFile);
+
+        String s = editor2.get("/example/color");
+
+        assertEquals("blue", s);
+    }
+
     @Test
     public void endToEnd() throws Exception {
 
@@ -85,8 +251,8 @@ public class InLineXMLEditorTest {
 
         assertTrue(Files.cp(origFile, sampleFile));
 
-        InLineXMLEditor editor = new InLineXMLEditor(sampleFile);
-        
+        InLineXmlEditor editor = new InLineXmlEditor(sampleFile);
+
         assertFalse(editor.isDirty());
         assertEquals(28, editor.getLineCount());
 
@@ -112,55 +278,12 @@ public class InLineXMLEditorTest {
         // make sure the change went to disk
         //
 
-        InLineXMLEditor editor2 = new InLineXMLEditor(sampleFile);
+        InLineXmlEditor editor2 = new InLineXmlEditor(sampleFile);
 
         String s = editor2.get("/project/version");
 
         assertEquals("1.0.0-SNAPSHOT-2", s);
     }
-
-    // preconditions fail ----------------------------------------------------------------------------------------------
-
-    @Test
-    public void fileDoesNotExist() throws Exception {
-
-        File doesNotExist = new File("/I/am/sure/this/file/does/not/exist.xml");
-
-        try {
-            new InLineXMLEditor(doesNotExist);
-            fail("should throw exception");
-        }
-        catch(IOException e) {
-
-            String msg = e.getMessage();
-            log.info(msg);
-            assertEquals("file /I/am/sure/this/file/does/not/exist.xml does not exist", msg);
-        }
-    }
-
-    @Test
-    public void fileCannotBeWritten() throws Exception {
-
-        File sampleFile =
-                new File(System.getProperty("basedir"), "src/test/resources/data/xml/file-that-cannot-be-written.xml");
-
-        assertTrue(sampleFile.isFile());
-        assertTrue(sampleFile.canRead());
-        assertFalse(sampleFile.canWrite());
-
-        try {
-            new InLineXMLEditor(sampleFile);
-            fail("should throw exception");
-        }
-        catch(IOException e) {
-
-            String msg = e.getMessage();
-            log.info(msg);
-            //assertTrue(msg.matches("file .*src/test/resources/data/xml/file-that-cannot-be-read.xml cannot be written"));
-            assertTrue(msg.matches("^file .*src/test/resources/data/xml/file-that-cannot-be-written\\.xml cannot be written"));
-        }
-    }
-
 
     // Package protected -----------------------------------------------------------------------------------------------
 

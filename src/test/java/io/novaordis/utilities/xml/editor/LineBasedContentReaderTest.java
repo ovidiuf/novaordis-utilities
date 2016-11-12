@@ -17,9 +17,8 @@
 package io.novaordis.utilities.xml.editor;
 
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -28,9 +27,11 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/11/16
  */
-public class CachedContentReaderTest {
+public class LineBasedContentReaderTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(LineBasedContentReaderTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -43,26 +44,25 @@ public class CachedContentReaderTest {
     @Test
     public void emptyReader() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent();
+        assertEquals(0, content.getLineCount());
+
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[4];
         assertZero(buffer, 0, 4);
 
         // we're already at the end of stream
-        count = r.read(buffer, 0, 1024);
+        count = r.read(buffer, 0, 4);
         assertEquals(-1, count);
     }
 
     @Test
     public void read() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        Line line = new Line(1, "test", "\n");
-        lines.add(line);
-
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent("test\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[1024];
@@ -88,11 +88,8 @@ public class CachedContentReaderTest {
     @Test
     public void read_MultipleLines_ExactNumberOfLines() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        lines.add(new Line(1, "test", "\n"));
-        lines.add(new Line(2, "test", "\n"));
-
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent("test\ntest\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[1024];
@@ -114,12 +111,8 @@ public class CachedContentReaderTest {
     @Test
     public void read_MultipleLines_NotExactNumberOfLines() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        lines.add(new Line(1, "test", "\n"));
-        lines.add(new Line(2, "test", "\n"));
-        lines.add(new Line(3, "test", "\n"));
-
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent("test\ntest\ntest\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[1024];
@@ -145,11 +138,8 @@ public class CachedContentReaderTest {
     @Test
     public void read_AllCharactersAreOnTheFirstLine() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        Line line = new Line(1, "test", "\n");
-        lines.add(line);
-
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent("test\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[5];
@@ -190,11 +180,8 @@ public class CachedContentReaderTest {
     @Test
     public void subsequentReadAfterWeReachEndOfStream() throws Exception {
 
-        List<Line> lines = new ArrayList<>();
-        Line line = new Line(1, "test", "\n");
-        lines.add(line);
-
-        CachedContentReader r = new CachedContentReader(lines);
+        LineBasedContent content = new LineBasedContent("test\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
 
         int count;
         char[] buffer = new char[1024];
@@ -211,6 +198,51 @@ public class CachedContentReaderTest {
         assertEquals("test\n", new String(buffer, 0, 5));
     }
 
+    @Test
+    public void read_LenLargerThanBufferCapacity() throws Exception {
+
+        LineBasedContent content = new LineBasedContent("test\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
+
+        char[] buffer = new char[2];
+        assertZero(buffer, 0, buffer.length);
+
+        // we are asking to read more than the buffer can hold, a StringReader responds with IndexOutOfBoundsException
+
+        try {
+
+            r.read(buffer, 0, 3);
+            fail("should have thrown exception");
+        }
+        catch (IndexOutOfBoundsException e) {
+
+            log.info(e.getMessage());
+        }
+    }
+
+    // close() ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void close() throws Exception {
+
+        LineBasedContent content = new LineBasedContent("test\n");
+        LineBasedContentReader r = new LineBasedContentReader(content);
+
+        int count;
+        char[] buffer = new char[1024];
+        assertZero(buffer, 0);
+
+        count = r.read(buffer, 0, 2);
+        String s = new String(buffer, 0, 2);
+        assertEquals("te", s);
+        assertEquals(2, count);
+        assertZero(buffer, 2);
+
+        r.close();
+
+        count = r.read(buffer, 0, 100);
+        assertEquals(-1, count);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
