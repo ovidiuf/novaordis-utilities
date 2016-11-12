@@ -1,2 +1,0 @@
-
-* Added support for in-line XML editor (InLineXmlEditor). See https://kb.novaordis.com/index.php/In-Line_XML_Editor
