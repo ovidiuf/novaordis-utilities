@@ -94,7 +94,7 @@ public class InLineXmlEditor {
 
             bis = new BufferedInputStream(new FileInputStream(xmlFile));
             content.read(bis);
-            
+
             log.debug("cached the content of " + xmlFile + " in memory");
         }
         finally {

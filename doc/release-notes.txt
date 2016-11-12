@@ -1,0 +1,4 @@
+
+* More InLineXmlEditor debugging info.
+
+RELEASE 4.2.2 WHEN InLineXmlEditor STABILIZES.
