@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.xml;
+package io.novaordis.utilities.xml.editor;
 
+import io.novaordis.utilities.Files;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +49,74 @@ public class InLineXMLEditorTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+
+    private File scratchDirectory;
+
+    @Before
+    public void before() throws Exception {
+
+        String projectBaseDirName = System.getProperty("basedir");
+        scratchDirectory = new File(projectBaseDirName, "target/test-scratch");
+        assertTrue(scratchDirectory.isDirectory());
+    }
+
+    @After
+    public void after() throws Exception {
+
+        //
+        // scratch directory cleanup
+        //
+
+        assertTrue(io.novaordis.utilities.Files.rmdir(scratchDirectory, false));
+    }
+
     @Test
     public void endToEnd() throws Exception {
 
-        File sampleFile = new File(System.getProperty("basedir"), "src/test/resources/data/xml/pom-sample.xml");
+        File origFile = new File(System.getProperty("basedir"), "src/test/resources/data/xml/pom-sample.xml");
 
-        assertTrue(sampleFile.isFile());
+        assertTrue(origFile.isFile());
 
-        MutableXMLDocument d = new MutableXMLDocument(sampleFile);
+        //
+        // copy it in the test area
+        //
 
+        File sampleFile = new File(scratchDirectory, "pom-sample.xml");
 
+        assertTrue(Files.cp(origFile, sampleFile));
 
+        InLineXMLEditor editor = new InLineXMLEditor(sampleFile);
+        
+        assertFalse(editor.isDirty());
+        assertEquals(28, editor.getLineCount());
+
+        //
+        // attempt to overwrite a value with the same
+        //
+
+        assertFalse(editor.set("/project/version", "1.0.0-SNAPSHOT-1"));
+        assertFalse(editor.isDirty());
+
+        //
+        // attempt to overwrite a value with a different one
+        //
+
+        assertTrue(editor.set("/project/version", "1.0.0-SNAPSHOT-2"));
+        assertTrue(editor.isDirty());
+
+        editor.save();
+
+        assertFalse(editor.isDirty());
+
+        //
+        // make sure the change went to disk
+        //
+
+        InLineXMLEditor editor2 = new InLineXMLEditor(sampleFile);
+
+        String s = editor2.get("/project/version");
+
+        assertEquals("1.0.0-SNAPSHOT-2", s);
     }
 
     // preconditions fail ----------------------------------------------------------------------------------------------
@@ -67,7 +127,7 @@ public class InLineXMLEditorTest {
         File doesNotExist = new File("/I/am/sure/this/file/does/not/exist.xml");
 
         try {
-            new MutableXMLDocument(doesNotExist);
+            new InLineXMLEditor(doesNotExist);
             fail("should throw exception");
         }
         catch(IOException e) {
@@ -89,7 +149,7 @@ public class InLineXMLEditorTest {
         assertFalse(sampleFile.canWrite());
 
         try {
-            new MutableXMLDocument(sampleFile);
+            new InLineXMLEditor(sampleFile);
             fail("should throw exception");
         }
         catch(IOException e) {
