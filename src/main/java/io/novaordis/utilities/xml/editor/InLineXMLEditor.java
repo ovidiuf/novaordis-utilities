@@ -176,13 +176,17 @@ public class InLineXmlEditor {
 
     /**
      * Writes the in-memory updates (if any) into the file.
+     *
+     * @return true if state was changed on disk as result of the save operation, false otherwise.
+     *
+     * @see InLineXmlEditor#undo()
      */
-    public void save() throws IOException {
+    public boolean save() throws IOException {
 
         if (!isDirty()) {
 
             log.debug("the content is not dirty, save is a noop");
-            return;
+            return false;
         }
 
         BufferedOutputStream bos = null;
@@ -193,6 +197,8 @@ public class InLineXmlEditor {
             content.write(bos);
 
             log.debug(this + " saved");
+
+            return true;
         }
         finally {
 
@@ -200,6 +206,29 @@ public class InLineXmlEditor {
                 bos.close();
             }
         }
+    }
+
+    /**
+     * Reverts the effects on disk of the <b>last</b> save() operation (if any), by restoring the underlying file to its
+     * state before the save() operation.
+     *
+     * If there was no previous save() operation, undo() is a noop and returns false.
+     *
+     * If there was a previous save() operation, but the operation did not change state, undo() is a noop and returns
+     * false.
+     *
+     * If there was a previous save() operation and the operation changed state(), undo() will revert the underlying
+     * file to the state present before the save() operation, and will return true. All subsequent undo() calls after
+     * that (unless a new save() operation is performed) will be noops and will return false.
+     *
+     * @return true if disk state was changed as result of the last undo() operation, false otherwise.
+     *
+     * @throws IOException
+     * @see InLineXmlEditor#save()
+     */
+    public boolean undo() throws IOException {
+
+        throw new RuntimeException("NYE");
     }
 
     public boolean isDirty() {

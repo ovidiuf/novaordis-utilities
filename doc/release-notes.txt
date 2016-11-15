@@ -1,6 +1,6 @@
 
-* More InLineXmlEditor debugging info.
-
 * Corrected a timestamp formatting defect related to daylight saving time difference.
-
-RELEASE 4.2.2 WHEN InLineXmlEditor STABILIZES.
+* InLineXmlEditor:
+** More debugging info.
+** save() returns a boolean
+** undo() that reverts the effect of the last save()

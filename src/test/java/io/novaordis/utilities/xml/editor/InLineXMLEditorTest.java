@@ -157,7 +157,7 @@ public class InLineXmlEditorTest {
         // save, nothing should happen
         //
 
-        editor.save();
+        assertFalse(editor.save());
 
         assertEquals("<blah/>", Files.read(xmlFile));
     }
@@ -180,7 +180,7 @@ public class InLineXmlEditorTest {
 
         assertTrue(editor.set("/root/a", "!"));
 
-        editor.save();
+        assertTrue(editor.save());
 
         assertEquals("<root><a>!</a></root>", Files.read(xmlFile));
     }
