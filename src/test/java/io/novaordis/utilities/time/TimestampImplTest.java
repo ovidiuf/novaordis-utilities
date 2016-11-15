@@ -71,8 +71,11 @@ public class TimestampImplTest extends TimestampTest {
 
         DateFormat f = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
         TimestampImpl t = new TimestampImpl("07/01/16 10:00:00", f);
+
+        long timeAtTheTimeTheTimestampWasRecorded = f.parse("07/01/16 10:00:00").getTime();
+
         assertEquals(
-                TimeZone.getDefault().getOffset(System.currentTimeMillis()),
+                TimeZone.getDefault().getOffset(timeAtTheTimeTheTimestampWasRecorded),
                 t.getTimeOffset().getOffset());
     }
 

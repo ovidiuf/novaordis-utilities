@@ -82,9 +82,9 @@ public class TimestampImpl implements Timestamp {
         if (this.timeOffset == null) {
 
             //
-            // get ehe offset for the default timezone
+            // get the offset for the default timezone, at the time the timestamp was recorded
             //
-            int offset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
+            int offset = TimeZone.getDefault().getOffset(time);
             this.timeOffset = new TimeOffset(offset);
         }
     }
@@ -141,11 +141,14 @@ public class TimestampImpl implements Timestamp {
         else {
 
             //
-            // adjust for the difference in the time zone
+            // adjust for the difference in the time zone, by making sure we get the effective offset at the time
+            // the time was recorded, and not at the current time
             //
 
             long adjustedTimestamp =
-                    time - TimeZone.getDefault().getOffset(System.currentTimeMillis()) + timeOffset.getOffset();
+                    time -
+                            TimeZone.getDefault().getOffset(time) +
+                            timeOffset.getOffset();
 
             return format.format(adjustedTimestamp);
         }

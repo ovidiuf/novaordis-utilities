@@ -90,7 +90,10 @@ public abstract class TimestampTest {
         //
 
         int offset = to.getOffset();
-        assertEquals(offset, TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+        long timeAtTheTimeTheTimestampWasRecorded =
+                new SimpleDateFormat("MM/dd/yy HH:mm:ss").parse("07/01/16 10:00:00").getTime();
+
+        assertEquals(offset, TimeZone.getDefault().getOffset(timeAtTheTimeTheTimestampWasRecorded));
 
         String s = to.toRFC822String();
         log.info(s);
@@ -224,7 +227,8 @@ public abstract class TimestampTest {
     @Test
     public void format() throws Exception {
 
-        int currentOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
+        TimeZone currentTimeZone = TimeZone.getDefault();
+        int currentOffset = currentTimeZone.getOffset(System.currentTimeMillis());
 
         // pick a different offset, to make sure the representations are different
 
@@ -269,21 +273,26 @@ public abstract class TimestampTest {
     @Test
     public void equivalentFormat() throws Exception {
 
-        int currentOffset = TimeZone.getDefault().getOffset(System.currentTimeMillis());
+        String original = "07/01/16 12:00:00";
+        SimpleDateFormat originalDateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+
+        int offsetAtTheTimeTheTimestampWasRecorded =
+                TimeZone.getDefault().getOffset(originalDateFormat.parse(original).getTime());
 
         // pick a different offset, to make sure the representations are different
 
-        int testOffsetValue = currentOffset - 2 * 3600 * 1000;
+        int testOffsetValue = offsetAtTheTimeTheTimestampWasRecorded - 2 * 3600 * 1000;
 
         if (!TimeOffset.isValidOffset(testOffsetValue)) {
-            testOffsetValue = currentOffset + 2 * 3600 * 1000;
+            testOffsetValue = offsetAtTheTimeTheTimestampWasRecorded + 2 * 3600 * 1000;
         }
 
         TimeOffset testOffset = new TimeOffset(testOffsetValue);
         String rfc822Offset = testOffset.toRFC822String();
-        String original = "07/01/16 12:00:00";
-        String s = original + " " + rfc822Offset;
-        Timestamp timestamp = new TimestampImpl(s, new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
+
+        String originalWithOffsetLiteral = original + " " + rfc822Offset;
+
+        Timestamp timestamp = new TimestampImpl(originalWithOffsetLiteral, new SimpleDateFormat("MM/dd/yy HH:mm:ss Z"));
 
         DateFormat targetFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
 
@@ -294,7 +303,6 @@ public abstract class TimestampTest {
         assertTrue(representation.equals(representation2));
         assertTrue(original.equals(representation));
     }
-
 
     @Test
     public void format_NoSourceTimezoneOffset() throws Exception {
