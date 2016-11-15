@@ -566,15 +566,6 @@ public class TimeOffsetTest {
         assertEquals("+1400", result);
     }
 
-    // getDefault() ----------------------------------------------------------------------------------------------------
-
-    @Test
-    public void getDefault() throws Exception {
-
-        TimeOffset d = TimeOffset.getDefault();
-        assertEquals(TimeZone.getDefault().getOffset(System.currentTimeMillis()), d.getOffset());
-    }
-
     // isValidOffset ---------------------------------------------------------------------------------------------------
 
     @Test

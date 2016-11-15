@@ -298,9 +298,6 @@ public abstract class TimestampTest {
 
         String representation = timestamp.format(targetFormat);
 
-        String representation2 = targetFormat.format(timestamp.adjustTime(TimeOffset.getDefault()));
-
-        assertTrue(representation.equals(representation2));
         assertTrue(original.equals(representation));
     }
 
