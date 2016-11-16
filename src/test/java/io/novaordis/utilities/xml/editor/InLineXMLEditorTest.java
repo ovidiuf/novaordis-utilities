@@ -114,7 +114,7 @@ public class InLineXmlEditorTest {
     // constructor -----------------------------------------------------------------------------------------------------
 
     @Test
-    public void constructor() throws Exception {
+    public void constructor_accessors() throws Exception {
 
         String content =
                 "<test>\n" +
@@ -129,6 +129,58 @@ public class InLineXmlEditorTest {
         assertEquals(3, editor.getLineCount());
         assertFalse(editor.isDirty());
         assertEquals(new File(scratchDirectory, "test.xml"), editor.getFile());
+
+        assertEquals("<test>\n   <something/>\n</test>", editor.getContent());
+    }
+
+    // set() -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void set_PathDoesNotExistInFile_Root() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a><b>x</b></a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        try {
+            assertTrue(editor.set("/c", "y"));
+            fail("should throw NYE");
+        }
+        catch(RuntimeException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("NOT YET IMPLEMENTED: we did not find element"));
+        }
+
+        // when implementing, test this:
+//        assertTrue(editor.isDirty());
+//        String content = editor.getContent();
+//        assertEquals("<a><b>x</b></a>\n<c>y</c>\n", content);
+    }
+
+    @Test
+    public void set_PathDoesNotExistInFile_Intermediate() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a><b>x</b></a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        try {
+            assertTrue(editor.set("/a/c", "y"));
+            fail("should throw NYE");
+        }
+        catch(RuntimeException e) {
+            String msg = e.getMessage();
+            log.info(msg);
+            assertTrue(msg.startsWith("NOT YET IMPLEMENTED: we did not find element"));
+        }
+
+        // when implementing, test this:
+//        assertTrue(editor.isDirty());
+//        String content = editor.getContent();
+//        assertEquals("<a><b>x</b>\n    <c>y</c>\n</a>\n", content);
     }
 
     // save ------------------------------------------------------------------------------------------------------------
@@ -183,6 +235,172 @@ public class InLineXmlEditorTest {
         assertTrue(editor.save());
 
         assertEquals("<root><a>!</a></root>", Files.read(xmlFile));
+    }
+
+    // undo ------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void undo_NoSave() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<root/>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        // noop
+        assertFalse(editor.undo());
+
+        // another noop
+        assertFalse(editor.undo());
+    }
+
+    @Test
+    public void undo_SaveNotDirty() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<root/>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertFalse(editor.save());
+
+        // noop
+        assertFalse(editor.undo());
+
+        // another noop
+        assertFalse(editor.undo());
+    }
+
+    @Test
+    public void undo_SaveDirty() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a>x</a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/a", "y"));
+
+        assertTrue(editor.save());
+
+        assertEquals("<a>y</a>", Files.read(xmlFile));
+
+        assertTrue(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+        assertEquals("x", editor.get("/a"));
+
+        // noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+
+        // another noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+    }
+
+    @Test
+    public void undo_SaveDirty_TwoSets() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a>x</a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/a", "y"));
+
+        assertTrue(editor.set("/a", "z"));
+
+        assertTrue(editor.save());
+
+        assertEquals("<a>z</a>", Files.read(xmlFile));
+
+        assertTrue(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+        assertEquals("x", editor.get("/a"));
+
+        // noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+
+        // another noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>x</a>", Files.read(xmlFile));
+    }
+
+    @Test
+    public void undo_TwoSuccessiveDirtySaves_UndoRestoresJustTheLastOne() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a>x</a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/a", "y"));
+
+        assertTrue(editor.save());
+
+        assertEquals("<a>y</a>", Files.read(xmlFile));
+
+        assertTrue(editor.set("/a", "z"));
+
+        assertTrue(editor.save());
+
+        assertEquals("<a>z</a>", Files.read(xmlFile));
+
+        assertTrue(editor.undo());
+
+        assertEquals("<a>y</a>", Files.read(xmlFile));
+
+        // noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>y</a>", Files.read(xmlFile));
+
+        // another noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>y</a>", Files.read(xmlFile));
+    }
+
+    @Test
+    public void undo_ThreeSuccessiveDirtySaves_UndoRestoresJustTheLastOne() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile, "<a>0</a>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/a", "1"));
+        assertTrue(editor.save());
+        assertEquals("<a>1</a>", Files.read(xmlFile));
+
+        assertTrue(editor.set("/a", "2"));
+        assertTrue(editor.save());
+        assertEquals("<a>2</a>", Files.read(xmlFile));
+
+        assertTrue(editor.set("/a", "3"));
+        assertTrue(editor.save());
+        assertEquals("<a>3</a>", Files.read(xmlFile));
+
+        assertTrue(editor.undo());
+
+        assertEquals("<a>2</a>", Files.read(xmlFile));
+
+        // noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>2</a>", Files.read(xmlFile));
+
+        // another noop
+        assertFalse(editor.undo());
+
+        assertEquals("<a>2</a>", Files.read(xmlFile));
     }
 
     // end to end ------------------------------------------------------------------------------------------------------

@@ -65,7 +65,12 @@ public class LineBasedContent {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * Overwrites the current content, if any.
+     */
     public void read(InputStream is) throws IOException {
+
+        clear();
 
         BufferedInputStream bis = new BufferedInputStream(is, bufferSize);
 
@@ -214,6 +219,25 @@ public class LineBasedContent {
 
         Line line = lines.get(zeroBasedLineNumber);
         return line.replace(from, to, newValue);
+    }
+
+    /**
+     * @return the text content, as currently cached in memory. It may contain changes that are not saved on disk.
+     */
+    public String getText() {
+
+        //
+        // TODO this is an operation that may be called often, optimize by caching the content and discard if modified
+        //
+
+        String s = "";
+
+        for(Line l: lines) {
+
+            s += new String(l.getChars());
+        }
+
+        return s;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

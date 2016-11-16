@@ -49,6 +49,18 @@ public class LineBasedContentTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    // empty -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void empty() throws Exception {
+
+        LineBasedContent c = new LineBasedContent();
+        assertEquals(0, c.getLineCount());
+        assertEquals("", c.getText());
+    }
+
+    // read() ----------------------------------------------------------------------------------------------------------
+
     @Test
     public void read_edgeCase_CarriageReturnAtTheEndOfARead_1() throws Exception {
 
@@ -209,6 +221,22 @@ public class LineBasedContentTest {
         assertFalse(line.hasNewLine());
         assertNull(line.getNewLine());
         assertEquals("c", line.getValue());
+
+        assertEquals("a\nb\r\nc", c.getText());
+    }
+
+    @Test
+    public void readOverwrites() throws Exception {
+
+        String s = "a\nb\nc\n";
+        LineBasedContent c = new LineBasedContent(s);
+        assertEquals(3, c.getLineCount());
+        assertEquals(s, c.getText());
+
+        String s2 = "x\ny\n";
+        c.read(new ByteArrayInputStream(s2.getBytes()));
+        assertEquals(2, c.getLineCount());
+        assertEquals(s2, c.getText());
     }
 
     @Test

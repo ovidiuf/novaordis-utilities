@@ -59,6 +59,11 @@ public class InLineXmlEditor {
     private LineBasedContent content;
     private XMLInputFactory staxFactory;
 
+    // may be null if there's nothing to undo
+    private byte[] undoContent;
+
+    private boolean moreThanOneConsequentialSave;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
@@ -88,21 +93,10 @@ public class InLineXmlEditor {
         this.xmlFile = xmlFile;
         this.content = new LineBasedContent();
 
-        BufferedInputStream bis = null;
+        loadFromDisk();
 
-        try {
-
-            bis = new BufferedInputStream(new FileInputStream(xmlFile));
-            content.read(bis);
-
-            log.debug("cached the content of " + xmlFile + " in memory");
-        }
-        finally {
-
-            if (bis != null) {
-                bis.close();
-            }
-        }
+        // nothing to undo so far
+        undoContent = null;
 
         staxFactory = XMLInputFactory.newFactory();
     }
@@ -119,8 +113,8 @@ public class InLineXmlEditor {
 
     /**
      * Updates the value of the element/attribute indicated by the path with the given string.
-     * <p>
-     * If the path does not exist
+     *
+     * If the path does not exist, it will be created.
      *
      * @return true if an actual update occurred, false if the existing value is identical with the new value.
      */
@@ -149,9 +143,27 @@ public class InLineXmlEditor {
         Location location = previous.getLocation();
         int zeroBasedLineNumber = location.getLineNumber() - 1;
         int zeroBasedPositionInLine = location.getColumnNumber() - 1;
-        //noinspection UnnecessaryLocalVariable
+
+        //
+        // undo state management; save previous state in case we need to undo
+        //
+
+        // this is an non-expensive operation, the underlying implementation caches content
+        byte[] transientUndoContent = content.getText().getBytes();
+
         boolean replaced = content.replace(
                 zeroBasedLineNumber, zeroBasedPositionInLine, zeroBasedPositionInLine + oldValue.length(), newValue);
+
+        if (replaced && (moreThanOneConsequentialSave || undoContent == null)) {
+            // we do this only on the first change or if the content was already overwritten on disk by a previous
+            // consequential save and we need to reset the state undo will revert to, if invoked.
+            undoContent = transientUndoContent;
+        }
+
+        //
+        // end of undo state management
+        //
+
         return replaced;
     }
 
@@ -185,7 +197,7 @@ public class InLineXmlEditor {
 
         if (!isDirty()) {
 
-            log.debug("the content is not dirty, save is a noop");
+            log.debug("the content is not dirty, save is non consequential");
             return false;
         }
 
@@ -196,7 +208,9 @@ public class InLineXmlEditor {
             bos = new BufferedOutputStream(new FileOutputStream(xmlFile));
             content.write(bos);
 
-            log.debug(this + " saved");
+            log.debug(this.getFile() + " saved");
+
+            moreThanOneConsequentialSave = true;
 
             return true;
         }
@@ -209,30 +223,62 @@ public class InLineXmlEditor {
     }
 
     /**
-     * Reverts the effects on disk of the <b>last</b> save() operation (if any), by restoring the underlying file to its
-     * state before the save() operation.
+     * Reverts the effects on disk of the <b>last</b> save() operation (if any), by restoring the underlying file
+     * and the corresponding memory state to the version available before the save() operation.
      *
      * If there was no previous save() operation, undo() is a noop and returns false.
      *
-     * If there was a previous save() operation, but the operation did not change state, undo() is a noop and returns
-     * false.
+     * If there was a previous save() operation, but the operation did not change state (un-consequential save()),
+     * undo() will be a noop and will return false.
      *
-     * If there was a previous save() operation and the operation changed state(), undo() will revert the underlying
-     * file to the state present before the save() operation, and will return true. All subsequent undo() calls after
-     * that (unless a new save() operation is performed) will be noops and will return false.
+     * If there were previous save() operations and the operations changed state on disk, undo() will revert the
+     * underlying file and the corresponding memory state to the version present on disk before the <b>last</b> save()
+     * operation, and will return true. All subsequent undo() calls after that (unless a new consequential save()
+     * operation is performed) will be noops and will return false.
      *
      * @return true if disk state was changed as result of the last undo() operation, false otherwise.
      *
-     * @throws IOException
      * @see InLineXmlEditor#save()
+     *
+     * @throws IOException
      */
     public boolean undo() throws IOException {
 
-        throw new RuntimeException("NYE");
+        if (undoContent == null) {
+            return false;
+        }
+
+        //
+        // undo on disk
+        //
+
+        FileOutputStream fos = new FileOutputStream(xmlFile);
+        fos.write(undoContent);
+        fos.close();
+
+        //
+        // nothing to undo after undoing
+        //
+        undoContent = null;
+
+        //
+        // update memory
+        //
+
+        loadFromDisk();
+
+        return true;
     }
 
     public boolean isDirty() {
         return content.isDirty();
+    }
+
+    /**
+     * @return the text content, as currently cached in memory. It may contain changes that are not saved on disk.
+     */
+    public String getContent() {
+        return content.getText();
     }
 
     @Override
@@ -287,6 +333,21 @@ public class InLineXmlEditor {
 
                     current = xmlReader.nextEvent();
 
+                    if (current.isEndDocument()) {
+
+                        //
+                        // apparently, hasNext() returns true after we pull END_DOCUMENT, is this supposed to happen
+                        // or is a StAX defect?
+                        //
+
+                        //
+                        // we reached the end of the document and our path is NOT depleted
+                        //
+                        throw new RuntimeException(
+                                "NOT YET IMPLEMENTED: we did not find element <" + currentPathToken +
+                                        "> in document, and we are supposed to add it, but this functionality is not implemented yet");
+                    }
+
                     if (!current.isStartElement()) {
 
                         continue;
@@ -336,6 +397,27 @@ public class InLineXmlEditor {
 
                     log.warn("failed to close an XML Reader: " + e.getMessage());
                 }
+            }
+        }
+    }
+
+    /**
+     * It overwrites the current content cached in memory, if any.
+     */
+    void loadFromDisk() throws IOException {
+
+        BufferedInputStream bis = null;
+
+        try {
+
+            bis = new BufferedInputStream(new FileInputStream(xmlFile));
+            content.read(bis);
+            log.debug("loaded content of " + xmlFile + " in memory");
+        }
+        finally {
+
+            if (bis != null) {
+                bis.close();
             }
         }
     }
