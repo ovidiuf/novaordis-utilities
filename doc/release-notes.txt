@@ -4,3 +4,4 @@
 ** More debugging info.
 ** save() returns a boolean
 ** undo() that reverts the effect of the last save()
+* Added support for OS mocking. https://kb.novaordis.com/index.php/Nova_Ordis_Utilities_OS_Support#Testing_with_a_Mock_OS

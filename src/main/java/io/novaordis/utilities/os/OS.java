@@ -28,6 +28,8 @@ public interface OS {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    String OS_IMPLEMENTATION_PROPERTY_NAME = "os.class";
+
     //
     // Conventional OS names
     //
@@ -39,6 +41,17 @@ public interface OS {
     // Static ----------------------------------------------------------------------------------------------------------
 
     static OS getInstance() throws Exception {
+
+        //
+        // first attempt to look up a custom implementation - this is mainly useful while testing
+        //
+
+        String osImplementationClassName = System.getProperty(OS_IMPLEMENTATION_PROPERTY_NAME);
+
+        if (osImplementationClassName != null) {
+            Class c = Class.forName(osImplementationClassName);
+            return (OS) c.newInstance();
+        }
 
         String osName = System.getProperty("os.name");
 
