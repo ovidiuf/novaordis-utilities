@@ -39,15 +39,15 @@ import java.util.Collection;
  *
  * $Id$
  */
-public class Files
-{
-    // Constants -----------------------------------------------------------------------------------
+public class Files {
+
+    // Constants -------------------------------------------------------------------------------------------------------
 
     private static final Logger log = Logger.getLogger(Files.class);
 
     public static final String SNAPSHOT_DIRECTORY_PROPERTY_NAME = "novaordis.util.snapshot.dir";
 
-    // Static --------------------------------------------------------------------------------------
+    // Static ----------------------------------------------------------------------------------------------------------
 
     /**
      * Appends the string content at the end of the file.
@@ -56,8 +56,7 @@ public class Files
      *
      * @return true if the operation is successful, false otherwise. The error is logged with log4j.
      */
-    public static boolean append(File f, String txt)
-    {
+    public static boolean append(File f, String txt) {
         return write(f, txt, true);
     }
 
@@ -68,8 +67,7 @@ public class Files
      *
      * @return true if the operation is successful, false otherwise. The error is logged with log4j.
      */
-    public static boolean write(File f, String txt)
-    {
+    public static boolean write(File f, String txt) {
         return write(f, txt, false);
     }
 
@@ -80,14 +78,12 @@ public class Files
      *
      * @return true if the operation is successful, false otherwise. The error is logged with log4j.
      */
-    public static boolean write(File f, String content, boolean append)
-    {
+    public static boolean write(File f, String content, boolean append) {
+
         File enclosingDir = f.getParentFile();
 
-        if (!enclosingDir.isDirectory())
-        {
-            if (!enclosingDir.mkdirs())
-            {
+        if (!enclosingDir.isDirectory()) {
+            if (!enclosingDir.mkdirs()) {
                 log.error("failed to create enclosing directory " + enclosingDir);
                 return false;
             }
@@ -95,29 +91,24 @@ public class Files
 
         FileWriter fw = null;
 
-        try
-        {
+        try {
+
             fw = new FileWriter(f, append);
             PrintWriter pw = new PrintWriter(fw);
             pw.print(content);
             pw.flush();
             return true;
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             log.error(e);
             return false;
         }
-        finally
-        {
-            if (fw != null)
-            {
-                try
-                {
+        finally {
+            if (fw != null) {
+                try {
                     fw.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error(e);
                 }
             }
@@ -134,20 +125,18 @@ public class Files
     }
 
     /**
-     * Read the content of a file as byte[]. The file should be small enough as there is no
-     * protection for OutOfMemoryError.
-     *
-     * TODO: not tested
+     * Read the content of a file as byte[]. The file should be small enough as there is no protection for
+     * OutOfMemoryError.
      */
-    public static byte[] readBytes(File f) throws Exception
-    {
+    public static byte[] readBytes(File f) throws Exception {
+
         FileInputStream fis = null;
         BufferedInputStream bis = null;
         ByteArrayOutputStream baos = null;
         BufferedOutputStream bos = null;
 
-        try
-        {
+        try  {
+
             fis = new FileInputStream(f);
             bis = new BufferedInputStream(fis, 10240);
 
@@ -157,8 +146,8 @@ public class Files
             byte[] buffer = new byte[10240];
 
             int i;
-            while((i = bis.read(buffer)) != -1)
-            {
+
+            while((i = bis.read(buffer)) != -1) {
                 bos.write(buffer, 0, i);
             }
 
@@ -166,52 +155,42 @@ public class Files
 
             return baos.toByteArray();
         }
-        finally
-        {
-            if (bis != null)
-            {
-                try
-                {
+        finally {
+
+            if (bis != null) {
+
+                try {
                     bis.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error("Failed to close the buffered input stream", e);
                 }
             }
 
-            if (fis != null)
-            {
-                try
-                {
+            if (fis != null) {
+
+                try {
                     fis.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error("Failed to close the souce input stream", e);
                 }
             }
 
-            if (bos != null)
-            {
-                try
-                {
+            if (bos != null) {
+                try  {
                     bos.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error("Failed to close the buffered output stream", e);
                 }
             }
 
-            if (baos != null)
-            {
-                try
-                {
+            if (baos != null) {
+                try {
                     baos.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error("Failed to close the target input stream", e);
                 }
             }
@@ -222,42 +201,40 @@ public class Files
      * Read the content of a file as string. The file should be small enough as there is no
      * protection for OutOfMemoryError.
      */
-    public static String read(File f, int bufferSize) throws Exception
-    {
-        StringBuffer sb = new StringBuffer();
+    public static String read(File f, int bufferSize) throws Exception {
+
+        StringBuilder sb = new StringBuilder();
         FileReader fr = null;
         BufferedReader br = null;
 
-        try
-        {
+        try {
+
             fr = new FileReader(f);
             br = new BufferedReader(fr, bufferSize);
 
-            int cnt = 0;
+            int cnt;
             char[] buffer = new char[bufferSize];
 
-            while((cnt = br.read(buffer, 0, buffer.length)) != -1)
-            {
+            while((cnt = br.read(buffer, 0, buffer.length)) != -1) {
+
                 boolean r = false;
                 int start = 0;
                 int end = cnt - 1;
                 int i = 0;
-                while(true)
-                {
-                    if (i > end)
-                    {
+
+                while(true) {
+
+                    if (i > end) {
                         break;
                     }
 
-                    if (buffer[i] == '\n')
-                    {
+                    if (buffer[i] == '\n') {
                         sb.append(buffer, start, r ? i - start - 1 : i - start).append('\n');
                         cnt -= i - start + 1;
                         start = i + 1;
                         r = false;
                     }
-                    else if (buffer[i] == '\r')
-                    {
+                    else if (buffer[i] == '\r') {
                         // swallow '\r'
                         r = true;
                     }
@@ -265,27 +242,23 @@ public class Files
                     i++;
                 }
 
-                if (cnt > 0)
-                {
+                if (cnt > 0) {
                     sb.append(buffer, start, cnt);
                 }
             }
         }
-        finally
-        {
-            if (br != null)
-            {
+        finally {
+
+            if (br != null) {
                 br.close();
             }
 
-            if (fr != null)
-            {
-                try
-                {
+            if (fr != null) {
+
+                try {
                     fr.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error(e);
                 }
             }
@@ -438,15 +411,13 @@ public class Files
     /**
      * Returns true if the argument is an existent directory that contain no children.
      */
-    public static boolean isEmpty(File dir)
-    {
-        if (dir.isDirectory())
-        {
+    public static boolean isEmpty(File dir) {
+
+        if (dir.isDirectory()) {
             File[] content = dir.listFiles();
-            return content.length == 0;
+            return content == null || content.length == 0;
         }
-        else
-        {
+        else {
             return false;
         }
     }
@@ -566,19 +537,17 @@ public class Files
      * @exception IllegalStateException if some assumption we rely on (like "user.dir" being an
      *            absolute path) are not met.
      */
-    public static LinkedList<String> tokenize(File f)
-    {
-        LinkedList<String> result = new LinkedList<String>();
+    public static LinkedList<String> tokenize(File f) {
+
+        LinkedList<String> result = new LinkedList<>();
 
         boolean isRelative = !f.isAbsolute() && !f.getPath().startsWith("\\");
 
-        if (isRelative)
-        {
+        if (isRelative) {
             // we look at System.getProperty("user.dir") and "pre-load" the result
             String userDirString = System.getProperty("user.dir");
             File userDir = new File(userDirString);
-            if (!userDir.isAbsolute())
-            {
+            if (!userDir.isAbsolute()) {
                 throw new IllegalStateException("We expect an absolute \"user.dir\", but it is " +
                                                 "relative: " + userDirString);
             }
@@ -586,33 +555,27 @@ public class Files
             result = tokenize(userDir);
         }
 
-        for (StringTokenizer st = new StringTokenizer(f.getPath(), File.separator);
-             st.hasMoreTokens(); )
-        {
+        for (StringTokenizer st = new StringTokenizer(f.getPath(), File.separator); st.hasMoreTokens(); ) {
+
             String tok = st.nextToken();
 
-            if (tok.endsWith(":"))
-            {
+            if (tok.endsWith(":")) {
                 // drive name on Windows, ignore
                 continue;
             }
 
-            if (".".equals(tok))
-            {
+            if (".".equals(tok)) {
                 // ignore
                 continue;
             }
 
-            if ("..".equals(tok))
-            {
-                if (result.isEmpty())
-                {
+            if ("..".equals(tok)) {
+                if (result.isEmpty()) {
                     throw new IllegalArgumentException(f + " contains an invalid number or '..'");
                 }
                 result.removeLast();
             }
-            else
-            {
+            else {
                 result.add(tok);
             }
 
@@ -636,19 +599,16 @@ public class Files
      * Returns the file name's extension, defined as the string that follows after the last dot in
      * the file name. If there are no dots, returns null.
      */
-    public static String getExtension(String path)
-    {
+    public static String getExtension(String path) {
         int i = path.lastIndexOf(".");
 
-        if (i == -1)
-        {
+        if (i == -1) {
             return null;
         }
 
         path = path.substring(i + 1);
 
-        if (path.indexOf("/") != -1)
-        {
+        if (path.contains("/")) {
             return null;
         }
 
@@ -665,18 +625,15 @@ public class Files
      *
      * @return the absolute path of the snapshot file on disk. May return null in case of failure.
      */
-    public static String writeSnapshot(File dir, final String prefix, int keepLast, Object o)
-    {
-        if (dir == null)
-        {
+    public static String writeSnapshot(File dir, final String prefix, int keepLast, Object o) {
+
+        if (dir == null) {
             log.warn("null snapshot directory");
             return null;
         }
 
-        try
-        {
-            if (!dir.isDirectory() && !dir.mkdirs())
-            {
+        try {
+            if (!dir.isDirectory() && !dir.mkdirs()) {
                 // try to create the directory if it doesn't exist
                 log.warn("failed to create snapshot directory " + dir);
                 return null;
@@ -685,16 +642,15 @@ public class Files
             // generate a unique name
             File f = generateUniqueName(dir, prefix + "." + System.currentTimeMillis());
 
-            if (!Files.write(f, convertToString(o)))
-            {
+            if (!Files.write(f, convertToString(o))) {
                 log.warn("failed to write snapshot file " + f);
                 return null;
             }
 
             // count the files with the same prefix, and delete all, but the last 'keepLast' ones
 
-            File[] filesArray = dir.listFiles(new FilenameFilter()
-            {
+            //noinspection Convert2Lambda
+            File[] filesArray = dir.listFiles(new FilenameFilter() {
                 public boolean accept(File dir, String name)
                 {
                     return name.startsWith(prefix + ".");
@@ -702,8 +658,8 @@ public class Files
             });
 
             List<File> files = Arrays.asList(filesArray);
-            Collections.sort(files, new Comparator<File>()
-            {
+            //noinspection Convert2Lambda
+            Collections.sort(files, new Comparator<File>() {
                 public int compare(File f1, File f2)
                 {
                     long diff = f1.lastModified() - f2.lastModified();
@@ -711,23 +667,19 @@ public class Files
                 }
             });
 
-            for(int i = 0; i < files.size(); i ++)
-            {
-                if (i + keepLast < files.size())
-                {
+            for(int i = 0; i < files.size(); i ++) {
+                if (i + keepLast < files.size()) {
                     File ftd = files.get(i);
-                    if (!ftd.delete())
-                    {
+                    if (!ftd.delete()) {
                         log.warn("failed to delete " + ftd);
                     }
                 }
             }
 
-            // retun the absolute path
+            // return the absolute path
             return f.getAbsolutePath();
         }
-        catch(Throwable t)
-        {
+        catch(Throwable t) {
             log.error("failed to write collection snapshot on disk", t);
             return null;
         }
@@ -747,20 +699,19 @@ public class Files
         return f;
     }
 
-    private static String convertToString(Object o)
-    {
-        if (o == null)
-        {
+    private static String convertToString(Object o) {
+
+        if (o == null) {
             return "null";
         }
-        else if (o instanceof Collection)
-        {
+        else if (o instanceof Collection) {
+
             Collection c = (Collection)o;
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
 
-            for(Object e: c)
-            {
+            //noinspection Convert2streamapi
+            for(Object e: c) {
                 pw.println(e);
             }
 
@@ -768,8 +719,7 @@ public class Files
 
             return sw.toString();
         }
-        else
-        {
+        else {
             return o.toString();
         }
     }
@@ -796,6 +746,34 @@ public class Files
 
         File dir = new File(dirName);
         return writeSnapshot(dir, prefix, keepLast, o);
+    }
+
+    /**
+     * @return true if the <b>content</b> of the files is identical.
+     */
+    public static boolean identical(File f, File f2) {
+
+        try {
+
+            byte[] content = read(f).getBytes();
+            byte[] content2 = read(f2).getBytes();
+
+            if (content.length != content2.length) {
+                return false;
+            }
+
+            for(int i = 0; i < content.length; i ++) {
+                if (content[i] != content2[i]) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch(Exception e) {
+            throw new IllegalStateException("file access generated I/O failure", e);
+        }
+
     }
 
     // Attributes ----------------------------------------------------------------------------------

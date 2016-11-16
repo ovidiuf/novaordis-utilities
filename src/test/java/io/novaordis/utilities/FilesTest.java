@@ -1,8 +1,10 @@
 package io.novaordis.utilities;
 
-import io.novaordis.utilities.testing.FileTestBase;
 import io.novaordis.utilities.testing.Tests;
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -14,6 +16,14 @@ import java.util.Iterator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:ovidiu@feodorov.com">Ovidiu Feodorov</a>
@@ -24,22 +34,102 @@ import java.util.Comparator;
  *
  * $Id$
  */
-public class FilesTest extends FileTestBase
-{
-    // Constants -----------------------------------------------------------------------------------
+public class FilesTest {
+
+    // Constants -------------------------------------------------------------------------------------------------------
 
     private static final Logger log = Logger.getLogger(FilesTest.class);
 
-    // Static --------------------------------------------------------------------------------------
+    // Static ----------------------------------------------------------------------------------------------------------
 
-    // Attributes ----------------------------------------------------------------------------------
+    /**
+     * @return a random name with no extension.
+     */
+    public static String getRandomFileName(String hint) {
+        return getRandomFileName(hint, null);
+    }
 
-    // Constructors --------------------------------------------------------------------------------
+    /**
+     * @return a random directory name based on hint.
+     */
+    public static String getRandomDirectoryName(String hint) {
+        String prefix = "dir-";
+        prefix = hint == null ? prefix : prefix + hint;
+        return getRandomFileName(prefix, null);
+    }
 
-    // Public --------------------------------------------------------------------------------------
+    /**
+     * @param extension can be null, in which case the name will use a random extension, or not at
+     *        all. DO NOT specify a dot, it will be automatically added.
+     */
+    public static String getRandomFileName(String hint, String extension) {
+        String name = hint + "-" + System.currentTimeMillis() + "-" + random.nextLong();
 
-    public void testIsEmpty_NoSuchDirectory() throws Exception
-    {
+        if (extension != null) {
+            name = name + "." + extension;
+        }
+
+        return name;
+    }
+
+    public static String getRandomContent(String hint) {
+        return hint + "#" + System.currentTimeMillis() + "#" + random.nextLong();
+    }
+
+    /**
+     * Byte array quality comparison.
+     */
+    public static void assertByteArrayEquals(byte[] b, byte[] b2) {
+
+        if (b == null) {
+            fail("not equal, first operand is null");
+        }
+
+        if (b2 == null) {
+            fail("not equal, second operand is null");
+        }
+
+        if (b.length != b2.length) {
+            fail("lengths differ (" + b.length + " vs. " + b2.length + ")");
+        }
+
+        for(int i = 0; i < b.length; i ++) {
+            if (b[i] != b2[i]) {
+                fail("arrays differ at byte " + i + " (" + (int)b[i] + " vs. " + (int)b2[i] + ")");
+            }
+        }
+    }
+
+    // Attributes ------------------------------------------------------------------------------------------------------
+
+    private static final Random random = new Random();
+
+    // Constructors ----------------------------------------------------------------------------------------------------
+
+    // Public ----------------------------------------------------------------------------------------------------------
+
+    private File scratchDirectory;
+
+    @Before
+    public void before() throws Exception {
+
+        String projectBaseDirName = System.getProperty("basedir");
+        scratchDirectory = new File(projectBaseDirName, "target/test-scratch");
+        assertTrue(scratchDirectory.isDirectory());
+    }
+
+    @After
+    public void after() throws Exception {
+
+        //
+        // scratch directory cleanup
+        //
+
+        assertTrue(io.novaordis.utilities.Files.rmdir(scratchDirectory, false));
+    }
+
+    @Test
+    public void testIsEmpty_NoSuchDirectory() throws Exception {
         File noSuchDir = new File(Tests.getScratchDirectory(), getRandomFileName("testIsEmpty"));
         assertFalse(noSuchDir.isDirectory());
         assertFalse(noSuchDir.isFile());
@@ -47,8 +137,8 @@ public class FilesTest extends FileTestBase
         assertFalse(Files.isEmpty(noSuchDir));
     }
 
-    public void testIsEmpty_ExistingFile() throws Exception
-    {
+    @Test
+    public void testIsEmpty_ExistingFile() throws Exception {
         File file = new File(Tests.getScratchDirectory(), getRandomFileName("testIsEmpty", "txt"));
         assertTrue(file.createNewFile());
         assertTrue(file.isFile());
@@ -56,8 +146,8 @@ public class FilesTest extends FileTestBase
         assertFalse(Files.isEmpty(file));
     }
 
-    public void testIsEmpty_EmptyDirectory() throws Exception
-    {
+    @Test
+    public void testIsEmpty_EmptyDirectory() throws Exception {
         File dir = new File(Tests.getScratchDirectory(), getRandomFileName("testIsEmptyDir"));
         assertFalse(dir.isDirectory());
         assertTrue(dir.mkdir());
@@ -65,8 +155,8 @@ public class FilesTest extends FileTestBase
         assertTrue(Files.isEmpty(dir));
     }
 
-    public void testIsEmpty_NonEmptyDirectory() throws Exception
-    {
+    @Test
+    public void testIsEmpty_NonEmptyDirectory() throws Exception {
         File dir =
             new File(Tests.getScratchDirectory(), getRandomFileName("testIsEmptyDir") + "/content");
         assertTrue(dir.mkdirs());
@@ -74,8 +164,8 @@ public class FilesTest extends FileTestBase
         assertFalse(Files.isEmpty(dir.getParentFile()));
     }
 
-    public void testIsEmpty_NonEmptyDirectory2() throws Exception
-    {
+    @Test
+    public void testIsEmpty_NonEmptyDirectory2() throws Exception {
         File dir = new File(Tests.getScratchDirectory(), getRandomFileName("testIsEmptyDir"));
         assertFalse(dir.isDirectory());
         assertTrue(dir.mkdir());
@@ -84,17 +174,18 @@ public class FilesTest extends FileTestBase
         assertFalse(Files.isEmpty(dir));
     }
 
-    public void testWrite_DestinationIsDirectory() throws Exception
-    {
+    @Test
+    public void testWrite_DestinationIsDirectory() throws Exception {
         assertFalse(Files.write(Tests.getScratchDirectory(), "", true));
     }
 
     //
-    // Files.write() tests -------------------------------------------------------------------------
+    // Files.write() tests ---------------------------------------------------------------------------------------------
     //
 
-    public void testWrite() throws Exception
-    {
+    @Test
+    public void testWrite() throws Exception {
+
         File target = new File(Tests.getScratchDirectory(), getRandomFileName("tw", "txt"));
         assertFalse(target.isFile());
 
@@ -105,8 +196,9 @@ public class FilesTest extends FileTestBase
         assertEquals(content, s);
     }
 
-    public void testWrite_EnclosingDirectoryNotExistent() throws Exception
-    {
+    @Test
+    public void testWrite_EnclosingDirectoryNotExistent() throws Exception {
+
         File scratch = Tests.getScratchDirectory();
 
         File enclosingDir = new File(scratch, "a/b/c");
@@ -126,33 +218,29 @@ public class FilesTest extends FileTestBase
     }
 
     //
-    // Files.read() tests --------------------------------------------------------------------------
+    // Files.read() tests ----------------------------------------------------------------------------------------------
     //
 
-    public void testRead() throws Exception
-    {
+    @Test
+    public void testRead() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -161,30 +249,26 @@ public class FilesTest extends FileTestBase
         assertEquals("", s);
     }
 
-    public void testRead2() throws Exception
-    {
+    @Test
+    public void testRead2() throws Exception  {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -193,30 +277,26 @@ public class FilesTest extends FileTestBase
         assertEquals("\n", s);
     }
 
-    public void testRead3() throws Exception
-    {
+    @Test
+    public void testRead3() throws Exception  {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("a");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -225,30 +305,26 @@ public class FilesTest extends FileTestBase
         assertEquals("a", s);
     }
 
-    public void testRead4() throws Exception
-    {
+    @Test
+    public void testRead4() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("a\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -257,30 +333,26 @@ public class FilesTest extends FileTestBase
         assertEquals("a\n", s);
     }
 
-    public void testRead5() throws Exception
-    {
+    @Test
+    public void testRead5() throws Exception  {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("\n\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -289,25 +361,22 @@ public class FilesTest extends FileTestBase
         assertEquals("\n\n", s);
     }
 
-    public void testRead6() throws Exception
-    {
+    @Test
+    public void testRead6() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("a\n\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
@@ -321,30 +390,26 @@ public class FilesTest extends FileTestBase
         assertEquals("a\n\n", s);
     }
 
-    public void testRead7() throws Exception
-    {
+    @Test
+    public void testRead7() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abc");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -353,30 +418,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abc", s);
     }
 
-    public void testRead8() throws Exception
-    {
+    @Test
+    public void testRead8() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abcd");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -385,30 +446,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abcd", s);
     }
 
-    public void testRead9() throws Exception
-    {
+    @Test
+    public void testRead9() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abcde");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -417,30 +474,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abcde", s);
     }
 
-    public void testRead10() throws Exception
-    {
+    @Test
+    public void testRead10() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("ab\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -449,30 +502,26 @@ public class FilesTest extends FileTestBase
         assertEquals("ab\n", s);
     }
 
-    public void testRead11() throws Exception
-    {
+    @Test
+    public void testRead11() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try  {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abc\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -481,30 +530,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abc\n", s);
     }
 
-    public void testRead12() throws Exception
-    {
+    @Test
+    public void testRead12() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abcd\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -513,30 +558,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abcd\n", s);
     }
 
-    public void testRead13() throws Exception
-    {
+    @Test
+    public void testRead13() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abcdef\nab\n\n\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -545,30 +586,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abcdef\nab\n\n\n", s);
     }
 
-    public void testRead14() throws Exception
-    {
+    @Test
+    public void testRead14() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("read", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abcdabcdabcd\n");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -577,30 +614,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abcdabcdabcd\n", s);
     }
 
-    public void testRead_SingleLineNoCR() throws Exception
-    {
+    @Test
+    public void testRead_SingleLineNoCR() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("singleline", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.print("abc");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -609,30 +642,26 @@ public class FilesTest extends FileTestBase
         assertEquals("abc", s);
     }
 
-    public void testRead_SingleLineWithCR() throws Exception
-    {
+    @Test
+    public void testRead_SingleLineWithCR() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("singleline-with-cr", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
             pw.println("abc");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -641,15 +670,14 @@ public class FilesTest extends FileTestBase
         assertEquals("abc\n", s);
     }
 
-    public void testRead_SingleLineWithCR2() throws Exception
-    {
+    @Test
+    public void testRead_SingleLineWithCR2() throws Exception {
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("singleline-with-cr", "txt"));
 
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
@@ -657,15 +685,12 @@ public class FilesTest extends FileTestBase
             pw.println("efg");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -674,9 +699,8 @@ public class FilesTest extends FileTestBase
         assertEquals("abc\nefg\n", s);
     }
 
-
-    public void testRead_Multiline() throws Exception
-    {
+    @Test
+    public void testRead_Multiline() throws Exception {
         String content = "abc\nxyz\n123\n";
 
         File f = new File(Tests.getScratchDirectory(), getRandomFileName("multiline", "txt"));
@@ -684,8 +708,7 @@ public class FilesTest extends FileTestBase
         FileWriter fw = null;
         PrintWriter pw = null;
 
-        try
-        {
+        try {
             fw = new FileWriter(f);
             pw = new PrintWriter(fw);
 
@@ -694,15 +717,12 @@ public class FilesTest extends FileTestBase
             pw.println("123");
             pw.flush();
         }
-        finally
-        {
-            if (pw != null)
-            {
+        finally {
+            if (pw != null) {
                 pw.close();
             }
 
-            if (fw != null)
-            {
+            if (fw != null) {
                 fw.close();
             }
         }
@@ -711,8 +731,8 @@ public class FilesTest extends FileTestBase
         assertEquals(content, s);
     }
 
-    public void testRmdir_File() throws Exception
-    {
+    @Test
+    public void testRmdir_File() throws Exception {
         File file = new File(Tests.getScratchDirectory(), getRandomFileName("testrm", "txt"));
         assertTrue(file.createNewFile());
         assertTrue(file.isFile());
@@ -724,8 +744,8 @@ public class FilesTest extends FileTestBase
         assertTrue(file.isFile());
     }
 
-    public void testRmdir_IncludingRoot() throws Exception
-    {
+    @Test
+    public void testRmdir_IncludingRoot() throws Exception {
         File root = new File(Tests.getScratchDirectory(), getRandomFileName("testrmdir-root"));
         assertTrue(root.mkdir());
         File file1 = new File(root, "file1.txt");
@@ -750,8 +770,8 @@ public class FilesTest extends FileTestBase
         assertTrue(Files.isEmpty(Tests.getScratchDirectory()));
     }
 
-    public void testRmdir_WithoutRoot() throws Exception
-    {
+    @Test
+    public void testRmdir_WithoutRoot() throws Exception {
         File root = new File(Tests.getScratchDirectory(), getRandomFileName("testrmdir-root"));
         assertTrue(root.mkdir());
         File file1 = new File(root, "file1.txt");
@@ -778,8 +798,8 @@ public class FilesTest extends FileTestBase
         assertTrue(Files.isEmpty(root));
     }
 
-    public void testRmdir_RootInclusive() throws Exception
-    {
+    @Test
+    public void testRmdir_RootInclusive() throws Exception  {
         File scratchDir = Tests.getScratchDirectory();
 
         File root = new File(scratchDir, getRandomFileName("root"));
@@ -816,8 +836,8 @@ public class FilesTest extends FileTestBase
         assertFalse(root.exists());
     }
 
-    public void testRmdir_ButNoRoot() throws Exception
-    {
+    @Test
+    public void testRmdir_ButNoRoot() throws Exception {
         File scratchDir = Tests.getScratchDirectory();
 
         File root = new File(scratchDir, getRandomFileName("root"));
@@ -855,9 +875,9 @@ public class FilesTest extends FileTestBase
 
         assertTrue(root.delete());
     }
-    
-    public void testCp_DestinationFileExists() throws Exception
-    {
+
+    @Test
+    public void testCp_DestinationFileExists() throws Exception {
         File src = new File(Tests.getScratchDirectory(), getRandomFileName("testcp-src-1", "txt"));
         String srcContent = getRandomContent("testcp SOURCE random content");
         assertTrue(Files.write(src, srcContent));
@@ -874,8 +894,8 @@ public class FilesTest extends FileTestBase
         assertEquals(srcContent, copied);
     }
 
-    public void testCp_DestinationIsDirectory() throws Exception
-    {
+    @Test
+    public void testCp_DestinationIsDirectory() throws Exception {
         File src = new File(Tests.getScratchDirectory(), getRandomFileName("testcp-src-2", "txt"));
         String srcContent = getRandomContent("testcp SOURCE random content");
         assertTrue(Files.write(src, srcContent));
@@ -892,8 +912,8 @@ public class FilesTest extends FileTestBase
         assertEquals(srcContent, copied);
     }
 
-    public void testCp_DestinationIsNothing() throws Exception
-    {
+    @Test
+    public void testCp_DestinationIsNothing() throws Exception {
         File src = new File(Tests.getScratchDirectory(), getRandomFileName("testcp-src-3", "txt"));
         String srcContent = getRandomContent("testcp SOURCE random content");
         assertTrue(Files.write(src, srcContent));
@@ -908,84 +928,76 @@ public class FilesTest extends FileTestBase
         assertEquals(srcContent, copied);
     }
 
-    public void testTokenize_InvalidAbsolutePath() throws Exception
-    {
-        try
-        {
+    @Test
+    public void testTokenize_InvalidAbsolutePath() throws Exception {
+        try {
             Files.tokenize(new File("/.."));
             fail("should've failed");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             log.debug(e.getMessage());
         }
     }
 
-    public void testTokenize_InvalidAbsolutePath2() throws Exception
-    {
-        try
-        {
+    @Test
+    public void testTokenize_InvalidAbsolutePath2() throws Exception {
+        try {
             Files.tokenize(new File("/./.."));
             fail("should've failed");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             log.debug(e.getMessage());
         }
     }
 
-    public void testTokenize_InvalidAbsolutePath3() throws Exception
-    {
-        try
-        {
+    @Test
+    public void testTokenize_InvalidAbsolutePath3() throws Exception {
+        try {
             Files.tokenize(new File("/a/../.."));
             fail("should've failed");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             log.debug(e.getMessage());
         }
     }
 
-    public void testTokenize_InvalidAbsolutePath4() throws Exception
-    {
-        try
-        {
+    @Test
+    public void testTokenize_InvalidAbsolutePath4() throws Exception {
+        try {
             Files.tokenize(new File("/a/b/c/../../././.././.."));
             fail("should've failed");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             log.debug(e.getMessage());
         }
     }
 
-    public void testTokenize_Root() throws Exception
-    {
+    @Test
+    public void testTokenize_Root() throws Exception {
         List<String> toks = Files.tokenize(new File("/"));
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_Root2() throws Exception
-    {
+    @Test
+    public void testTokenize_Root2() throws Exception {
         List<String> toks = Files.tokenize(new File("/."));
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_Root3() throws Exception
-    {
+    @Test
+    public void testTokenize_Root3() throws Exception {
         List<String> toks = Files.tokenize(new File("/./"));
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_Root4() throws Exception
-    {
+    @Test
+    public void testTokenize_Root4() throws Exception {
         List<String> toks = Files.tokenize(new File("/./a/.."));
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_ValidAbsolutePath() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidAbsolutePath() throws Exception {
         List<String> toks = Files.tokenize(new File("/a/b/c/"));
 
         assertEquals(3, toks.size());
@@ -994,8 +1006,8 @@ public class FilesTest extends FileTestBase
         assertEquals("c", toks.get(2));
     }
 
-    public void testTokenize_ValidAbsolutePath2() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidAbsolutePath2() throws Exception {
         List<String> toks = Files.tokenize(new File("/a/b/c"));
 
         assertEquals(3, toks.size());
@@ -1004,21 +1016,21 @@ public class FilesTest extends FileTestBase
         assertEquals("c", toks.get(2));
     }
 
-    public void testTokenize_ValidAbsolutePath3() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidAbsolutePath3() throws Exception {
         List<String> toks = Files.tokenize(new File("/a/b/c/../.././././.."));
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_ValidAbsolutePath4() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidAbsolutePath4() throws Exception {
         List<String> toks = Files.tokenize(new File("/a/b/c/.././././.."));
         assertEquals(1, toks.size());
         assertEquals("a", toks.get(0));
     }
 
-    public void testTokenize_ValidRelativePath() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidRelativePath() throws Exception {
         List<String> toks = Files.tokenize(new File("."));
 
         // at this point, toks should contain the "user.dir" content.
@@ -1026,31 +1038,28 @@ public class FilesTest extends FileTestBase
         String userDir = System.getProperty("user.dir");
 
         String myPath = "";
-        for(Iterator<String> i = toks.iterator(); i.hasNext(); )
-        {
+        for(Iterator<String> i = toks.iterator(); i.hasNext(); ) {
             myPath += i.next();
 
-            if (i.hasNext())
-            {
+            if (i.hasNext()) {
                 myPath += File.separator;
             }
         }
 
         log.debug("userDir: " + userDir);
         log.debug("myPath:  " + myPath);
-        assertTrue(userDir.indexOf(myPath) != -1);
+        assertTrue(userDir.contains(myPath));
     }
 
-    public void testTokenize_InvalidValidRelativePath() throws Exception
-    {
+    @Test
+    public void testTokenize_InvalidValidRelativePath() throws Exception {
         // we count the number of components of "user.dir"
 
         String userDir = System.getProperty("user.dir");
         File crtFile = new File(userDir);
 
         int count = 0;
-        while(crtFile.getParentFile() != null)
-        {
+        while(crtFile.getParentFile() != null) {
             count ++;
             crtFile = crtFile.getParentFile();
         }
@@ -1058,37 +1067,32 @@ public class FilesTest extends FileTestBase
         // we create a relative path that exceeds the count with one
 
         String invalidRelPath = "";
-        for(int i = 0; i <= count; i++)
-        {
+        for(int i = 0; i <= count; i++) {
             invalidRelPath += "..";
 
-            if (i < count)
-            {
+            if (i < count) {
                invalidRelPath += "/";
             }
         }
 
-        try
-        {
+        try {
             Files.tokenize(new File(invalidRelPath));
             fail("should've failed");
         }
-        catch(IllegalArgumentException e)
-        {
+        catch(IllegalArgumentException e) {
             log.debug(e.getMessage());
         }
     }
 
-    public void testTokenize_ValidUpwardsRelativePath() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidUpwardsRelativePath() throws Exception {
         // we count the number of components of "user.dir"
 
         String userDir = System.getProperty("user.dir");
         File crtFile = new File(userDir);
 
         int count = 0;
-        while(crtFile.getParentFile() != null)
-        {
+        while(crtFile.getParentFile() != null) {
             count ++;
             crtFile = crtFile.getParentFile();
         }
@@ -1096,12 +1100,10 @@ public class FilesTest extends FileTestBase
         // we create a relative path containing the exact number of ".."
 
         String invalidRelPath = "";
-        for(int i = 0; i < count; i++)
-        {
+        for(int i = 0; i < count; i++) {
             invalidRelPath += "..";
 
-            if (i < count - 1)
-            {
+            if (i < count - 1) {
                invalidRelPath += "/";
             }
         }
@@ -1112,8 +1114,8 @@ public class FilesTest extends FileTestBase
         assertTrue(toks.isEmpty());
     }
 
-    public void testTokenize_ValidRelativePath2() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidRelativePath2() throws Exception {
         List<String> toks = Files.tokenize(new File("a/b/c"));
 
         // we count the number of components of "user.dir"
@@ -1122,8 +1124,7 @@ public class FilesTest extends FileTestBase
         File crtFile = new File(userDir);
 
         int count = 0;
-        while(crtFile.getParentFile() != null)
-        {
+        while(crtFile.getParentFile() != null) {
             count ++;
             crtFile = crtFile.getParentFile();
         }
@@ -1134,8 +1135,8 @@ public class FilesTest extends FileTestBase
         assertEquals("c", toks.get(count + 2));
     }
 
-    public void testTokenize_ValidRelativePath3() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidRelativePath3() throws Exception {
         List<String> toks = Files.tokenize(new File("a/b/./c"));
 
         // we count the number of components of "user.dir"
@@ -1144,8 +1145,7 @@ public class FilesTest extends FileTestBase
         File crtFile = new File(userDir);
 
         int count = 0;
-        while(crtFile.getParentFile() != null)
-        {
+        while(crtFile.getParentFile() != null) {
             count ++;
             crtFile = crtFile.getParentFile();
         }
@@ -1156,8 +1156,8 @@ public class FilesTest extends FileTestBase
         assertEquals("c", toks.get(count + 2));
     }
 
-    public void testTokenize_ValidRelativePath4() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidRelativePath4() throws Exception {
         List<String> toks = Files.tokenize(new File("a/b/../c"));
 
         // we count the number of components of "user.dir"
@@ -1166,8 +1166,7 @@ public class FilesTest extends FileTestBase
         File crtFile = new File(userDir);
 
         int count = 0;
-        while(crtFile.getParentFile() != null)
-        {
+        while(crtFile.getParentFile() != null) {
             count ++;
             crtFile = crtFile.getParentFile();
         }
@@ -1177,8 +1176,8 @@ public class FilesTest extends FileTestBase
         assertEquals("c", toks.get(count + 1));
     }
 
-    public void testTokenize_ValidRelativePath5() throws Exception
-    {
+    @Test
+    public void testTokenize_ValidRelativePath5() throws Exception  {
         List<String> toks = Files.tokenize(new File("a/"));
 
         // we count the number of components of "user.dir"
@@ -1197,48 +1196,48 @@ public class FilesTest extends FileTestBase
         assertEquals("a", toks.get(count));
     }
 
-    public void testRelativePath_NoRelationship() throws Exception
-    {
+    @Test
+    public void testRelativePath_NoRelationship() throws Exception {
         assertNull(Files.relativePath(new File("/a/b/c"), new File("/d")));
     }
 
-    public void testRelativePath_SameFile() throws Exception
-    {
+    @Test
+    public void testRelativePath_SameFile() throws Exception {
         assertEquals("", Files.relativePath(new File("/a/b/c"), new File("/a/b/c")));
     }
 
-    public void testRelativePath_SameFile2() throws Exception
-    {
+    @Test
+    public void testRelativePath_SameFile2() throws Exception {
         assertEquals("", Files.relativePath(new File("."), new File(".")));
     }
 
-    public void testRelativePath_SameFile3() throws Exception
-    {
+    @Test
+    public void testRelativePath_SameFile3() throws Exception {
         assertEquals("", Files.relativePath(new File("a/b/c"), new File("a/b/c")));
     }
 
-    public void testRelativePath_SameFile4() throws Exception
-    {
+    @Test
+    public void testRelativePath_SameFile4() throws Exception {
         assertEquals("", Files.relativePath(new File("a/../b/"), new File("b")));
     }
 
-    public void testRelativePath_SameFile5() throws Exception
-    {
+    @Test
+    public void testRelativePath_SameFile5() throws Exception {
         assertEquals("", Files.relativePath(new File("a//b/c"), new File("a/./b/./c")));
     }
 
-    public void testRelativePath_NotADescendant() throws Exception
-    {
+    @Test
+    public void testRelativePath_NotADescendant() throws Exception {
         assertNull(Files.relativePath(new File("/a/b/c"), new File("/a/b/d")));
     }
 
-    public void testRelativePath_NotADescendant3() throws Exception
-    {
+    @Test
+    public void testRelativePath_NotADescendant3() throws Exception {
         assertNull(Files.relativePath(new File("/a/b/c"), new File("/a/b")));
     }
 
-    public void testMkdirOneElement() throws Exception
-    {
+    @Test
+    public void testMkdirOneElement() throws Exception {
         File scratch = Tests.getScratchDir();
         String lementOne = getRandomFileName("blah");
 
@@ -1253,8 +1252,8 @@ public class FilesTest extends FileTestBase
         assertTrue(f.isDirectory());
     }
 
-    public void testMkdirTwoElements() throws Exception
-    {
+    @Test
+    public void testMkdirTwoElements() throws Exception {
         File scratch = Tests.getScratchDir();
         String elementOne = getRandomFileName("blah");
         String elementTwo = getRandomFileName("bluh");
@@ -1273,8 +1272,8 @@ public class FilesTest extends FileTestBase
         assertTrue(f2.isDirectory());
     }
 
-    public void testMkdirElementsAlreadyExisting() throws Exception
-    {
+    @Test
+    public void testMkdirElementsAlreadyExisting() throws Exception {
         File scratch = Tests.getScratchDir();
         String elementOne = getRandomFileName("blah");
         String elementTwo = getRandomFileName("bluh");
@@ -1300,61 +1299,59 @@ public class FilesTest extends FileTestBase
         assertTrue(f2.isDirectory());
     }
 
-    public void testGetExtension_NullPath() throws Exception
-    {
-        try
-        {
+    @Test
+    public void testGetExtension_NullPath() throws Exception {
+        try {
             Files.getExtension(null);
             fail("should have failed with NPE");
         }
-        catch(NullPointerException e)
-        {
-            log.debug(">>> " + e.getMessage());
+        catch(NullPointerException e) {
+            log.info(e.getMessage());
         }
     }
 
-    public void testGetExtension_EmptyPath() throws Exception
-    {
+    @Test
+    public void testGetExtension_EmptyPath() throws Exception {
         assertNull(Files.getExtension(""));
     }
 
-    public void testGetExtension_NoExtensionFileName() throws Exception
-    {
+    @Test
+    public void testGetExtension_NoExtensionFileName() throws Exception {
         assertNull(Files.getExtension("a"));
     }
 
-    public void testGetExtension_EmptyExtensionFileName() throws Exception
-    {
+    @Test
+    public void testGetExtension_EmptyExtensionFileName() throws Exception {
         assertEquals("", Files.getExtension("a."));
     }
 
-    public void testGetExtension_ValidExtensionFileName() throws Exception
-    {
+    @Test
+    public void testGetExtension_ValidExtensionFileName() throws Exception {
         assertEquals("b", Files.getExtension("a.b"));
     }
 
-    public void testGetExtension_NoExtensionFileNameWithinAPath() throws Exception
-    {
+    @Test
+    public void testGetExtension_NoExtensionFileNameWithinAPath() throws Exception {
         assertNull(Files.getExtension("a/b"));
     }
 
-    public void testGetExtension_EmptyExtensionFileNameWithinAPath() throws Exception
-    {
+    @Test
+    public void testGetExtension_EmptyExtensionFileNameWithinAPath() throws Exception {
         assertEquals("", Files.getExtension("a/b."));
     }
 
-    public void testGetExtension_ValidExtensionFileNameWithinAPath() throws Exception
-    {
+    @Test
+    public void testGetExtension_ValidExtensionFileNameWithinAPath() throws Exception {
         assertEquals("c", Files.getExtension("a/b.c"));
     }
 
-    public void testGetExtension_LastDotInNonTerminalPathComponent() throws Exception
-    {
+    @Test
+    public void testGetExtension_LastDotInNonTerminalPathComponent() throws Exception {
         assertNull(Files.getExtension("a/b.c/d"));
     }
 
 
-    // alternative implementation of relativePath() ------------------------------------------------
+    // alternative implementation of relativePath() --------------------------------------------------------------------
 
 //    @Test
 //    public void testRelativePathExperimental() throws Exception
@@ -1387,32 +1384,32 @@ public class FilesTest extends FileTestBase
 //        assertEquals("a/b/c", path);
 //    }
 
-    public void testRelativePathExperimental_NoRelationshipWhatsoever() throws Exception
-    {
+    @Test
+    public void testRelativePathExperimental_NoRelationshipWhatsoever() throws Exception {
         File ancestor = new File("B:\\");
         File descendent = new File("C:\\a\\b\\c");
 
         assertNull(Files.relativePathExperimental(ancestor, descendent));
     }
 
-    // writeSnapshot -------------------------------------------------------------------------------
+    // writeSnapshot ---------------------------------------------------------------------------------------------------
 
     /**
      * If the system property that specifies the snapshot directory is not set, writeSnapshot()
      * should return null and warn.
      */
-    public void testWriteSnapshot_NoSystemPropertySet() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_NoSystemPropertySet() throws Exception {
         assertNull(Files.writeSnapshot("doesntmatter", 3, "doesntmatter"));
     }
 
-    public void testWriteSnapshot_NullDirectory() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_NullDirectory() throws Exception {
         assertNull(Files.writeSnapshot(null, "doesntmatter", 3, "doesntmatter"));
     }
 
-    public void testWriteSnapshot_NonExistentDirectory() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_NonExistentDirectory() throws Exception {
         File d = new File(Tests.getScratchDir(), getRandomDirectoryName("snapshot"));
         assertFalse(d.isDirectory());
 
@@ -1428,6 +1425,7 @@ public class FilesTest extends FileTestBase
         assertTrue(d2.isDirectory());
 
         File[] files = d2.listFiles();
+        assertNotNull(files);
         assertEquals(1, files.length);
 
         File f = files[0];
@@ -1446,46 +1444,54 @@ public class FilesTest extends FileTestBase
         assertEquals("bluh", Files.read(f));
     }
 
-    public void testWriteSnapshot_KeepLast3() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_KeepLast3() throws Exception {
         File d = new File(Tests.getScratchDir(), getRandomDirectoryName("snapshot"));
         assertTrue(d.mkdir());
 
         String s = Files.writeSnapshot(d, "blah", 3, "1");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
 
         File[] files = d.listFiles();
+        assertNotNull(files);
         assertEquals(1, files.length);
 
         Thread.sleep(2);
 
         s = Files.writeSnapshot(d, "blah", 3, "2");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
 
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(2, files.length);
 
         Thread.sleep(2);
 
         s = Files.writeSnapshot(d, "blah", 3, "3");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
 
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(3, files.length);
 
         Thread.sleep(2);
 
         s = Files.writeSnapshot(d, "blah", 3, "4");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
         
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(3, files.length);
 
         // order the files
 
         List<File> fs = Arrays.asList(files);
-        Collections.sort(fs, new Comparator<File>()
-        {
+        //noinspection Convert2Lambda
+        Collections.sort(fs, new Comparator<File>() {
             public int compare(File f1, File f2)
             {
                 return f1.getName().compareTo(f2.getName());
@@ -1499,16 +1505,18 @@ public class FilesTest extends FileTestBase
         Thread.sleep(2);
 
         s = Files.writeSnapshot(d, "blah", 3, "5");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
 
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(3, files.length);
 
         // order the files
 
         fs = Arrays.asList(files);
-        Collections.sort(fs, new Comparator<File>()
-        {
+        //noinspection Convert2Lambda
+        Collections.sort(fs, new Comparator<File>() {
             public int compare(File f1, File f2)
             {
                 return f1.getName().compareTo(f2.getName());
@@ -1522,16 +1530,18 @@ public class FilesTest extends FileTestBase
         Thread.sleep(2);
 
         s = Files.writeSnapshot(d, "blah", 2, "6");
+        assertNotNull(s);
         assertTrue(new File(s).getName().startsWith("blah."));
 
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(2, files.length);
 
         // order the files
 
         fs = Arrays.asList(files);
-        Collections.sort(fs, new Comparator<File>()
-        {
+        //noinspection Convert2Lambda
+        Collections.sort(fs, new Comparator<File>(){
             public int compare(File f1, File f2)
             {
                 return f1.getName().compareTo(f2.getName());
@@ -1542,8 +1552,8 @@ public class FilesTest extends FileTestBase
         assertEquals("6", Files.read(fs.get(1)));
     }
 
-    public void testWriteSnapshot_MakeSureDifferentPrefixesAreIgnored() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_MakeSureDifferentPrefixesAreIgnored() throws Exception {
         File d = new File(Tests.getScratchDir(), getRandomDirectoryName("snapshot"));
         assertTrue(d.mkdir());
 
@@ -1551,13 +1561,14 @@ public class FilesTest extends FileTestBase
 
         Files.writeSnapshot(d, "blah", 1, "1");
         File[] files = d.listFiles();
+        assertNotNull(files);
         assertEquals(2, files.length);
 
         // order the files
 
         List<File> fs = Arrays.asList(files);
-        Collections.sort(fs, new Comparator<File>()
-        {
+        //noinspection Convert2Lambda
+        Collections.sort(fs, new Comparator<File>() {
             public int compare(File f1, File f2)
             {
                 return f1.getName().compareTo(f2.getName());
@@ -1569,13 +1580,14 @@ public class FilesTest extends FileTestBase
 
         Files.writeSnapshot(d, "blah", 1, "2");
         files = d.listFiles();
+        assertNotNull(files);
         assertEquals(2, files.length);
 
         // order the files
 
         fs = Arrays.asList(files);
-        Collections.sort(fs, new Comparator<File>()
-        {
+        //noinspection Convert2Lambda
+        Collections.sort(fs, new Comparator<File>() {
             public int compare(File f1, File f2)
             {
                 return f1.getName().compareTo(f2.getName());
@@ -1586,8 +1598,8 @@ public class FilesTest extends FileTestBase
         assertEquals("bluh", Files.read(fs.get(1)));
     }
 
-    public void testGenerateUniqueName() throws Exception
-    {
+    @Test
+    public void testGenerateUniqueName() throws Exception {
         File d = new File(Tests.getScratchDir(), getRandomDirectoryName("d"));
         assertTrue(d.mkdir());
 
@@ -1612,8 +1624,8 @@ public class FilesTest extends FileTestBase
         assertTrue(Files.write(f, "something"));
     }
 
-    public void testWriteSnapshot_Collection() throws Exception
-    {
+    @Test
+    public void testWriteSnapshot_Collection() throws Exception {
         File d = new File(Tests.getScratchDir(), getRandomDirectoryName("snapshot"));
         assertTrue(d.mkdir());
 
@@ -1621,9 +1633,11 @@ public class FilesTest extends FileTestBase
 
         String s = Files.writeSnapshot(d, "collection", 1, content);
         File[] files = d.listFiles();
+        assertNotNull(files);
         assertEquals(1, files.length);
 
         File f = files[0];
+        assertNotNull(s);
         assertEquals(f.getAbsoluteFile(), new File(s));
 
         String recovered = Files.read(f);
@@ -1638,11 +1652,71 @@ public class FilesTest extends FileTestBase
         br.close();
     }
 
-    // Package protected ---------------------------------------------------------------------------
+    // readBytes() -----------------------------------------------------------------------------------------------------
 
-    // Protected -----------------------------------------------------------------------------------
+    @Test
+    public void readBytes() throws Exception {
 
-    // Private -------------------------------------------------------------------------------------
+        String content = "something\nsomething else\nend\n";
+        File f = new File(scratchDirectory, "test.txt");
+        Files.write(f, content);
 
-    // Inner classes -------------------------------------------------------------------------------
+        byte[] bytes = Files.readBytes(f);
+        assertByteArrayEquals(content.getBytes(), bytes);
+    }
+
+    // append() --------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void append() throws Exception {
+
+        String content = "something\nsomething else\nend\n";
+        File f = new File(scratchDirectory, "test.txt");
+        Files.write(f, content);
+
+        assertTrue(Files.append(f, "not quite\n"));
+
+        assertEquals(
+                "something\n" +
+                "something else\n" +
+                "end\n" +
+                "not quite\n",
+                Files.read(f));
+    }
+
+    // identical() -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void identical() throws Exception {
+
+        String content = "something\nsomething else\nend\n";
+        File f = new File(scratchDirectory, "test.txt");
+        assertTrue(Files.write(f, content));
+        File f2 = new File(scratchDirectory, "test2.txt");
+        assertTrue(Files.write(f2, content));
+
+        assertTrue(Files.identical(f, f2));
+    }
+
+    @Test
+    public void testNotIdentical() throws Exception {
+
+        String content = "something\nsomething else\nend\n";
+        File f = new File(scratchDirectory, "test.txt");
+        assertTrue(Files.write(f, content));
+
+        String content2 = content.substring(0, content.length() - 1);
+        File f2 = new File(scratchDirectory, "test2.txt");
+        assertTrue(Files.write(f2, content2));
+
+        assertFalse(Files.identical(f, f2));
+    }
+
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 }
