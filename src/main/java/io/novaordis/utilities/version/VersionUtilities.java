@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
+package io.novaordis.utilities.version;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
+ * See {@linktourl https://kb.novaordis.com/index.php/Nova_Ordis_Utilities_Version_Metadata_Handling}
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/27/16
  */

@@ -7,3 +7,4 @@
 * OS
 ** Added support for OS mocking. https://kb.novaordis.com/index.php/Nova_Ordis_Utilities_OS_Support#Testing_with_a_Mock_OS
 ** OS.getInstance() caches the instance now.
+* VersionUtilities: moved the class under io.novaordis.utilities.version.

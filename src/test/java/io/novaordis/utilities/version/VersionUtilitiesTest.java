@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
+package io.novaordis.utilities.version;
 
+import io.novaordis.utilities.Files;
+import io.novaordis.utilities.version.VersionUtilities;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
