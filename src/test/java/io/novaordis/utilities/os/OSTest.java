@@ -17,11 +17,13 @@
 package io.novaordis.utilities.os;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -41,6 +43,16 @@ public abstract class OSTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @After
+    public void tearDown() {
+
+        //
+        // clear the cached OS instance, if any
+        //
+
+        OS.clearInstance();
+    }
+
     // getInstance() ---------------------------------------------------------------------------------------------------
 
     @Test
@@ -49,6 +61,16 @@ public abstract class OSTest {
         OS os = OS.getInstance();
         log.info(os);
         assertNotNull(os);
+    }
+
+    @Test
+    public void getInstance_SuccessiveInvocationsReturnIdenticalInstances() throws Exception {
+
+        OS os = OS.getInstance();
+
+        OS os2 = OS.getInstance();
+
+        assertTrue(os == os2);
     }
 
     @Test

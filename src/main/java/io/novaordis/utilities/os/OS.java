@@ -34,44 +34,87 @@ public interface OS {
     // Conventional OS names
     //
 
+    @SuppressWarnings("unused")
     String MacOS = "MacOS";
+
+    @SuppressWarnings("unused")
     String Linux = "Linux";
+
+    @SuppressWarnings("unused")
     String Windows = "Windows";
+
+    //
+    // cached instance
+    //
+
+    OS[] instance = new OS[1];
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * Build and return the OS implementation appropriated for this system. The default behavior can be modified by
+     * setting "os.class" system property to contain a fully qualified class name of an OS implementation.
+     *
+     * The method caches the instance internally upon creation. It is guaranteed that two successive invocations return
+     * instances that are identical (instance1 == instance2).
+     */
     static OS getInstance() throws Exception {
 
-        //
-        // first attempt to look up a custom implementation - this is mainly useful while testing
-        //
+        synchronized (instance) {
 
-        String osImplementationClassName = System.getProperty(OS_IMPLEMENTATION_PROPERTY_NAME);
+            if (instance[0] != null) {
+                return instance[0];
+            }
 
-        if (osImplementationClassName != null) {
-            Class c = Class.forName(osImplementationClassName);
-            return (OS) c.newInstance();
+            //
+            // first attempt to look up a custom implementation - this is mainly useful while testing
+            //
+
+            String osImplementationClassName = System.getProperty(OS_IMPLEMENTATION_PROPERTY_NAME);
+
+            if (osImplementationClassName != null) {
+                Class c = Class.forName(osImplementationClassName);
+                instance[0] = (OS) c.newInstance();
+            }
+            else {
+
+                String osName = System.getProperty("os.name");
+
+                if (osName == null) {
+                    throw new IllegalStateException(
+                            "'" + OS_IMPLEMENTATION_PROPERTY_NAME + "' or 'os.name' system properties not available");
+                }
+
+                String lcOsName = osName.toLowerCase();
+
+                if (lcOsName.contains("mac")) {
+
+                    instance[0] = new MacOS();
+                }
+                else if (lcOsName.contains("linux")) {
+
+                    instance[0] = new LinuxOS();
+                }
+                else if (lcOsName.contains("windows")) {
+
+                    instance[0] = new WindowsOS();
+                }
+                else {
+                    throw new IllegalStateException("unrecognized 'os.name' value " + osName);
+                }
+            }
+
+            return instance[0];
         }
+    }
 
-        String osName = System.getProperty("os.name");
+    /**
+     * Clears the cached OS instance, if any.
+     */
+    static void clearInstance() {
 
-        if (osName == null) {
-            throw new IllegalStateException("'os.name' system property not available");
-        }
-
-        String lcOsName = osName.toLowerCase();
-
-        if (lcOsName.contains("mac")) {
-            return new MacOS();
-        }
-        else if (lcOsName.contains("linux")) {
-            return new LinuxOS();
-        }
-        else if (lcOsName.contains("windows")) {
-            return new WindowsOS();
-        }
-        else {
-            throw new IllegalStateException("unrecognized 'os.name' value " + osName);
+        synchronized (instance) {
+            instance[0] = null;
         }
     }
 
@@ -88,28 +131,28 @@ public interface OS {
 
      try {
 
-        NativeExecutionResult result = os.execute(commandName);
+     NativeExecutionResult result = os.execute(commandName);
 
-        if (result.isSuccess()) {
-            stdout = result.getStdout();
-        }
-        else {
-            log.warn(result.getStderr());
-        }
+     if (result.isSuccess()) {
+     stdout = result.getStdout();
+     }
+     else {
+     log.warn(result.getStderr());
+     }
      }
      catch(NativeExecutionException e) {
 
-        String msg = e.getMessage();
-        String warningMsg = msg != null ? msg : "";
-        Throwable cause = e.getCause();
-        if (cause != null) {
-            String causeMsg = cause.getClass().getSimpleName();
-            if (cause.getMessage() != null) {
-                causeMsg += ": " + cause.getMessage();
-            }
-            warningMsg += ", " + causeMsg;
-        }
-        log.warn(warningMsg);
+     String msg = e.getMessage();
+     String warningMsg = msg != null ? msg : "";
+     Throwable cause = e.getCause();
+     if (cause != null) {
+     String causeMsg = cause.getClass().getSimpleName();
+     if (cause.getMessage() != null) {
+     causeMsg += ": " + cause.getMessage();
+     }
+     warningMsg += ", " + causeMsg;
+     }
+     log.warn(warningMsg);
      }
      */
     NativeExecutionResult execute(String command) throws NativeExecutionException;

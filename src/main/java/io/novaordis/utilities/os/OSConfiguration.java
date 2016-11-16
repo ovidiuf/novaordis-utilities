@@ -17,7 +17,6 @@
 package io.novaordis.utilities.os;
 
 /**
- *
  * An instance that give access to underlying O/S configuration values that do not change as long as the system is
  * not rebooted (an example is the memory page size). The instance reads those values at initialization, and then it
  * keeps returned the cached values. Instances implementing this interface can only be obtained through the
