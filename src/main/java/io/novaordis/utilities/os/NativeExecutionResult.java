@@ -88,6 +88,12 @@ public class NativeExecutionResult {
         return exitStatus;
     }
 
+    @Override
+    public String toString() {
+
+        return "" + exitStatus;
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
