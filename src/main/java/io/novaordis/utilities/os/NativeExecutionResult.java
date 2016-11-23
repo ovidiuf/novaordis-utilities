@@ -65,6 +65,14 @@ public class NativeExecutionResult {
     }
 
     /**
+     * @return true the corresponding command execution was a failure - it completed and returned a non-zero exit status.
+     */
+    public boolean isFailure() {
+
+        return !isSuccess();
+    }
+
+    /**
      * @return the content sent by the corresponding command to stdout during the execution. May return null.
      */
     public String getStdout() {

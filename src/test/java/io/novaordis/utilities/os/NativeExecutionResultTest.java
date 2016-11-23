@@ -74,6 +74,7 @@ public class NativeExecutionResultTest {
 
         assertEquals(0, r.getExitStatus());
         assertTrue(r.isSuccess());
+        assertFalse(r.isFailure());
         assertEquals("something", r.getStdout());
         assertEquals("something else", r.getStderr());
     }
@@ -85,6 +86,7 @@ public class NativeExecutionResultTest {
 
         assertEquals(1, r.getExitStatus());
         assertFalse(r.isSuccess());
+        assertTrue(r.isFailure());
     }
 
     @Test
