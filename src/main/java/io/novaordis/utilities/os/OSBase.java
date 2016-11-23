@@ -16,6 +16,10 @@
 
 package io.novaordis.utilities.os;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -25,6 +29,8 @@ import java.io.InputStream;
 abstract class OSBase implements OS {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(OSBase.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -36,6 +42,17 @@ abstract class OSBase implements OS {
 
     @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {
+        return execute(null, command);
+    }
+
+    @Override
+    public NativeExecutionResult execute(File directory, String command) throws NativeExecutionException {
+
+        if (directory == null) {
+            directory = new File(".");
+        }
+
+        log.debug("executing " + command + " in " + directory.getAbsolutePath());
 
         //
         // Linux and MacOS implementations should be identical; for Windows, will override if necessary

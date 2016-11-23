@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.os;
 
+import java.io.File;
+
 /**
  * A proxy for the underlying operating system, to be used for native command execution.
  *
@@ -154,8 +156,18 @@ public interface OS {
      }
      log.warn(warningMsg);
      }
+
+     @see OS#execute(String)
      */
     NativeExecutionResult execute(String command) throws NativeExecutionException;
+
+    /**
+     * @param directory the directory to execute the command into. null is OK, it means "execute in the current
+     *                  directory"
+     *
+     * @see OS#execute(String)
+     */
+    NativeExecutionResult execute(File directory, String command) throws NativeExecutionException;
 
     /**
      * "Linux" (OS.Linux), "MacOS" (OS.MacOS), "Windows" (OS.Windows).

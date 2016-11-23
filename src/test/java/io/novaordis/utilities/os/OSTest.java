@@ -80,6 +80,8 @@ public abstract class OSTest {
         assertNotNull(os);
     }
 
+    // execute ---------------------------------------------------------------------------------------------------------
+
     @Test
     public void execute_OneWord() throws Exception {
 
@@ -97,6 +99,18 @@ public abstract class OSTest {
 
         OS os = getOSToTest();
         NativeExecutionResult ner = os.execute("ls .");
+
+        assertEquals(0, ner.getExitStatus());
+        String lsContent = ner.getStdout();
+        log.info(lsContent);
+        assertFalse(lsContent.isEmpty());
+    }
+
+    @Test
+    public void execute_NullCurrentDirectory() throws Exception {
+
+        OS os = getOSToTest();
+        NativeExecutionResult ner = os.execute(null, "ls");
 
         assertEquals(0, ner.getExitStatus());
         String lsContent = ner.getStdout();

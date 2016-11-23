@@ -16,6 +16,7 @@
 
 package io.novaordis.utilities.os;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,11 @@ public class MockOS implements OS {
 
     @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {
+        return execute(null, command);
+    }
+
+    @Override
+    public NativeExecutionResult execute(File directory, String command) throws NativeExecutionException {
 
         //
         // first try the commands that throw exceptions
