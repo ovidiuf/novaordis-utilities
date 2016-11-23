@@ -136,11 +136,11 @@ public interface OS {
             if (location.endsWith("/.")) {
                 location = location.substring(0, location.length() - 2);
             }
-            
+
             location = " in " + location;
         }
 
-        log.debug("executing " + command + location);
+        log.debug("executing \"" + command + "\"" + location);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
