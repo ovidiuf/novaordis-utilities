@@ -131,7 +131,13 @@ public interface OS {
         String location = "";
 
         if (directory != null) {
-            location = " in " + directory.getAbsolutePath();
+            location = directory.getAbsolutePath();
+
+            if (location.endsWith("/.")) {
+                location = location.substring(0, location.length() - 2);
+            }
+            
+            location = " in " + location;
         }
 
         log.debug("executing " + command + location);
