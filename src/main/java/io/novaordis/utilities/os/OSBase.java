@@ -52,7 +52,7 @@ abstract class OSBase implements OS {
             directory = new File(".");
         }
 
-        log.debug("executing " + command + " in " + directory.getAbsolutePath());
+        OS.logExecution(log, directory, command);
 
         //
         // Linux and MacOS implementations should be identical; for Windows, will override if necessary

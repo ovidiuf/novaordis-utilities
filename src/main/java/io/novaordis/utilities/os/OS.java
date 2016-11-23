@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.os;
 
+import org.slf4j.Logger;
+
 import java.io.File;
 
 /**
@@ -118,6 +120,21 @@ public interface OS {
         synchronized (instance) {
             instance[0] = null;
         }
+    }
+
+    static void logExecution(Logger log, File directory, String command) {
+
+        if (log == null) {
+            return;
+        }
+
+        String location = "";
+
+        if (directory != null) {
+            location = " in " + directory.getAbsolutePath();
+        }
+
+        log.debug("executing " + command + location);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
