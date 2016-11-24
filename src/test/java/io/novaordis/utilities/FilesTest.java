@@ -1712,6 +1712,19 @@ public class FilesTest {
         assertFalse(Files.identical(f, f2));
     }
 
+    // chmod() ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void chmod() throws Exception {
+
+        File f = new File(scratchDirectory, "test.txt");
+        Files.write(f, "test");
+        assertTrue(Files.chmod(f, "rw-rw----"));
+
+        String s = Files.getPermissions(f);
+        assertEquals("rw-rw----", s);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -19,8 +20,11 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FilenameFilter;
 import java.io.StringWriter;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.LinkedList;
 import java.util.Arrays;
@@ -732,15 +736,13 @@ public class Files {
      *
      * @see Files#writeSnapshot(java.io.File, String, int, Object)
      */
-    public static String writeSnapshot(String prefix, int keepLast, Object o)
-    {
+    public static String writeSnapshot(String prefix, int keepLast, Object o) {
+
         String dirName = System.getProperty(SNAPSHOT_DIRECTORY_PROPERTY_NAME);
 
-        if (dirName == null)
-        {
-            log.warn("No '" + SNAPSHOT_DIRECTORY_PROPERTY_NAME + "' system property set, " +
-                     "don't know where to write the snapshot");
+        if (dirName == null) {
 
+            log.warn("No '" + SNAPSHOT_DIRECTORY_PROPERTY_NAME + "' system property set, don't know where to write the snapshot");
             return null;
         }
 
@@ -776,17 +778,45 @@ public class Files {
 
     }
 
-    // Attributes ----------------------------------------------------------------------------------
+    /**
+     * Applies permissions specified in chmod format.
+     *
+     * Multiple formats are allowed.
+     *
+     * TODO: incomplete implementation
+     */
+    public static boolean chmod(File f, String posixMode) {
 
-    // Constructors --------------------------------------------------------------------------------
+        Set<PosixFilePermission> permissions = PosixFilePermissions.fromString(posixMode);
 
-    // Public --------------------------------------------------------------------------------------
+        try {
+            java.nio.file.Files.setPosixFilePermissions(f.toPath(), permissions);
+        }
+        catch(IOException e) {
+            log.warn("failed to set permissions " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
 
-    // Package protected ---------------------------------------------------------------------------
+    public static String getPermissions(File f) throws IOException {
 
-    // Protected -----------------------------------------------------------------------------------
+        Set<PosixFilePermission> permissions = java.nio.file.Files.getPosixFilePermissions(f.toPath());
+        return PosixFilePermissions.toString(permissions);
 
-    // Private -------------------------------------------------------------------------------------
+    }
 
-    // Inner classes -------------------------------------------------------------------------------
+    // Attributes ------------------------------------------------------------------------------------------------------
+
+    // Constructors ----------------------------------------------------------------------------------------------------
+
+    // Public ----------------------------------------------------------------------------------------------------------
+
+    // Package protected -----------------------------------------------------------------------------------------------
+
+    // Protected -------------------------------------------------------------------------------------------------------
+
+    // Private ---------------------------------------------------------------------------------------------------------
+
+    // Inner classes ---------------------------------------------------------------------------------------------------
 }

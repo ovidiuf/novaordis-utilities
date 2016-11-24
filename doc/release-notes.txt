@@ -12,3 +12,5 @@
 ** Added support for double-quoted strings passed as argument to execute().
 * VersionUtilities: moved the class under io.novaordis.utilities.version.
 * Added Files.identical()
+* Files
+** Added Files.chmod()
