@@ -151,8 +151,19 @@ public interface OS {
     OSConfiguration getConfiguration();
 
     /**
+     * @see OS#execute(File, String)
+     */
+    NativeExecutionResult execute(String command) throws NativeExecutionException;
+
+    /**
+     * @param directory the directory to execute the command into. null is OK, it means "execute in the current
+     *                  directory"
+     *
+     * @param command A double quote enclosed sequence is sent to the underlying API as one string.
+     *
      * Recommended usage pattern:
      *
+     <pre>
 
      try {
 
@@ -180,15 +191,9 @@ public interface OS {
      log.warn(warningMsg);
      }
 
-     @see OS#execute(String)
-     */
-    NativeExecutionResult execute(String command) throws NativeExecutionException;
+     </pre>
 
-    /**
-     * @param directory the directory to execute the command into. null is OK, it means "execute in the current
-     *                  directory"
-     *
-     * @see OS#execute(String)
+        @see OS#execute(String)
      */
     NativeExecutionResult execute(File directory, String command) throws NativeExecutionException;
 

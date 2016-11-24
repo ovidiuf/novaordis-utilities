@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -33,6 +35,65 @@ abstract class OSBase implements OS {
     private static final Logger log = LoggerFactory.getLogger(OSBase.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
+
+    // Package Protected Static ----------------------------------------------------------------------------------------
+
+    /**
+     * Splits into tokens, taking into account double quotes.
+     */
+    static String[] split(String s) {
+
+        List<String> tokens = new ArrayList<>();
+
+        String token = "";
+        boolean quoted = false;
+
+        for(int i = 0; i < s.length(); i ++) {
+
+            char c = s.charAt(i);
+
+            if (quoted) {
+
+                if (c == '"') {
+
+                    //
+                    // end quotes
+                    //
+
+                    tokens.add(token);
+                    token = "";
+                    quoted = false;
+                    continue;
+                }
+            }
+            else if (c == ' ' || c == '\t') {
+
+                if (token.length() > 0) {
+                    tokens.add(token);
+                    token = "";
+                }
+                continue;
+            }
+            else if (c == '"') {
+
+                quoted = true;
+                continue;
+            }
+
+            token += c;
+        }
+
+        //
+        // process last token
+        //
+
+        if (token.length() > 0) {
+            tokens.add(token);
+        }
+
+        String[] result = new String[tokens.size()];
+        return tokens.toArray(result);
+    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -58,7 +119,7 @@ abstract class OSBase implements OS {
         // Linux and MacOS implementations should be identical; for Windows, will override if necessary
         //
 
-        String[] commands = command.split(" +");
+        String[] commands = split(command);
 
         try {
 

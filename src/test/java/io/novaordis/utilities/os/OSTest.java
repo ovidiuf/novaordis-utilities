@@ -118,6 +118,49 @@ public abstract class OSTest {
         assertFalse(lsContent.isEmpty());
     }
 
+    @Test
+    public void execute_DoubleQuotedStringFragment() throws Exception {
+
+        OS os = getOSToTest();
+
+        NativeExecutionResult er = os.execute("echo \"two words\"");
+
+        assertTrue(er.isSuccess());
+
+        String stdout = er.getStdout();
+        assertEquals("two words\n", stdout);
+    }
+
+    // split -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void split_NoSpaces() throws Exception {
+
+        String[] s = OSBase.split("test");
+        assertEquals(1, s.length);
+        assertEquals("test", s[0]);
+    }
+
+    @Test
+    public void split_Spaces() throws Exception {
+
+        String[] s = OSBase.split(" test1     test2 \t\t test3 ");
+        assertEquals(3, s.length);
+        assertEquals("test1", s[0]);
+        assertEquals("test2", s[1]);
+        assertEquals("test3", s[2]);
+    }
+
+    @Test
+    public void split_DoubleQuotes() throws Exception {
+
+        String[] s = OSBase.split("a \"b c\" d");
+        assertEquals(3, s.length);
+        assertEquals("a", s[0]);
+        assertEquals("b c", s[1]);
+        assertEquals("d", s[2]);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

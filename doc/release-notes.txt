@@ -9,5 +9,6 @@
 ** OS.getInstance() caches the instance now.
 ** OS.execute() logs commands in DEBUG
 ** Additional OS.execute() signature that gets the directory to execute into.
+** Added support for double-quoted strings passed as argument to execute().
 * VersionUtilities: moved the class under io.novaordis.utilities.version.
 * Added Files.identical()
