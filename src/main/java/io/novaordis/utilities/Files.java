@@ -806,6 +806,36 @@ public class Files {
 
     }
 
+    /**
+     * The same semantics as the basename Linux command. Equivalent with basename(f, null).
+     */
+    public static String basename(File f) {
+
+        return basename(f, null);
+    }
+
+    /**
+     * The same semantics as the basename Linux command.
+     *
+     * @param extension The string to be eliminate as extension when extracting the basename. If we want to eliminate
+     *                  the dot, it must be specified in the extension string. null is acceptable, means ignore
+     *                  extension and return the basename with it.
+     */
+    public static String basename(File f, String extension) {
+
+        String name = f.getName();
+
+        if (extension == null) {
+            return name;
+        }
+
+        if (name.endsWith(extension)) {
+            return name.substring(0, name.length() - extension.length());
+        }
+
+        return name;
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------

@@ -1725,6 +1725,29 @@ public class FilesTest {
         assertEquals("rw-rw----", s);
     }
 
+    // basename() ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void basename() throws Exception {
+
+        String n = Files.basename(new File("something/somethingelse.txt"));
+        assertEquals("somethingelse.txt", n);
+    }
+
+    @Test
+    public void basename2() throws Exception {
+
+        String n = Files.basename(new File("something/somethingelse.txt"), ".txt");
+        assertEquals("somethingelse", n);
+    }
+
+    @Test
+    public void basename3() throws Exception {
+
+        String n = Files.basename(new File("something/somethingelse.txt"), "txt");
+        assertEquals("somethingelse.", n);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

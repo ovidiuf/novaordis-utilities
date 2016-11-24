@@ -10,7 +10,7 @@
     <artifactId>novaordis-utilities</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.2.2-SNAPSHOT-16</version>
+    <version>4.2.2-SNAPSHOT-17</version>
 
     <properties>
         <slf4j-version>1.7.12</slf4j-version>
