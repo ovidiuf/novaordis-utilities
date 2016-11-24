@@ -87,6 +87,15 @@ public class MockOS implements OS {
             }
         }
 
+        //
+        // we simulate pwd
+        //
+
+        if ("pwd".equals(command)) {
+
+            return new NativeExecutionResult(0, directory.toString() + "\n", null);
+        }
+
         throw new RuntimeException("we don't know how to mock command " + command);
     }
 

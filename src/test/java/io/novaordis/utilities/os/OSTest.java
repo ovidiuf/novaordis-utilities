@@ -18,7 +18,10 @@ package io.novaordis.utilities.os;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -39,18 +42,35 @@ public abstract class OSTest {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private File scratchDirectory;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    @Before
+    public void before() throws Exception {
+
+        String projectBaseDirName = System.getProperty("basedir");
+        scratchDirectory = new File(projectBaseDirName, "target/test-scratch");
+        assertTrue(scratchDirectory.isDirectory());
+    }
+
     @After
     public void tearDown() {
+
+        //
+        // scratch directory cleanup
+        //
+
+        assertTrue(io.novaordis.utilities.Files.rmdir(scratchDirectory, false));
 
         //
         // clear the cached OS instance, if any
         //
 
         OS.clearInstance();
+
     }
 
     // getInstance() ---------------------------------------------------------------------------------------------------
@@ -129,6 +149,27 @@ public abstract class OSTest {
 
         String stdout = er.getStdout();
         assertEquals("two words\n", stdout);
+    }
+
+    @Test
+    public void execute_DifferentDirectory() throws Exception {
+
+        OS os = getOSToTest();
+
+        File d = new File(scratchDirectory, "test-dir");
+        assertTrue(d.mkdir());
+
+        NativeExecutionResult er = os.execute(d, "pwd");
+
+        assertTrue(er.isSuccess());
+
+        String stdout = er.getStdout();
+
+        stdout = stdout.trim();
+
+        File d2 = new File(stdout);
+
+        assertEquals(d2, d);
     }
 
     // split -----------------------------------------------------------------------------------------------------------

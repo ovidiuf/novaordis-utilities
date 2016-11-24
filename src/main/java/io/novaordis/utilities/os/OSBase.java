@@ -110,6 +110,7 @@ abstract class OSBase implements OS {
     public NativeExecutionResult execute(File directory, String command) throws NativeExecutionException {
 
         if (directory == null) {
+
             directory = new File(".");
         }
 
@@ -127,7 +128,9 @@ abstract class OSBase implements OS {
             // TODO naive implementation, does not account for limited buffers, etc, must revisit ...
             //
 
-            Process p = new ProcessBuilder().command(commands).start();
+            ProcessBuilder pb = new ProcessBuilder();
+            pb.directory(directory);
+            Process p = pb.command(commands).start();
 
             int exitCode = p.waitFor();
 
