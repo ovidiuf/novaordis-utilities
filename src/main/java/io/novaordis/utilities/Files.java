@@ -775,13 +775,12 @@ public class Files {
         catch(Exception e) {
             throw new IllegalStateException("file access generated I/O failure", e);
         }
-
     }
 
     /**
-     * Applies permissions specified in chmod format.
+     * Applies permissions specified in chmod format. Multiple formats are allowed.
      *
-     * Multiple formats are allowed.
+     * @param posixMode Formats supported: "rwxr-xr-x"
      *
      * TODO: incomplete implementation
      */
