@@ -914,6 +914,7 @@ public class FilesTest {
 
     @Test
     public void testCp_DestinationIsNothing() throws Exception {
+
         File src = new File(Tests.getScratchDirectory(), getRandomFileName("testcp-src-3", "txt"));
         String srcContent = getRandomContent("testcp SOURCE random content");
         assertTrue(Files.write(src, srcContent));
@@ -927,6 +928,24 @@ public class FilesTest {
         String copied = Files.read(dest);
         assertEquals(srcContent, copied);
     }
+
+    @Test
+    public void cp_RecursiveDirectory() throws Exception {
+
+        File scratchDirectory = Tests.getScratchDirectory();
+        File sourceDir = new File(System.getProperty("basedir"), "src/test/resources/data/files");
+        assertFalse(new File(scratchDirectory, "files").exists());
+
+        assertTrue(Files.cp(sourceDir, scratchDirectory));
+
+        assertTrue(new File(scratchDirectory, "files").isDirectory());
+        assertTrue(new File(scratchDirectory, "files/file1.txt").isFile());
+        assertTrue(new File(scratchDirectory, "files/dir1").isDirectory());
+        assertTrue(new File(scratchDirectory, "files/dir1/file2.txt").isFile());
+        assertTrue(new File(scratchDirectory, "files/dir1/dir2").isDirectory());
+    }
+
+    // tokenize --------------------------------------------------------------------------------------------------------
 
     @Test
     public void testTokenize_InvalidAbsolutePath() throws Exception {

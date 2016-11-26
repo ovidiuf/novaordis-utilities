@@ -293,7 +293,8 @@ public class Files {
     }
 
     /**
-     * Copies the source file to destination
+     * Copies the source file or directory to destination. If the source is a directory, the directory is copied
+     * recursively. The behavior is identical with cp -r .../src .../dest (it will create .../dest/src/...)
      *
      * If 'dest' is a file that exists, its content will be overwritten.
      *
@@ -305,31 +306,70 @@ public class Files {
      * @return true if operation completed successfully, false otherwise. Errors are logged with
      *         log4j.
      */
-    public static boolean cp(File src, File dest)
-    {
+    public static boolean cp(File src, File dest) {
+
         File destDir;
         String destFile;
 
-        if (dest.isDirectory())
-        {
+        if (dest.isDirectory()) {
+
             destDir = dest;
             destFile = src.getName();
         }
-        else
-        {
+        else {
+
             destDir = dest.getParentFile();
             destFile = dest.getName();
         }
 
-        if (!destDir.isDirectory())
-        {
+        if (!destDir.isDirectory()) {
+
             // attempt to create the target dir
-            if (!destDir.mkdirs())
-            {
+            if (!destDir.mkdirs()) {
+
                 log.warn("Could not create directory " + destDir);
                 return false;
             }
         }
+
+        if (src.isDirectory()) {
+
+            //
+            // create root
+            //
+
+            File root = new File(dest, src.getName());
+
+            if (!root.mkdir()) {
+
+                return false;
+            }
+
+            //
+            // recursive directory copy
+            //
+
+            File[] dirContent = src.listFiles();
+
+            if (dirContent == null) {
+
+                return true;
+            }
+
+            for(File c: dirContent) {
+
+                if (!Files.cp(c, root)) {
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        //
+        // file copy
+        //
 
         dest = new File(destDir, destFile);
 
@@ -338,8 +378,8 @@ public class Files {
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
 
-        try
-        {
+        try {
+
             fis = new FileInputStream(src);
             bis = new BufferedInputStream(fis, 10240);
 
@@ -349,63 +389,61 @@ public class Files {
             byte[] buffer = new byte[10240];
 
             int i;
-            while((i = bis.read(buffer)) != -1)
-            {
+            while((i = bis.read(buffer)) != -1) {
+
                 bos.write(buffer, 0, i);
             }
 
             return true;
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
+
             return false;
         }
-        finally
-        {
-            if (bis != null)
-            {
-                try
-                {
+        finally {
+
+            if (bis != null) {
+
+                try {
+
                     bis.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
+
                     log.error("Failed to close the buffered input stream", e);
                 }
             }
 
-            if (fis != null)
-            {
-                try
-                {
+            if (fis != null) {
+
+                try {
+
                     fis.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
+
                     log.error("Failed to close the souce input stream", e);
                 }
             }
 
-            if (bos != null)
-            {
-                try
-                {
+            if (bos != null) {
+
+                try {
+
                     bos.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
+
                     log.error("Failed to close the buffered output stream", e);
                 }
             }
 
-            if (fos != null)
-            {
-                try
-                {
+            if (fos != null) {
+
+                try {
                     fos.close();
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     log.error("Failed to close the target input stream", e);
                 }
             }
@@ -473,7 +511,7 @@ public class Files {
             {
                 // descendent is "shorter", so it's not an actual descendant
                 log.debug(descendant + " not a descendant of " + ancestor + ", " + descendant +
-                          " is shorter");
+                        " is shorter");
                 return null;
             }
 
@@ -483,7 +521,7 @@ public class Files {
             {
                 // component differ, not a descendant
                 log.debug(descendant + " not a descendant of " + ancestor + ", tokens '" +
-                          ancestorToken + "' and '" + descendantToken + "' differ");
+                        ancestorToken + "' and '" + descendantToken + "' differ");
                 return null;
             }
 
@@ -553,7 +591,7 @@ public class Files {
             File userDir = new File(userDirString);
             if (!userDir.isAbsolute()) {
                 throw new IllegalStateException("We expect an absolute \"user.dir\", but it is " +
-                                                "relative: " + userDirString);
+                        "relative: " + userDirString);
             }
 
             result = tokenize(userDir);

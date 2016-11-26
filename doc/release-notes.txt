@@ -16,3 +16,4 @@
 * Added Files.identical()
 * Files
 ** Added Files.chmod()
+** Added Files.cp() functionality to recursively copy directories.
