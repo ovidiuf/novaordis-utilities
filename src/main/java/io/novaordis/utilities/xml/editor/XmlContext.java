@@ -30,14 +30,16 @@ public class XmlContext {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String xmlContentPath;
     private XMLEvent previous;
     private XMLEvent current;
 
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public XmlContext(XMLEvent previous, XMLEvent current) {
+    public XmlContext(String xmlContentPath, XMLEvent previous, XMLEvent current) {
 
+        this.xmlContentPath = xmlContentPath;
         this.current = current;
         this.previous = previous;
     }
@@ -52,6 +54,16 @@ public class XmlContext {
         return current;
     }
 
+    public String getXmlContentPath() {
+
+        return xmlContentPath;
+    }
+
+    @Override
+    public String toString() {
+
+        return xmlContentPath + "(" + previous + "), " + current;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

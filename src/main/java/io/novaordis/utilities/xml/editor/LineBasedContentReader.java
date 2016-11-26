@@ -130,7 +130,6 @@ public class LineBasedContentReader extends Reader {
     @Override
     public void close() throws IOException {
 
-        lineBasedContent.clear();
         lineBasedContent = null;
         currentLine = -1;
         currentPositionInLine = -1;

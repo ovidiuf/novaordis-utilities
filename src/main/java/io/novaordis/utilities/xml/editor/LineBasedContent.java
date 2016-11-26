@@ -240,6 +240,12 @@ public class LineBasedContent {
         return s;
     }
 
+    @Override
+    public String toString() {
+
+        return lines == null ? "null" : lines.size() + " lines";
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     void setBufferSize(int bufferSize) {

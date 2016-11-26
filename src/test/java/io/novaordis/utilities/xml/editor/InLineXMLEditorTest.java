@@ -23,11 +23,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -49,8 +53,8 @@ public class InLineXmlEditorTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-
     private File scratchDirectory;
+    private File baseDirectory;
 
     @Before
     public void before() throws Exception {
@@ -58,6 +62,9 @@ public class InLineXmlEditorTest {
         String projectBaseDirName = System.getProperty("basedir");
         scratchDirectory = new File(projectBaseDirName, "target/test-scratch");
         assertTrue(scratchDirectory.isDirectory());
+
+        baseDirectory = new File(System.getProperty("basedir"));
+        assertTrue(baseDirectory.isDirectory());
     }
 
     @After
@@ -118,8 +125,8 @@ public class InLineXmlEditorTest {
 
         String content =
                 "<test>\n" +
-                "   <something/>\n" +
-                "</test>";
+                        "   <something/>\n" +
+                        "</test>";
 
         File f = new File(scratchDirectory, "test.xml");
         assertTrue(Files.write(f, content));
@@ -131,6 +138,218 @@ public class InLineXmlEditorTest {
         assertEquals(new File(scratchDirectory, "test.xml"), editor.getFile());
 
         assertEquals("<test>\n   <something/>\n</test>", editor.getContent());
+    }
+
+    // normalize -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void normalize() throws Exception {
+
+        String s = InLineXmlEditor.normalize("/a/b/c");
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize2() throws Exception {
+
+        String s = InLineXmlEditor.normalize("/a/b/c/");
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void split3() throws Exception {
+
+        String s = InLineXmlEditor.normalize("a/b/c/");
+        assertEquals("/a/b/c", s);
+    }
+
+    // walk ------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void walk() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/level1/level2/level3");
+
+        assertEquals(1, matches.size());
+
+        XmlContext ctx = matches.get(0);
+
+        XMLEvent c = ctx.getCurrent();
+
+        assertTrue(c.isCharacters());
+        String s = c.asCharacters().getData().trim();
+
+        assertEquals("something", s);
+
+        XMLEvent p = ctx.getPrevious();
+
+        assertTrue(p.isStartElement());
+        StartElement se = p.asStartElement();
+        assertEquals("level3", se.getName().getLocalPart());
+
+        assertEquals("/level1/level2/level3", ctx.getXmlContentPath());
+    }
+
+    @Test
+    public void walk_SkipADeepIncursion() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/level1/level2-b/level3-b");
+
+        assertEquals(1, matches.size());
+
+        XmlContext ctx = matches.get(0);
+
+        XMLEvent c = ctx.getCurrent();
+
+        assertTrue(c.isCharacters());
+
+        String s = c.asCharacters().getData().trim();
+
+        assertEquals("somethingelse", s);
+
+        XMLEvent p = ctx.getPrevious();
+
+        assertTrue(p.isStartElement());
+        StartElement se = p.asStartElement();
+        assertEquals("level3-b", se.getName().getLocalPart());
+
+        assertEquals("/level1/level2-b/level3-b", ctx.getXmlContentPath());
+    }
+
+    @Test
+    public void walk_NoPath_Partial() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/level1/level2/no-such-element");
+
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test
+    public void walk_NoPath_AtAll() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/no-such-element1/no-such-element2");
+
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test
+    public void walk_NoPath_PastTheEdgeOfThePath() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/level1/level2/level3/level4/level5");
+
+        assertTrue(matches.isEmpty());
+    }
+
+    @Test
+    public void walk_MultipleElementsMatchingPath() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<XmlContext> matches = ed.walk("/level1/list1/list1-element");
+
+        assertEquals(3, matches.size());
+
+        XmlContext match;
+        XMLEvent c, p;
+
+        match = matches.get(0);
+        c = match.getCurrent();
+        assertEquals("a", c.asCharacters().getData().trim());
+        p = match.getPrevious();
+        assertEquals("list1-element", p.asStartElement().getName().getLocalPart());
+
+        match = matches.get(1);
+        c = match.getCurrent();
+        assertEquals("b", c.asCharacters().getData().trim());
+        p = match.getPrevious();
+        assertEquals("list1-element", p.asStartElement().getName().getLocalPart());
+
+        match = matches.get(2);
+        c = match.getCurrent();
+        assertEquals("c", c.asCharacters().getData().trim());
+        p = match.getPrevious();
+        assertEquals("list1-element", p.asStartElement().getName().getLocalPart());
+    }
+
+    // get() -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void get() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+        String s = ed.get("/level1/level2/level3");
+        assertEquals("something", s);
+    }
+
+    @Test
+    public void get_SkipADeepIncursion() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+        String s = ed.get("/level1/level2-b/level3-b");
+        assertEquals("somethingelse", s);
+    }
+
+    @Test
+    public void get_NoPath_Partial() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+        String s = ed.get("/level1/level2/no-such-element");
+        assertNull(s);
+    }
+
+    @Test
+    public void get_MultipleElementsMatchingPath() throws Exception {
+
+        File pom = copyToScratch("xml/walk.xml", "walk.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+        String s = ed.get("/level1/list1/list1-element");
+        assertEquals("a", s);
+    }
+
+    // getList() -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getList() throws Exception {
+
+        File pom = copyToScratch("xml/pom-multi-module.xml", "pom.xml");
+
+        InLineXmlEditor ed = new InLineXmlEditor(pom);
+
+        List<String> modules = ed.getList("/project/modules/module");
+
+        assertEquals(3, modules.size());
+        assertEquals("module1", modules.get(0));
+        assertEquals("module2", modules.get(1));
+        assertEquals("release", modules.get(2));
     }
 
     // set() -----------------------------------------------------------------------------------------------------------
@@ -150,7 +369,7 @@ public class InLineXmlEditorTest {
         catch(RuntimeException e) {
             String msg = e.getMessage();
             log.info(msg);
-            assertTrue(msg.startsWith("NOT YET IMPLEMENTED: we did not find element"));
+            assertTrue(msg.startsWith("NOT YET IMPLEMENTED: we did not find element and we don't know how to add"));
         }
 
         // when implementing, test this:
@@ -181,6 +400,92 @@ public class InLineXmlEditorTest {
 //        assertTrue(editor.isDirty());
 //        String content = editor.getContent();
 //        assertEquals("<a><b>x</b>\n    <c>y</c>\n</a>\n", content);
+    }
+
+    @Test
+    public void set_EssentialValuesDoNotDiffer() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+
+        String content = "<root><a>  ?    </a></root>\n";
+
+        Files.write(xmlFile, content);
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertFalse(editor.set("/root/a", "?"));
+    }
+
+    @Test
+    public void set_EssentialValuesDoNotDiffer_MultiLine() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+
+        String content =
+                "" +
+                        "<root>\n" +
+                        "      <a>\n" +
+                        "               ?   \n" +
+                        "      </a>\n" +
+                        "</root>";
+
+        Files.write(xmlFile, content);
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertFalse(editor.set("/root/a", "?"));
+    }
+
+    @Test
+    public void set_PreservesSurroundingSpace_OneLine_PaddingDiffers() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+
+        String content = "<root><a>  ?    </a></root>\n";
+
+        Files.write(xmlFile, content);
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/root/a", ".."));
+
+        String modifiedContent = editor.getContent();
+
+        String expected = "<root><a>  ..    </a></root>\n";
+
+        assertEquals(expected, modifiedContent);
+    }
+
+    @Test
+    public void set_PreservesSurroundingSpace_MultiLine() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+
+        String content =
+                "" +
+                        "<root>\n" +
+                        "      <a>\n" +
+                        "               ?   \n" +
+                        "      </a>\n" +
+                        "</root>";
+
+        Files.write(xmlFile, content);
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+
+        assertTrue(editor.set("/root/a", "!"));
+
+        String modifiedContent = editor.getContent();
+
+        String expected =
+                "" +
+                        "<root>\n" +
+                        "      <a>\n" +
+                        "               !   \n" +
+                        "      </a>\n" +
+                        "</root>";
+
+        assertEquals(expected, modifiedContent);
     }
 
     // save ------------------------------------------------------------------------------------------------------------
@@ -235,6 +540,41 @@ public class InLineXmlEditorTest {
         assertTrue(editor.save());
 
         assertEquals("<root><a>!</a></root>", Files.read(xmlFile));
+    }
+
+    @Test
+    public void save_Dirty_MultiLine() throws Exception {
+
+        File xmlFile = new File(scratchDirectory, "test.xml");
+        Files.write(xmlFile,
+                "<root>\n" +
+                        "      <a>\n" +
+                        "               ?   \n" +
+                        "      </a>\n" +
+                        "</root>");
+
+        InLineXmlEditor editor = new InLineXmlEditor(xmlFile);
+        assertFalse(editor.isDirty());
+
+        //
+        // change the file on disk, then save. It should overwrite.
+        //
+
+        Files.write(xmlFile, "<blah/>");
+        assertEquals("<blah/>", Files.read(xmlFile));
+
+        assertTrue(editor.set("/root/a", "!"));
+
+        assertTrue(editor.save());
+
+        String expected =
+                "<root>\n" +
+                        "      <a>\n" +
+                        "               !   \n" +
+                        "      </a>\n" +
+                        "</root>";
+
+        assertEquals(expected, Files.read(xmlFile));
     }
 
     // undo ------------------------------------------------------------------------------------------------------------
@@ -508,6 +848,21 @@ public class InLineXmlEditorTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * Copies to scratch the specified resource file. The path of the resource file must be relative to
+     * ./src/test/resources/data.
+     *
+     * The method fails if the file is not found or the copy fails.
+     *
+     * @return the copied file in the scratch area.
+     */
+    private File copyToScratch(String pathRelativeToDataDir, String pathInScratch) {
+
+        File pom = new File(scratchDirectory, pathInScratch);
+        assertTrue(Files.cp(new File(baseDirectory, "src/test/resources/data/" + pathRelativeToDataDir), pom));
+        return pom;
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

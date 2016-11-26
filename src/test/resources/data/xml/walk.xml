@@ -1,0 +1,18 @@
+<level1>
+    <level2>
+        <level3>
+            something
+        </level3>
+    </level2>
+    <level2-b>
+        <level3-b>
+            somethingelse
+        </level3-b>
+    </level2-b>
+    <list1>
+        <list1-element>a</list1-element>
+        <list1-element>b</list1-element>
+        <some-unrelated-element>blah</some-unrelated-element>
+        <list1-element>c</list1-element>
+    </list1>
+</level1>

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -242,6 +243,15 @@ public class LineBasedContentReaderTest {
 
         count = r.read(buffer, 0, 100);
         assertEquals(-1, count);
+
+        //
+        // make sure we don't change the origin LineBaseContent
+        //
+
+        assertEquals(1, content.getLineCount());
+        Line line = content.get(0);
+        assertNotNull(line);
+        assertEquals("test", line.getValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
