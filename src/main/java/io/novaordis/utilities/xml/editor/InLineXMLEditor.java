@@ -564,7 +564,7 @@ public class InLineXmlEditor {
 
             bis = new BufferedInputStream(new FileInputStream(xmlFile));
             content.read(bis);
-            log.debug("loaded content of " + xmlFile + " in memory");
+            log.debug("loaded " + xmlFile);
         }
         finally {
 
