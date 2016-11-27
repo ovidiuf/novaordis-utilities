@@ -81,6 +81,15 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
         return delegateEditor.getContent();
     }
 
+    @Override
+    public List<String> getElementNames(String path) {
+
+        //
+        // there are no variables in the element names, delegate
+        //
+        return delegateEditor.getElementNames(path);
+    }
+
     /**
      * @exception IllegalStateException if an incorrectly specified variable is identified.
      */

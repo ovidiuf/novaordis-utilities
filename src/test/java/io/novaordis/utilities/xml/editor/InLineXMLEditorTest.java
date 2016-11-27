@@ -193,7 +193,7 @@ public abstract class InLineXmlEditorTest {
     @Test
     public void getList() throws Exception {
 
-        File pomFile = Util.cp(baseDirectory, "src/test/resources/data/xml/pom-multi-module.xml", scratchDirectory);
+        File pomFile = Util.cp("xml/pom-multi-module.xml", scratchDirectory);
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
@@ -203,6 +203,45 @@ public abstract class InLineXmlEditorTest {
         assertEquals("module1", modules.get(0));
         assertEquals("module2", modules.get(1));
         assertEquals("release", modules.get(2));
+    }
+
+    // getElementNames -------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getElementNames_NoSuchPath() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        List<String> l = ed.getElementNames("/no/such/path");
+        assertTrue(l.isEmpty());
+    }
+
+    @Test
+    public void getElementNames_ElementHasNoChildren() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        List<String> l = ed.getElementNames("/root/listA/a");
+        assertTrue(l.isEmpty());
+    }
+
+    @Test
+    public void getElementNames() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        List<String> l = ed.getElementNames("/root/listA");
+
+        assertEquals(3, l.size());
+        assertEquals("a", l.get(0));
+        assertEquals("b", l.get(1));
+        assertEquals("c", l.get(2));
     }
 
     // set() -----------------------------------------------------------------------------------------------------------

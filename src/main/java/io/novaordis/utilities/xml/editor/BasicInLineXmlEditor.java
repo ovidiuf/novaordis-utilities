@@ -208,6 +208,11 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     }
 
     @Override
+    public List<String> getElementNames(String path) {
+        throw new RuntimeException("getElementNames() NOT YET IMPLEMENTED");
+    }
+
+    @Override
     public boolean set(String path, String newValue) {
 
         List<XmlContext> matches = walk(path);

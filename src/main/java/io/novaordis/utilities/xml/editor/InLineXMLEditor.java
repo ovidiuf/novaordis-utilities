@@ -80,6 +80,12 @@ public interface InLineXmlEditor {
     List<String> getList(String path);
 
     /**
+     * @return the names of the first-level child elements for the given path, or an empty list if the path does not
+     * exist or it does not have any element children.
+     */
+    List<String> getElementNames(String path);
+
+    /**
      * Updates the value of the element/attribute indicated by the path with the given string.
      *
      * If the path does not exist, it will be created.
