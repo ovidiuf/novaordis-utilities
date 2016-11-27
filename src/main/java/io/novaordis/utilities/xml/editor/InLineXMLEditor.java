@@ -16,151 +16,62 @@
 
 package io.novaordis.utilities.xml.editor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * InLineXmlEditor is an API that can be used to modify XML files on disk directly from Java programs.
  *
+ * Depending on the implementation, it may or may not handle variables.
+ *
  * Currently NOT thread safe, must be accessed and used from a single thread at a time.
  *
  * For more details see https://kb.novaordis.com/index.php/In-Line_XML_Editor
  *
+ * @see BasicInLineXmlEditor
+ * @see VariableEnabledInLineXmlEditor
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 11/10/16
+ * @since 11/27/16
  */
-public class InLineXmlEditor {
+public interface InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXmlEditor.class);
-
     // Static ----------------------------------------------------------------------------------------------------------
-
-    // Package Protected Static ----------------------------------------------------------------------------------------
-
-    /**
-     * Normalizes the path, makes sure it starts with a "/", etc.
-     */
-    static String normalize(String path) {
-
-        List<String> tokens = new ArrayList<>();
-
-        String crt = "";
-
-        for(int i = 0; i < path.length(); i ++) {
-
-            char c = path.charAt(i);
-
-            if (c == '/') {
-
-                if (i != 0) {
-
-                    tokens.add(crt);
-                    crt = "";
-                }
-            }
-            else {
-
-                crt += c;
-            }
-        }
-
-        if (crt.length() > 0) {
-
-            tokens.add(crt);
-        }
-
-        String s = "/";
-
-        for(Iterator<String> i = tokens.iterator(); i.hasNext(); ) {
-
-            s += i.next();
-
-            if (i.hasNext())  {
-
-                s += '/';
-            }
-        }
-
-        return s;
-    }
-
-    // Attributes ------------------------------------------------------------------------------------------------------
-
-    private File xmlFile;
-    private LineBasedContent content;
-    private XMLInputFactory staxFactory;
-
-    // may be null if there's nothing to undo
-    private byte[] undoContent;
-
-    private boolean moreThanOneConsequentialSave;
-
-    // Constructors ----------------------------------------------------------------------------------------------------
-
-    /**
-     * Fails early. Performs as many verifications it can (file exists, can be read, can be written) at this stage and
-     * fails if the preconditions aren't met.
-     *
-     * @throws java.io.IOException
-     */
-    public InLineXmlEditor(File xmlFile) throws IOException {
-
-        if (xmlFile == null) {
-            throw new IllegalArgumentException("null xml file");
-        }
-
-        if (!xmlFile.isFile()) {
-            throw new IOException("file " + xmlFile + " does not exist");
-        }
-
-        if (!xmlFile.canRead()) {
-            throw new IOException("file " + xmlFile + " cannot be read");
-        }
-
-        if (!xmlFile.canWrite()) {
-            throw new IOException("file " + xmlFile + " cannot be written");
-        }
-
-        this.xmlFile = xmlFile;
-        this.content = new LineBasedContent();
-
-        loadFromDisk();
-
-        // nothing to undo so far
-        undoContent = null;
-
-        staxFactory = XMLInputFactory.newFactory();
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public int getLineCount() {
-        return content.getLineCount();
-    }
+    File getFile();
 
-    public File getFile() {
-        return xmlFile;
-    }
+    int getLineCount();
+
+    boolean isDirty();
+
+    /**
+     * @return the text representation of the underlying file, as currently cached in memory. If the instance is
+     * dirty, the content does contain changes that are not saved on disk.
+     *
+     * @see InLineXmlEditor#isDirty()
+     */
+    String getContent();
+
+    /**
+     * @return the String associated with the first element that matched the path. Note that if more than one element
+     * matches the path, only the first value will be returned. Will return null if no element matches the path.
+     *
+     * @see InLineXmlEditor#getList(String)
+     */
+    String get(String path);
+
+    /**
+     * @return the Strings associated with the all elements that matched the path, in the order in which the elements
+     * were matched in the underlying document. Will return an empty list if no element matches the path.
+     *
+     * @see InLineXmlEditor#get(String)
+     */
+    List<String> getList(String path);
 
     /**
      * Updates the value of the element/attribute indicated by the path with the given string.
@@ -169,196 +80,7 @@ public class InLineXmlEditor {
      *
      * @return true if an actual update occurred, false if the existing value is identical with the new value.
      */
-    public boolean set(String path, String newValue) {
-
-        List<XmlContext> matches = walk(path);
-
-        if (matches.isEmpty()) {
-
-            throw new RuntimeException("NOT YET IMPLEMENTED: we did not find element and we don't know how to add");
-        }
-
-        //
-        // set the first match only
-        //
-
-        XmlContext match = matches.get(0);
-        XMLEvent previous = match.getPrevious();
-        XMLEvent current = match.getCurrent();
-
-        if (!current.isCharacters()) {
-            throw new RuntimeException("NOT YET IMPLEMENTED");
-        }
-
-        Characters characters = current.asCharacters();
-
-        String oldValue = characters.getData();
-
-        Location startElementLocation = previous.getLocation();
-        int zeroBasedLineNumber = startElementLocation.getLineNumber() - 1;
-        int zeroBasedPositionInLine = startElementLocation.getColumnNumber() - 1;
-
-        //
-        // account for multi-line character sequences, and for the fact that the non-blank value may be preceded and
-        // trailed by blanks (spaces, tabs, etc.); we want to preserve leading and trailing blank areas (including new
-        // lines)
-        //
-        // TODO multi-line support not complete, we won't handle well cases when the value contains one or more new lines
-        //
-
-        int lineCountOffset = 0;
-        String leadingBlankSpace = "";
-        String trailingBlankSpace = "";
-        int trimmedOldValueFrom =0;
-        int trimmedOldValueTo = oldValue.length();
-        String trimmedOldValue;
-
-        //
-        // start with the front of the string, extract leading blank space
-        //
-
-        for(int i = 0; i < oldValue.length(); i ++) {
-
-            char c = oldValue.charAt(i);
-
-            if (c == ' ' || c == '\t') {
-                leadingBlankSpace += c;
-            }
-            else if (c == '\n')  {
-
-                // TODO: also handle '\r\n' for Windows-generated XML
-
-                leadingBlankSpace = "";
-                lineCountOffset++;
-                //
-                // also change zero-based position in line, as where the preceding element ends is irrelevant now
-                //
-                zeroBasedPositionInLine = 0;
-            }
-            else {
-
-                //
-                // continue at the back of the string
-                //
-                trimmedOldValueFrom = i;
-                break;
-            }
-        }
-
-        //
-        // continue from the back of the string, extract the trailing blank space
-        //
-
-        for(int i = oldValue.length() - 1; i >= trimmedOldValueFrom; i --) {
-
-            char c = oldValue.charAt(i);
-
-            if (c == ' ' || c == '\t') {
-                trailingBlankSpace = c + trailingBlankSpace;
-            }
-            else if (c == '\n')  {
-
-                // TODO: also handle '\r\n' for Windows-generated XML
-
-                trailingBlankSpace = "";
-            }
-            else {
-
-                trimmedOldValueTo = i + 1;
-                break;
-            }
-        }
-
-        trimmedOldValue = oldValue.substring(trimmedOldValueFrom, trimmedOldValueTo);
-
-        //
-        // check for the old value part that matters
-        //
-
-        if (trimmedOldValue.equals(newValue)) {
-
-            //
-            // no replacement necessary
-            //
-
-            return false;
-        }
-
-        //
-        // values are different, replace, but preserve the leading and trailing blanks
-        //
-
-        oldValue = leadingBlankSpace + trimmedOldValue + trailingBlankSpace;
-        newValue = leadingBlankSpace + newValue + trailingBlankSpace;
-        zeroBasedLineNumber = zeroBasedLineNumber + lineCountOffset;
-
-        //
-        // undo state management; save previous state in case we need to undo
-        //
-
-        // this is an non-expensive operation, the underlying implementation caches content
-        byte[] transientUndoContent = content.getText().getBytes();
-
-        boolean replaced = content.replace(
-                zeroBasedLineNumber, zeroBasedPositionInLine, zeroBasedPositionInLine + oldValue.length(), newValue);
-
-        if (replaced && (moreThanOneConsequentialSave || undoContent == null)) {
-            // we do this only on the first change or if the content was already overwritten on disk by a previous
-            // consequential save and we need to reset the state undo will revert to, if invoked.
-            undoContent = transientUndoContent;
-        }
-
-        //
-        // end of undo state management
-        //
-
-        return replaced;
-    }
-
-    /**
-     * @return the String associated with the first element that matched the path. Note that if more than one element
-     * matches the path, only the first value will be returned. Will return null if no element matches the path.
-     *
-     * @see InLineXmlEditor#getList(String)
-     */
-    public String get(String path) {
-
-        List<String> matches = getList(path);
-
-        if (matches.isEmpty()) {
-            return null;
-        }
-
-        return matches.get(0);
-    }
-
-    /**
-     * @return the Strings associated with the all elements that matched the path, in the order in which the elements
-     * were matched in the underlying document. Will return an empty list if no element matches the path.
-     *
-     * @see InLineXmlEditor#get(String)
-     */
-    public List<String> getList(String path) {
-
-        List<String> result = new ArrayList<>();
-
-        List<XmlContext> matches = walk(path);
-
-        for(XmlContext c: matches) {
-
-            XMLEvent current = c.getCurrent();
-
-            if (!current.isCharacters()) {
-                throw new RuntimeException("NOT YET IMPLEMENTED");
-            }
-
-            Characters characters = current.asCharacters();
-            String value = characters.getData().trim();
-            result.add(value);
-        }
-
-        return result;
-    }
+    boolean set(String path, String newValue);
 
     /**
      * Writes the in-memory updates (if any) into the file.
@@ -367,34 +89,7 @@ public class InLineXmlEditor {
      *
      * @see InLineXmlEditor#undo()
      */
-    public boolean save() throws IOException {
-
-        if (!isDirty()) {
-
-            log.debug("the content is not dirty, save is non consequential");
-            return false;
-        }
-
-        BufferedOutputStream bos = null;
-
-        try {
-
-            bos = new BufferedOutputStream(new FileOutputStream(xmlFile));
-            content.write(bos);
-
-            log.debug(this.getFile() + " saved");
-
-            moreThanOneConsequentialSave = true;
-
-            return true;
-        }
-        finally {
-
-            if (bos != null) {
-                bos.close();
-            }
-        }
-    }
+    boolean save() throws IOException;
 
     /**
      * Reverts the effects on disk of the <b>last</b> save() operation (if any), by restoring the underlying file
@@ -416,168 +111,6 @@ public class InLineXmlEditor {
      *
      * @throws IOException
      */
-    public boolean undo() throws IOException {
-
-        if (undoContent == null) {
-            return false;
-        }
-
-        //
-        // undo on disk
-        //
-
-        FileOutputStream fos = new FileOutputStream(xmlFile);
-        fos.write(undoContent);
-        fos.close();
-
-        //
-        // nothing to undo after undoing
-        //
-        undoContent = null;
-
-        //
-        // update memory
-        //
-
-        loadFromDisk();
-
-        return true;
-    }
-
-    public boolean isDirty() {
-        return content.isDirty();
-    }
-
-    /**
-     * @return the text content, as currently cached in memory. It may contain changes that are not saved on disk.
-     */
-    public String getContent() {
-        return content.getText();
-    }
-
-    @Override
-    public String toString() {
-
-        return xmlFile + " " + (content == null ? "UNINITIALIZED" : (content.isDirty() ? "(dirty)" : "(not dirty)"));
-
-    }
-
-    // Package protected -----------------------------------------------------------------------------------------------
-
-    /**
-     * Concurrently walk the path and the XML document attempting to match the path to the XML document, for as many
-     * times as possible. Returns a list of matched contexts, in the order in which they were found, or an empty list
-     * if there was no match
-     */
-    List<XmlContext> walk(String pathAsString) {
-
-        List<XmlContext> matches = new ArrayList<>();
-
-        String normalizedPath = normalize(pathAsString);
-
-        XMLEventReader xmlReader = null;
-
-        try {
-
-            Reader lineBasedContentReader = new LineBasedContentReader(content);
-            xmlReader = staxFactory.createXMLEventReader(lineBasedContentReader);
-            XMLEvent previousEvent = null, currentEvent;
-
-            String normalizedXmlContentPath = "";
-
-            //
-            // Apparently, hasNext() returns true after we pull END_DOCUMENT, so we don't use it at all while iterating.
-            // Is this supposed to happen or is a StAX defect?
-            //
-            for(; !(currentEvent = xmlReader.nextEvent()).isEndDocument(); previousEvent = currentEvent) {
-
-                //
-                // iterate over the XML content repeatedly matching the path against the content
-                //
-
-                if (currentEvent.isStartElement()) {
-
-                    StartElement se = currentEvent.asStartElement();
-                    String elementName = se.getName().getLocalPart();
-                    normalizedXmlContentPath += "/" + elementName;
-                }
-                else if (currentEvent.isEndElement()) {
-
-                    normalizedXmlContentPath = normalizedXmlContentPath.substring(0, normalizedXmlContentPath.lastIndexOf('/'));
-                }
-                else {
-
-                    //
-                    // full path match, add to context anything that follows that match
-                    //
-
-                    if (normalizedXmlContentPath.equals(normalizedPath)) {
-
-                        //
-                        // avoid duplicate Characters event addition, only add the first one
-                        //
-
-                        if (!matches.isEmpty() && matches.get(matches.size() - 1).getCurrent().equals(previousEvent)) {
-
-                            //
-                            // already added content for that path, ignore
-                            //
-
-                            continue;
-                        }
-
-                        XmlContext c = new XmlContext(normalizedXmlContentPath, previousEvent, currentEvent);
-                        matches.add(c);
-                    }
-                }
-            }
-
-            return matches;
-        }
-        catch (XMLStreamException e) {
-
-            throw new RuntimeException("NOT YET IMPLEMENTED");
-        }
-        finally {
-
-            if (xmlReader != null) {
-
-                try {
-                    xmlReader.close();
-                }
-                catch(XMLStreamException e) {
-
-                    log.warn("failed to close an XML Reader: " + e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * It overwrites the current content cached in memory, if any.
-     */
-    void loadFromDisk() throws IOException {
-
-        BufferedInputStream bis = null;
-
-        try {
-
-            bis = new BufferedInputStream(new FileInputStream(xmlFile));
-            content.read(bis);
-            log.debug("loaded " + xmlFile);
-        }
-        finally {
-
-            if (bis != null) {
-                bis.close();
-            }
-        }
-    }
-
-    // Protected -------------------------------------------------------------------------------------------------------
-
-    // Private ---------------------------------------------------------------------------------------------------------
-
-    // Inner classes ---------------------------------------------------------------------------------------------------
+    boolean undo() throws IOException;
 
 }
