@@ -682,7 +682,7 @@ public abstract class InLineXmlEditorTest {
 
     // Package protected -----------------------------------------------------------------------------------------------
 
-    protected abstract BasicInLineXmlEditor getInLineXmlEditorToTest(File xmlFile) throws Exception;
+    protected abstract InLineXmlEditor getInLineXmlEditorToTest(File xmlFile) throws Exception;
 
     // Protected -------------------------------------------------------------------------------------------------------
 

@@ -14,60 +14,17 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
-
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
+package io.novaordis.utilities.variable;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 11/25/16
+ * @since 11/22/16
  */
-public class Util {
+public class VariableProviderImplTest extends VariableValueProviderTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    /**
-     * Fails if the file/directory is not found or a copy failure occurs.
-     *
-     * Works on both files and directories (recursively).
-     *
-     * @return the destination File
-     */
-    public static File cp(
-            File baseDirectory, String srcPathRelativeToBaseDir,
-            File scratchDirectory, String destPathRelativeToScratchDir) {
-
-        File orig = new File(baseDirectory, srcPathRelativeToBaseDir);
-        assertTrue(orig.isFile() || orig.isDirectory());
-
-        File destFile = scratchDirectory;
-        if (destPathRelativeToScratchDir != null) {
-
-            destFile = new File(scratchDirectory, destPathRelativeToScratchDir);
-        }
-
-        assertTrue(Files.cp(orig, destFile));
-        return destFile.isFile() ? destFile : new File(destFile, orig.getName());
-    }
-
-    public static File cp(File baseDirectory, String srcPathRelativeToBaseDir, File scratchDirectory) {
-
-        return cp(baseDirectory, srcPathRelativeToBaseDir, scratchDirectory, null);
-    }
-
-    /**
-     * @param srcPathRelativeToBaseDataDir the path must be relative to
-     *                                     System.getProperty("basedir") + "/src/test/resources/data"
-     */
-    public static File cp(String srcPathRelativeToBaseDataDir, File scratchDirectory) {
-
-        return cp(new File(System.getProperty("basedir"), "src/test/resources/data"), srcPathRelativeToBaseDataDir,
-                scratchDirectory);
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -76,6 +33,12 @@ public class Util {
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
+
+    @Override
+    protected VariableProvider getVariableValueProviderToTest() throws Exception {
+
+        return new VariableProviderImpl();
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 
