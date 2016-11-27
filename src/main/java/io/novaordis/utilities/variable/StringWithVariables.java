@@ -31,6 +31,44 @@ public class StringWithVariables {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * Fast scanner that establishes whether the given string contains variable references (valid or invalid).
+     *
+     * If the string does not contain variable references, it does not make sense to parse it and build a
+     * StringWithVariables instance out of it.
+     *
+     * This is a speed optimization.
+     *
+     * The implementation is insensitive to null, will return false for it.
+     */
+    public static boolean containsVariableReferences(String s) {
+
+        if (s == null) {
+
+            return false;
+        }
+
+        for(int i = 0; i < s.length(); i ++) {
+
+            char c = s.charAt(i);
+
+            if (c == '$') {
+
+                if (i == s.length() - 1) {
+
+                    return false;
+                }
+
+                if (s.charAt(i + 1) == '{') {
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private String literal;
@@ -156,7 +194,7 @@ public class StringWithVariables {
 
                 if (i == -1) {
 
-                    throw new VariableFormatException("invalid variable definition, missing closing bracket");
+                    throw new VariableFormatException("invalid variable reference, missing closing bracket");
                 }
 
                 tokens.add(new Variable(literal.substring(crt + 2, i)));

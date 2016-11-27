@@ -16,7 +16,11 @@
 
 package io.novaordis.utilities.xml.editor;
 
+import io.novaordis.utilities.variable.StringWithVariables;
+import io.novaordis.utilities.variable.VariableFormatException;
 import io.novaordis.utilities.variable.VariableProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +38,8 @@ import java.util.List;
 public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(InLineXmlEditorWithVariableSupport.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -75,20 +81,63 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
         return delegateEditor.getContent();
     }
 
+    /**
+     * @exception IllegalStateException if an incorrectly specified variable is identified.
+     */
     @Override
     public String get(String path) {
 
-        return delegateEditor.get(path);
+        String s = delegateEditor.get(path);
+
+        //
+        // optimization
+        //
+
+        if (!StringWithVariables.containsVariableReferences(s)) {
+
+            return s;
+        }
+
+        return resolveVariables(s, path);
     }
 
     @Override
     public List<String> getList(String path) {
 
-        return delegateEditor.getList(path);
+        List<String> elements = delegateEditor.getList(path);
+
+        if (elements.isEmpty()) {
+
+            return elements;
+        }
+
+        for(int i = 0; i < elements.size(); i ++) {
+
+            String e = elements.get(i);
+
+            //
+            // optimization
+            //
+
+            if (StringWithVariables.containsVariableReferences(e)) {
+
+                e = resolveVariables(e, path);
+                elements.set(i, e);
+            }
+        }
+
+        return elements;
     }
 
     @Override
     public boolean set(String path, String newValue) {
+
+        String current = delegateEditor.get(path);
+
+        if (StringWithVariables.containsVariableReferences(current)) {
+
+            throw new RuntimeException("NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
+        }
 
         return delegateEditor.set(path, newValue);
     }
@@ -121,6 +170,27 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
+
+    String resolveVariables(String rawContent, String path) throws IllegalStateException {
+
+        StringWithVariables sv;
+
+        try {
+
+            sv = new StringWithVariables(rawContent);
+        }
+        catch (VariableFormatException e) {
+
+            //
+            // incorrectly specified variable
+            //
+
+            log.debug("invalid variable reference '" + rawContent + "'", e);
+            throw new IllegalStateException("path " + path + " contains an invalid variable reference '" + rawContent + "'");
+        }
+
+        return sv.resolve(variableProvider);
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

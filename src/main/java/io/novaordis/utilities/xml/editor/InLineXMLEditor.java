@@ -61,6 +61,9 @@ public interface InLineXmlEditor {
      * @return the String associated with the first element that matched the path. Note that if more than one element
      * matches the path, only the first value will be returned. Will return null if no element matches the path.
      *
+     * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
+     * are detected. Consult implementation documentation for details.
+     *
      * @see InLineXmlEditor#getList(String)
      */
     String get(String path);
@@ -68,6 +71,9 @@ public interface InLineXmlEditor {
     /**
      * @return the Strings associated with the all elements that matched the path, in the order in which the elements
      * were matched in the underlying document. Will return an empty list if no element matches the path.
+     *
+     * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
+     * are detected. Consult implementation documentation for details.
      *
      * @see InLineXmlEditor#get(String)
      */

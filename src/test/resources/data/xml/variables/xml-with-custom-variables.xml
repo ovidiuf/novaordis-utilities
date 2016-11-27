@@ -1,3 +1,21 @@
 <root>
+
     <blue>${something}</blue>
+
+    <!-- broken variable -->
+    <red>${broken.variable</red>
+
+    <list>
+        <element>A</element>
+        <element>${element.variable}</element>
+        <element>C</element>
+    </list>
+
+    <list2>
+        <element2>A</element2>
+        <element2>${broken.element.variable</element2>
+        <element2>C</element2>
+    </list2>
+
+
 </root>

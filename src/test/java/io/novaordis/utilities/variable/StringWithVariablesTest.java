@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -44,6 +46,54 @@ public class StringWithVariablesTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Tests -----------------------------------------------------------------------------------------------------------
+
+    // containsVariableReferences --------------------------------------------------------------------------------------
+
+    @Test
+    public void containsVariableReferences_null() throws Exception {
+
+        assertFalse(StringWithVariables.containsVariableReferences(null));
+    }
+
+    @Test
+    public void containsVariableReferences_NoReferences() throws Exception {
+
+        assertFalse(StringWithVariables.containsVariableReferences("something"));
+    }
+
+    @Test
+    public void containsVariableReferences_NoReferences_Edge1() throws Exception {
+
+        assertFalse(StringWithVariables.containsVariableReferences("something $"));
+    }
+
+    @Test
+    public void containsVariableReferences_NoReferences_Edge2() throws Exception {
+
+        assertFalse(StringWithVariables.containsVariableReferences("some$thing"));
+    }
+
+    @Test
+    public void containsVariableReferences_ValidVariable() throws Exception {
+
+        assertTrue(StringWithVariables.containsVariableReferences("a ${b} c"));
+    }
+
+    @Test
+    public void containsVariableReferences_ValidMultipleVariables() throws Exception {
+
+        assertTrue(StringWithVariables.containsVariableReferences("a ${b} c ${d} "));
+    }
+
+    @Test
+    public void containsVariableReferences_InvalidVariableReference() throws Exception {
+
+        assertTrue(StringWithVariables.containsVariableReferences("a ${b something"));
+    }
+
+    // constructor -----------------------------------------------------------------------------------------------------
 
     @Test
     public void constructor_Null() throws Exception {
@@ -110,7 +160,7 @@ public class StringWithVariablesTest {
 
             String msg = e.getMessage();
             log.info(msg);
-            assertEquals("invalid variable definition, missing closing bracket", msg);
+            assertEquals("invalid variable reference, missing closing bracket", msg);
         }
     }
 
