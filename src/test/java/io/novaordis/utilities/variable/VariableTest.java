@@ -60,7 +60,7 @@ public class VariableTest extends TokenTest {
 
         assertEquals("${something}", s);
 
-        p.setValue("something", "blah");
+        p.setVariableValue("something", "blah");
 
         assertEquals("blah", v.resolve(p));
     }

@@ -41,7 +41,7 @@ public interface VariableProvider {
      *
      * See ${linkUrl https://kb.novaordis.com/index.php/Clad_User_Manual_-_Concepts#Variable_Support} for more details.
      */
-    String getValue(String variableName);
+    String getVariableValue(String variableName);
 
     /**
      * Use this method to install variables into the provider.
@@ -50,14 +50,14 @@ public interface VariableProvider {
      *
      * @return the old value of the variable, or null if none.
      */
-    String setValue(String variableName, String variableValue);
+    String setVariableValue(String variableName, String variableValue);
 
     /**
      * May return null if this instance is the root of the hierarchy.
      */
-    VariableProvider getParent();
+    VariableProvider getVariableProviderParent();
 
-    void setParent(VariableProvider parent);
+    void setVariableProviderParent(VariableProvider parent);
 
 
 }

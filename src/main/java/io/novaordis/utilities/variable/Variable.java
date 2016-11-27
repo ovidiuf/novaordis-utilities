@@ -57,7 +57,7 @@ public class Variable implements Token {
             return getLiteral();
         }
 
-        String value = provider.getValue(name);
+        String value = provider.getVariableValue(name);
 
         if (value == null) {
             return getLiteral();

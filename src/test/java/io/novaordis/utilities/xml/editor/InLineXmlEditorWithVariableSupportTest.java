@@ -115,7 +115,7 @@ public class InLineXmlEditorWithVariableSupportTest extends InLineXmlEditorTest 
         InLineXmlEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
-        assertNull(p.getValue("something"));
+        assertNull(p.getVariableValue("something"));
 
         editor.setVariableProvider(p);
 
@@ -153,7 +153,7 @@ public class InLineXmlEditorWithVariableSupportTest extends InLineXmlEditorTest 
         InLineXmlEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
-        p.setValue("something", "bright");
+        p.setVariableValue("something", "bright");
 
         editor.setVariableProvider(p);
 
@@ -214,7 +214,7 @@ public class InLineXmlEditorWithVariableSupportTest extends InLineXmlEditorTest 
         InLineXmlEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
-        assertNull(p.getValue("element.variable"));
+        assertNull(p.getVariableValue("element.variable"));
 
         editor.setVariableProvider(p);
 
@@ -258,7 +258,7 @@ public class InLineXmlEditorWithVariableSupportTest extends InLineXmlEditorTest 
         InLineXmlEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
-        p.setValue("element.variable", "B");
+        p.setVariableValue("element.variable", "B");
 
         editor.setVariableProvider(p);
 

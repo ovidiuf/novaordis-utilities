@@ -46,8 +46,8 @@ public abstract class VariableProviderTest {
 
         VariableProvider p = getVariableProviderToTest();
 
-        assertNull(p.getParent());
-        assertNull(p.getValue("something"));
+        assertNull(p.getVariableProviderParent());
+        assertNull(p.getVariableValue("something"));
     }
 
     // setVariable -----------------------------------------------------------------------------------------------------
@@ -57,21 +57,21 @@ public abstract class VariableProviderTest {
 
         VariableProvider p = getVariableProviderToTest();
 
-        assertNull(p.getValue("something"));
+        assertNull(p.getVariableValue("something"));
 
-        assertNull(p.setValue("something", "A"));
+        assertNull(p.setVariableValue("something", "A"));
 
-        assertEquals("A", p.getValue("something"));
+        assertEquals("A", p.getVariableValue("something"));
 
-        assertEquals("A", p.setValue("something", "B"));
+        assertEquals("A", p.setVariableValue("something", "B"));
 
-        assertEquals("B", p.getValue("something"));
+        assertEquals("B", p.getVariableValue("something"));
 
-        assertEquals("B", p.setValue("something", null));
+        assertEquals("B", p.setVariableValue("something", null));
 
-        assertNull(p.getValue("something"));
+        assertNull(p.getVariableValue("something"));
 
-        assertNull(p.setValue("something", "C"));
+        assertNull(p.setVariableValue("something", "C"));
     }
 
     // hierarchy -------------------------------------------------------------------------------------------------------
@@ -81,49 +81,49 @@ public abstract class VariableProviderTest {
 
         VariableProvider parent = getVariableProviderToTest();
 
-        assertNull(parent.getParent());
+        assertNull(parent.getVariableProviderParent());
 
         VariableProvider childOne = getVariableProviderToTest();
 
-        assertNull(childOne.getParent());
+        assertNull(childOne.getVariableProviderParent());
 
         VariableProvider childTwo = getVariableProviderToTest();
 
-        assertNull(childTwo.getParent());
+        assertNull(childTwo.getVariableProviderParent());
 
 
-        childOne.setParent(parent);
-        assertEquals(parent, childOne.getParent());
+        childOne.setVariableProviderParent(parent);
+        assertEquals(parent, childOne.getVariableProviderParent());
 
-        childTwo.setParent(parent);
-        assertEquals(parent, childTwo.getParent());
+        childTwo.setVariableProviderParent(parent);
+        assertEquals(parent, childTwo.getVariableProviderParent());
 
 
         //
         // verify hierarchical resolution
         //
 
-        parent.setValue("variableA", "valueA");
+        parent.setVariableValue("variableA", "valueA");
 
-        assertEquals("valueA", parent.getValue("variableA"));
-        assertEquals("valueA", childOne.getValue("variableA"));
-        assertEquals("valueA", childTwo.getValue("variableA"));
+        assertEquals("valueA", parent.getVariableValue("variableA"));
+        assertEquals("valueA", childOne.getVariableValue("variableA"));
+        assertEquals("valueA", childTwo.getVariableValue("variableA"));
 
         //
         // local values supersede the values above them in the hierarchy
         //
 
-        childOne.setValue("variableA", "valueB");
+        childOne.setVariableValue("variableA", "valueB");
 
-        assertEquals("valueA", parent.getValue("variableA"));
-        assertEquals("valueB", childOne.getValue("variableA"));
-        assertEquals("valueA", childTwo.getValue("variableA"));
+        assertEquals("valueA", parent.getVariableValue("variableA"));
+        assertEquals("valueB", childOne.getVariableValue("variableA"));
+        assertEquals("valueA", childTwo.getVariableValue("variableA"));
 
-        childTwo.setValue("variableA", "valueC");
+        childTwo.setVariableValue("variableA", "valueC");
 
-        assertEquals("valueA", parent.getValue("variableA"));
-        assertEquals("valueB", childOne.getValue("variableA"));
-        assertEquals("valueC", childTwo.getValue("variableA"));
+        assertEquals("valueA", parent.getVariableValue("variableA"));
+        assertEquals("valueB", childOne.getVariableValue("variableA"));
+        assertEquals("valueC", childTwo.getVariableValue("variableA"));
     }
 
 

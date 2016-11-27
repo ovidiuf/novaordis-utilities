@@ -44,7 +44,7 @@ public class VariableProviderImpl implements VariableProvider {
     // VariableProvider implementation ---------------------------------------------------------------------------------
 
     @Override
-    public String getValue(String variableName) {
+    public String getVariableValue(String variableName) {
 
         String localValue = localValues.get(variableName);
 
@@ -66,23 +66,23 @@ public class VariableProviderImpl implements VariableProvider {
             return null;
         }
 
-        return parent.getValue(variableName);
+        return parent.getVariableValue(variableName);
     }
 
     @Override
-    public String setValue(String variableName, String variableValue) {
+    public String setVariableValue(String variableName, String variableValue) {
 
         return localValues.put(variableName, variableValue);
     }
 
     @Override
-    public VariableProvider getParent() {
+    public VariableProvider getVariableProviderParent() {
 
         return parent;
     }
 
     @Override
-    public void setParent(VariableProvider parent) {
+    public void setVariableProviderParent(VariableProvider parent) {
 
         this.parent = parent;
     }
