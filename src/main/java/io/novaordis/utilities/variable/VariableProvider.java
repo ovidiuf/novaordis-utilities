@@ -17,6 +17,13 @@
 package io.novaordis.utilities.variable;
 
 /**
+ * A hierarchical variable provider. A provider can have just one parent, but a parent can have multiple children.
+ * However, the parents do not know of their children, the search can only be conducted up the hierarchy.
+ *
+ * If a local variable is not found, the search is delegated to the parent.
+ *
+ * A local variable supersedes the same variable up in the hierarchy, if exists.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
  */
@@ -44,5 +51,13 @@ public interface VariableProvider {
      * @return the old value of the variable, or null if none.
      */
     String setValue(String variableName, String variableValue);
+
+    /**
+     * May return null if this instance is the root of the hierarchy.
+     */
+    VariableProvider getParent();
+
+    void setParent(VariableProvider parent);
+
 
 }

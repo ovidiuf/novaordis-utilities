@@ -31,12 +31,14 @@ public class VariableProviderImpl implements VariableProvider {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Map<String, String> values;
+    private VariableProvider parent;
+
+    private Map<String, String> localValues;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public VariableProviderImpl() {
-        values = new HashMap<>();
+        localValues = new HashMap<>();
     }
 
     // VariableProvider implementation ---------------------------------------------------------------------------------
@@ -44,13 +46,45 @@ public class VariableProviderImpl implements VariableProvider {
     @Override
     public String getValue(String variableName) {
 
-        return values.get(variableName);
+        String localValue = localValues.get(variableName);
+
+        //
+        // if found, local values have priority
+        //
+
+        if (localValue != null) {
+
+            return localValue;
+        }
+
+        //
+        // if not found, and we have a parent, delegate to the parent
+        //
+
+        if (parent == null) {
+
+            return null;
+        }
+
+        return parent.getValue(variableName);
     }
 
     @Override
     public String setValue(String variableName, String variableValue) {
 
-        return values.put(variableName, variableValue);
+        return localValues.put(variableName, variableValue);
+    }
+
+    @Override
+    public VariableProvider getParent() {
+
+        return parent;
+    }
+
+    @Override
+    public void setParent(VariableProvider parent) {
+
+        this.parent = parent;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

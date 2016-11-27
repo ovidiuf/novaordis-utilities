@@ -20,7 +20,7 @@ package io.novaordis.utilities.variable;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
  */
-public class VariableProviderImplTest extends VariableValueProviderTest {
+public class VariableProviderImplTest extends VariableProviderTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ public class VariableProviderImplTest extends VariableValueProviderTest {
     // Package protected -----------------------------------------------------------------------------------------------
 
     @Override
-    protected VariableProvider getVariableValueProviderToTest() throws Exception {
+    protected VariableProvider getVariableProviderToTest() throws Exception {
 
         return new VariableProviderImpl();
     }
