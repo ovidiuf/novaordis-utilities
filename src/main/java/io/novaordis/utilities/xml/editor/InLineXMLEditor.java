@@ -30,7 +30,7 @@ import java.util.List;
  * For more details see https://kb.novaordis.com/index.php/In-Line_XML_Editor
  *
  * @see BasicInLineXmlEditor
- * @see VariableEnabledInLineXmlEditor
+ * @see InLineXmlEditorWithVariableSupport
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
@@ -80,10 +80,10 @@ public interface InLineXmlEditor {
     List<String> getList(String path);
 
     /**
-     * @return the names of the first-level child elements for the given path, or an empty list if the path does not
-     * exist or it does not have any element children.
+     * @return the XmlElement instances of the first-level child elements for the given path, or an empty list if the
+     * path does not exist or it does not have any element children.
      */
-    List<String> getElementNames(String path);
+    List<XmlElement> getElements(String path);
 
     /**
      * Updates the value of the element/attribute indicated by the path with the given string.

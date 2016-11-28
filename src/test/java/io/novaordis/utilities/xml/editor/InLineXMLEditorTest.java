@@ -205,43 +205,57 @@ public abstract class InLineXmlEditorTest {
         assertEquals("release", modules.get(2));
     }
 
-    // getElementNames -------------------------------------------------------------------------------------------------
+    // getElements -------------------------------------------------------------------------------------------------
 
     @Test
-    public void getElementNames_NoSuchPath() throws Exception {
+    public void getElements_NoSuchPath() throws Exception {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<String> l = ed.getElementNames("/no/such/path");
+        List<XmlElement> l = ed.getElements("/no/such/path");
         assertTrue(l.isEmpty());
     }
 
     @Test
-    public void getElementNames_ElementHasNoChildren() throws Exception {
+    public void getElements_ElementHasNoChildren() throws Exception {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<String> l = ed.getElementNames("/root/listA/a");
+        List<XmlElement> l = ed.getElements("/root/listB");
         assertTrue(l.isEmpty());
     }
 
     @Test
-    public void getElementNames() throws Exception {
+    public void getElements_ElementHasNoChildren2() throws Exception {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<String> l = ed.getElementNames("/root/listA");
+        List<XmlElement> l = ed.getElements("/root/listC");
+        assertTrue(l.isEmpty());
+    }
+
+    @Test
+    public void getElements() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        List<XmlElement> l = ed.getElements("/root/listA");
 
         assertEquals(3, l.size());
-        assertEquals("a", l.get(0));
-        assertEquals("b", l.get(1));
-        assertEquals("c", l.get(2));
+        assertEquals("a", l.get(0).getName());
+        assertEquals("A", l.get(0).getValue());
+        assertEquals("b", l.get(1).getName());
+        assertEquals("B", l.get(1).getValue());
+        assertEquals("c", l.get(2).getName());
+        assertEquals("C", l.get(2).getValue());
     }
 
     // set() -----------------------------------------------------------------------------------------------------------

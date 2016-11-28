@@ -208,10 +208,41 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     }
 
     @Override
-    public List<String> getElementNames(String path) {
+    public List<XmlElement> getElements(String path) {
 
+        List<XmlElement> children = new ArrayList<>();
 
-        throw new RuntimeException("getElementNames() NOT YET IMPLEMENTED");
+        // walk the XML content and collect element names and values on match
+
+        walk(path, false, (String normalizedXmlPath, XMLEvent previous, XMLEvent current) -> {
+
+            //
+            // exact match or the normalized XML path starts with the given path
+            //
+
+            if (normalizedXmlPath.equals(path) || !previous.isStartElement()) {
+
+                //
+                // ignore the exact match, or non start elements
+                //
+
+                return;
+            }
+
+            StartElement se = previous.asStartElement();
+            String name = se.getName().getLocalPart();
+
+            if (!current.isCharacters()) {
+                throw new RuntimeException(
+                        "NOT YET IMPLEMENTED: we don't know how to handle the content of " + normalizedXmlPath);
+            }
+
+            String value = current.asCharacters().getData();
+            XmlElement element = new XmlElement(name, value);
+            children.add(element);
+        });
+
+        return children;
     }
 
     @Override
@@ -434,8 +465,11 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     /**
      * Walks the XML document attempting to match the path to the XML document element paths, for as many times as
      * possible. Execute the closure upon match.
+     *
+     * @param exactMatch if true, the closure will be applied only in case of exact match. If false, the closure
+     *                   will be applied both on exact matches and on paths that start with the given path.
      */
-    void walk(String pathAsString, XmlContextClosure closure) {
+    void walk(String pathAsString, boolean exactMatch, XmlContextClosure closure) {
 
         String normalizedPath = normalize(pathAsString);
 
@@ -471,7 +505,8 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
                 }
                 else {
 
-                    if (normalizedXmlContentPath.equals(normalizedPath)) {
+                    if (normalizedXmlContentPath.equals(normalizedPath) ||
+                            (!exactMatch && normalizedXmlContentPath.startsWith(normalizedPath))) {
 
                         //
                         // full path match, apply the closure
@@ -513,7 +548,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
         // the closure simply collects the XmlContext and puts in "matches"
         //
 
-        walk(pathAsString, (String normalizedXmlPath, XMLEvent previous, XMLEvent current) -> {
+        walk(pathAsString, true, (String normalizedXmlPath, XMLEvent previous, XMLEvent current) -> {
 
             //
             // avoid duplicate Characters event addition, only add the first one

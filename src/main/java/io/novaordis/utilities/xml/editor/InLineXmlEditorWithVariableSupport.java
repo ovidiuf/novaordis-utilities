@@ -82,12 +82,12 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
     }
 
     @Override
-    public List<String> getElementNames(String path) {
+    public List<XmlElement> getElements(String path) {
 
         //
         // there are no variables in the element names, delegate
         //
-        return delegateEditor.getElementNames(path);
+        return delegateEditor.getElements(path);
     }
 
     /**
