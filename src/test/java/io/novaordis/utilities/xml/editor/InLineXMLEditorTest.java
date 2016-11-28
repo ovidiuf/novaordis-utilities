@@ -258,6 +258,40 @@ public abstract class InLineXmlEditorTest {
         assertEquals("C", l.get(2).getValue());
     }
 
+    @Test
+    public void getElements_MultiLineBlankPaddedValue() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list-2.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        List<XmlElement> l = ed.getElements("/root/listA");
+
+        assertEquals(1, l.size());
+        assertEquals("a", l.get(0).getName());
+        assertEquals("A", l.get(0).getValue());
+    }
+
+    @Test
+    public void getElements_ValueNotCharacters() throws Exception {
+
+        File pomFile = Util.cp("xml/element-name-list-3.xml", scratchDirectory);
+
+        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+
+        try {
+            ed.getElements("/root/listA");
+            fail("should have thrown exception");
+        }
+        catch(RuntimeException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("NOT YET IMPLEMENTED (2): cannot process embedded elements yet (/root/listA/a)", msg);
+        }
+    }
+
+
     // set() -----------------------------------------------------------------------------------------------------------
 
     @Test

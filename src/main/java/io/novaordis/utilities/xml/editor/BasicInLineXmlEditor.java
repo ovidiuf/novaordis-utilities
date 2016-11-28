@@ -234,10 +234,16 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 
             if (!current.isCharacters()) {
                 throw new RuntimeException(
-                        "NOT YET IMPLEMENTED: we don't know how to handle the content of " + normalizedXmlPath);
+                        "NOT YET IMPLEMENTED (1): cannot process embedded elements yet (" + normalizedXmlPath + ")");
             }
 
-            String value = current.asCharacters().getData();
+            String value = current.asCharacters().getData().trim();
+
+            if (value.isEmpty()) {
+                throw new RuntimeException(
+                        "NOT YET IMPLEMENTED (2): cannot process embedded elements yet (" + normalizedXmlPath + ")");
+            }
+
             XmlElement element = new XmlElement(name, value);
             children.add(element);
         });
