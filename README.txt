@@ -1,5 +1,0 @@
-
-Projects.
-
-Nova Ordis Utilities.
-
