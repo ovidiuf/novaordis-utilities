@@ -189,7 +189,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 
         List<String> result = new ArrayList<>();
 
-        List<XmlContext> matches = walk(path);
+        List<XmlContext> matches = collectMatches(path);
 
         for(XmlContext c: matches) {
 
@@ -209,13 +209,15 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 
     @Override
     public List<String> getElementNames(String path) {
+
+
         throw new RuntimeException("getElementNames() NOT YET IMPLEMENTED");
     }
 
     @Override
     public boolean set(String path, String newValue) {
 
-        List<XmlContext> matches = walk(path);
+        List<XmlContext> matches = collectMatches(path);
 
         if (matches.isEmpty()) {
 
@@ -430,13 +432,10 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     // Package protected -----------------------------------------------------------------------------------------------
 
     /**
-     * Concurrently walk the path and the XML document attempting to match the path to the XML document, for as many
-     * times as possible. Returns a list of matched contexts, in the order in which they were found, or an empty list
-     * if there was no match
+     * Walks the XML document attempting to match the path to the XML document element paths, for as many times as
+     * possible. Execute the closure upon match.
      */
-    List<XmlContext> walk(String pathAsString) {
-
-        List<XmlContext> matches = new ArrayList<>();
+    void walk(String pathAsString, XmlContextClosure closure) {
 
         String normalizedPath = normalize(pathAsString);
 
@@ -472,32 +471,15 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
                 }
                 else {
 
-                    //
-                    // full path match, add to context anything that follows that match
-                    //
-
                     if (normalizedXmlContentPath.equals(normalizedPath)) {
 
                         //
-                        // avoid duplicate Characters event addition, only add the first one
+                        // full path match, apply the closure
                         //
-
-                        if (!matches.isEmpty() && matches.get(matches.size() - 1).getCurrent().equals(previousEvent)) {
-
-                            //
-                            // already added content for that path, ignore
-                            //
-
-                            continue;
-                        }
-
-                        XmlContext c = new XmlContext(normalizedXmlContentPath, previousEvent, currentEvent);
-                        matches.add(c);
+                        closure.apply(normalizedXmlContentPath, previousEvent, currentEvent);
                     }
                 }
             }
-
-            return matches;
         }
         catch (XMLStreamException e) {
 
@@ -517,6 +499,131 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
             }
         }
     }
+
+    /**
+     * Walks the XML document attempting to match the path to the XML document element paths, for as many times as
+     * possible. Returns a list of matched contexts, in the order in which they were found, or an empty list if there
+     * was no match
+     */
+    List<XmlContext> collectMatches(String pathAsString) {
+
+        List<XmlContext> matches = new ArrayList<>();
+
+        //
+        // the closure simply collects the XmlContext and puts in "matches"
+        //
+
+        walk(pathAsString, (String normalizedXmlPath, XMLEvent previous, XMLEvent current) -> {
+
+            //
+            // avoid duplicate Characters event addition, only add the first one
+            //
+
+            if (!matches.isEmpty() && matches.get(matches.size() - 1).getCurrent().equals(previous)) {
+
+                //
+                // already added content for that path, ignore
+                //
+
+                return;
+            }
+
+            XmlContext c = new XmlContext(normalizedXmlPath, previous, current);
+            matches.add(c);
+        });
+
+        return matches;
+    }
+
+
+//    /**
+//     * Walks the XML document attempting to match the path to the XML document element paths, for as many times as
+//     * possible. Returns a list of matched contexts, in the order in which they were found, or an empty list if there
+//     * was no match
+//     */
+//    List<XmlContext> walk(String pathAsString) {
+//
+//        List<XmlContext> matches = new ArrayList<>();
+//
+//        String normalizedPath = normalize(pathAsString);
+//
+//        XMLEventReader xmlReader = null;
+//
+//        try {
+//
+//            Reader lineBasedContentReader = new LineBasedContentReader(content);
+//            xmlReader = staxFactory.createXMLEventReader(lineBasedContentReader);
+//            XMLEvent previousEvent = null, currentEvent;
+//
+//            String normalizedXmlContentPath = "";
+//
+//            //
+//            // Apparently, hasNext() returns true after we pull END_DOCUMENT, so we don't use it at all while iterating.
+//            // Is this supposed to happen or is a StAX defect?
+//            //
+//            for(; !(currentEvent = xmlReader.nextEvent()).isEndDocument(); previousEvent = currentEvent) {
+//
+//                //
+//                // iterate over the XML content repeatedly matching the path against the content
+//                //
+//
+//                if (currentEvent.isStartElement()) {
+//
+//                    StartElement se = currentEvent.asStartElement();
+//                    String elementName = se.getName().getLocalPart();
+//                    normalizedXmlContentPath += "/" + elementName;
+//                }
+//                else if (currentEvent.isEndElement()) {
+//
+//                    normalizedXmlContentPath = normalizedXmlContentPath.substring(0, normalizedXmlContentPath.lastIndexOf('/'));
+//                }
+//                else {
+//
+//                    if (normalizedXmlContentPath.equals(normalizedPath)) {
+//
+//                        //
+//                        // full path match, add to context anything that follows that match
+//                        //
+//
+//                        //
+//                        // avoid duplicate Characters event addition, only add the first one
+//                        //
+//
+//                        if (!matches.isEmpty() && matches.get(matches.size() - 1).getCurrent().equals(previousEvent)) {
+//
+//                            //
+//                            // already added content for that path, ignore
+//                            //
+//
+//                            continue;
+//                        }
+//
+//                        XmlContext c = new XmlContext(normalizedXmlContentPath, previousEvent, currentEvent);
+//                        matches.add(c);
+//                    }
+//                }
+//            }
+//
+//            return matches;
+//        }
+//        catch (XMLStreamException e) {
+//
+//            throw new RuntimeException("NOT YET IMPLEMENTED");
+//        }
+//        finally {
+//
+//            if (xmlReader != null) {
+//
+//                try {
+//                    xmlReader.close();
+//                }
+//                catch(XMLStreamException e) {
+//
+//                    log.warn("failed to close an XML Reader: " + e.getMessage());
+//                }
+//            }
+//        }
+//    }
 
     /**
      * It overwrites the current content cached in memory, if any.

@@ -16,7 +16,6 @@
 
 package io.novaordis.utilities.xml.editor;
 
-import io.novaordis.utilities.Files;
 import io.novaordis.utilities.Util;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,9 +27,7 @@ import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -73,16 +70,16 @@ public class BasicInLineXmlEditorTest extends InLineXmlEditorTest {
         assertEquals("/a/b/c", s);
     }
 
-    // walk ------------------------------------------------------------------------------------------------------------
+    // collectMatches --------------------------------------------------------------------------------------------------
 
     @Test
-    public void walk() throws Exception {
+    public void collectMatches() throws Exception {
 
-        File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
+        File pom = Util.cp("xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/level1/level2/level3");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/level3");
 
         assertEquals(1, matches.size());
 
@@ -102,16 +99,18 @@ public class BasicInLineXmlEditorTest extends InLineXmlEditorTest {
         assertEquals("level3", se.getName().getLocalPart());
 
         assertEquals("/level1/level2/level3", ctx.getXmlContentPath());
+
+        log.debug(".");
     }
 
     @Test
-    public void walk_SkipADeepIncursion() throws Exception {
+    public void collectMatches_SkipADeepIncursion() throws Exception {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/level1/level2-b/level3-b");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2-b/level3-b");
 
         assertEquals(1, matches.size());
 
@@ -135,49 +134,49 @@ public class BasicInLineXmlEditorTest extends InLineXmlEditorTest {
     }
 
     @Test
-    public void walk_NoPath_Partial() throws Exception {
+    public void collectMatches_NoPath_Partial() throws Exception {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/level1/level2/no-such-element");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/no-such-element");
 
         assertTrue(matches.isEmpty());
     }
 
     @Test
-    public void walk_NoPath_AtAll() throws Exception {
+    public void collectMatches_NoPath_AtAll() throws Exception {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/no-such-element1/no-such-element2");
+        List<XmlContext> matches = ed.collectMatches("/no-such-element1/no-such-element2");
 
         assertTrue(matches.isEmpty());
     }
 
     @Test
-    public void walk_NoPath_PastTheEdgeOfThePath() throws Exception {
+    public void collectMatches_NoPath_PastTheEdgeOfThePath() throws Exception {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/level1/level2/level3/level4/level5");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/level3/level4/level5");
 
         assertTrue(matches.isEmpty());
     }
 
     @Test
-    public void walk_MultipleElementsMatchingPath() throws Exception {
+    public void collectMatches_MultipleElementsMatchingPath() throws Exception {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
         BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XmlContext> matches = ed.walk("/level1/list1/list1-element");
+        List<XmlContext> matches = ed.collectMatches("/level1/list1/list1-element");
 
         assertEquals(3, matches.size());
 
