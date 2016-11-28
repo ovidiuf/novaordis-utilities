@@ -24,3 +24,5 @@
 ** Added Files.cp() functionality to recursively copy directories.
 
 * Variables: moved Variable support from clad to here.
+
+* Added zip utilities (ZipUtil)
