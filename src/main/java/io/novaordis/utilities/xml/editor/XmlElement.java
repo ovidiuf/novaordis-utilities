@@ -20,7 +20,7 @@ package io.novaordis.utilities.xml.editor;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public class XmlElement {
+public class XMLElement {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ public class XmlElement {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public XmlElement(String name, String value) {
+    public XMLElement(String name, String value) {
 
         this.name = name;
         this.value = value;

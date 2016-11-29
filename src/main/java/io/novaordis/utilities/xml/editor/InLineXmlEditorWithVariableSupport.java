@@ -45,14 +45,14 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private BasicInLineXmlEditor delegateEditor;
+    private BasicInLineXMLEditor delegateEditor;
     private VariableProvider variableProvider;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public InLineXmlEditorWithVariableSupport(File xmlFile) throws IOException {
 
-        this.delegateEditor = new BasicInLineXmlEditor(xmlFile);
+        this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
     }
 
     // InLineXmlEditor implementation ----------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
     }
 
     @Override
-    public List<XmlElement> getElements(String path) {
+    public List<XMLElement> getElements(String path) {
 
         //
         // there are no variables in the element names, delegate

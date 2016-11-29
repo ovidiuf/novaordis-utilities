@@ -44,11 +44,11 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class BasicInLineXmlEditor implements InLineXmlEditor {
+public class BasicInLineXMLEditor implements InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(BasicInLineXmlEditor.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicInLineXMLEditor.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -120,7 +120,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
      *
      * @throws java.io.IOException
      */
-    public BasicInLineXmlEditor(File xmlFile) throws IOException {
+    public BasicInLineXMLEditor(File xmlFile) throws IOException {
 
         if (xmlFile == null) {
             throw new IllegalArgumentException("null xml file");
@@ -189,9 +189,9 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 
         List<String> result = new ArrayList<>();
 
-        List<XmlContext> matches = collectMatches(path);
+        List<XMLContext> matches = collectMatches(path);
 
-        for(XmlContext c: matches) {
+        for(XMLContext c: matches) {
 
             XMLEvent current = c.getCurrent();
 
@@ -208,9 +208,9 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     }
 
     @Override
-    public List<XmlElement> getElements(String path) {
+    public List<XMLElement> getElements(String path) {
 
-        List<XmlElement> children = new ArrayList<>();
+        List<XMLElement> children = new ArrayList<>();
 
         // walk the XML content and collect element names and values on match
 
@@ -244,7 +244,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
                         "NOT YET IMPLEMENTED (2): cannot process embedded elements yet (" + normalizedXmlPath + ")");
             }
 
-            XmlElement element = new XmlElement(name, value);
+            XMLElement element = new XMLElement(name, value);
             children.add(element);
         });
 
@@ -254,7 +254,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
     @Override
     public boolean set(String path, String newValue) {
 
-        List<XmlContext> matches = collectMatches(path);
+        List<XMLContext> matches = collectMatches(path);
 
         if (matches.isEmpty()) {
 
@@ -265,7 +265,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
         // set the first match only
         //
 
-        XmlContext match = matches.get(0);
+        XMLContext match = matches.get(0);
         XMLEvent previous = match.getPrevious();
         XMLEvent current = match.getCurrent();
 
@@ -475,7 +475,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
      * @param exactMatch if true, the closure will be applied only in case of exact match. If false, the closure
      *                   will be applied both on exact matches and on paths that start with the given path.
      */
-    void walk(String pathAsString, boolean exactMatch, XmlContextClosure closure) {
+    void walk(String pathAsString, boolean exactMatch, XMLContextClosure closure) {
 
         String normalizedPath = normalize(pathAsString);
 
@@ -546,12 +546,12 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
      * possible. Returns a list of matched contexts, in the order in which they were found, or an empty list if there
      * was no match
      */
-    List<XmlContext> collectMatches(String pathAsString) {
+    List<XMLContext> collectMatches(String pathAsString) {
 
-        List<XmlContext> matches = new ArrayList<>();
+        List<XMLContext> matches = new ArrayList<>();
 
         //
-        // the closure simply collects the XmlContext and puts in "matches"
+        // the closure simply collects the XMLContext and puts in "matches"
         //
 
         walk(pathAsString, true, (String normalizedXmlPath, XMLEvent previous, XMLEvent current) -> {
@@ -569,7 +569,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
                 return;
             }
 
-            XmlContext c = new XmlContext(normalizedXmlPath, previous, current);
+            XMLContext c = new XMLContext(normalizedXmlPath, previous, current);
             matches.add(c);
         });
 
@@ -582,9 +582,9 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 //     * possible. Returns a list of matched contexts, in the order in which they were found, or an empty list if there
 //     * was no match
 //     */
-//    List<XmlContext> walk(String pathAsString) {
+//    List<XMLContext> walk(String pathAsString) {
 //
-//        List<XmlContext> matches = new ArrayList<>();
+//        List<XMLContext> matches = new ArrayList<>();
 //
 //        String normalizedPath = normalize(pathAsString);
 //
@@ -639,7 +639,7 @@ public class BasicInLineXmlEditor implements InLineXmlEditor {
 //                            continue;
 //                        }
 //
-//                        XmlContext c = new XmlContext(normalizedXmlContentPath, previousEvent, currentEvent);
+//                        XMLContext c = new XMLContext(normalizedXmlContentPath, previousEvent, currentEvent);
 //                        matches.add(c);
 //                    }
 //                }

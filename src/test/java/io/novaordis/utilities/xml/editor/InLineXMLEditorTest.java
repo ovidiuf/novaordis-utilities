@@ -214,7 +214,7 @@ public abstract class InLineXmlEditorTest {
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<XmlElement> l = ed.getElements("/no/such/path");
+        List<XMLElement> l = ed.getElements("/no/such/path");
         assertTrue(l.isEmpty());
     }
 
@@ -225,7 +225,7 @@ public abstract class InLineXmlEditorTest {
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<XmlElement> l = ed.getElements("/root/listB");
+        List<XMLElement> l = ed.getElements("/root/listB");
         assertTrue(l.isEmpty());
     }
 
@@ -236,7 +236,7 @@ public abstract class InLineXmlEditorTest {
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<XmlElement> l = ed.getElements("/root/listC");
+        List<XMLElement> l = ed.getElements("/root/listC");
         assertTrue(l.isEmpty());
     }
 
@@ -247,7 +247,7 @@ public abstract class InLineXmlEditorTest {
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<XmlElement> l = ed.getElements("/root/listA");
+        List<XMLElement> l = ed.getElements("/root/listA");
 
         assertEquals(3, l.size());
         assertEquals("a", l.get(0).getName());
@@ -265,7 +265,7 @@ public abstract class InLineXmlEditorTest {
 
         InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
 
-        List<XmlElement> l = ed.getElements("/root/listA");
+        List<XMLElement> l = ed.getElements("/root/listA");
 
         assertEquals(1, l.size());
         assertEquals("a", l.get(0).getName());
