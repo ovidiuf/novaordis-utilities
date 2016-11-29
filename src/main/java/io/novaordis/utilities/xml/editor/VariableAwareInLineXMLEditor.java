@@ -35,11 +35,11 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public class InLineXMLEditorWithVariableSupport implements InLineXMLEditor {
+public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorWithVariableSupport.class);
+    private static final Logger log = LoggerFactory.getLogger(VariableAwareInLineXMLEditor.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ public class InLineXMLEditorWithVariableSupport implements InLineXMLEditor {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public InLineXMLEditorWithVariableSupport(File xmlFile) throws IOException {
+    public VariableAwareInLineXMLEditor(File xmlFile) throws IOException {
 
         this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
     }

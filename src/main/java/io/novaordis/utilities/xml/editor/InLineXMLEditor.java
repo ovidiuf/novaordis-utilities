@@ -30,7 +30,7 @@ import java.util.List;
  * For more details see https://kb.novaordis.com/index.php/In-Line_XML_Editor
  *
  * @see BasicInLineXMLEditor
- * @see InLineXMLEditorWithVariableSupport
+ * @see VariableAwareInLineXMLEditor
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16

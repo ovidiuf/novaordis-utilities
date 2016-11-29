@@ -34,11 +34,11 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest {
+public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorWithVariableSupportTest.class);
+    private static final Logger log = LoggerFactory.getLogger(VariableAwareInLineXMLEditorTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/simple.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         assertNull(editor.getVariableProvider());
 
@@ -75,7 +75,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         //
         // we don't install any VariableProvider
@@ -92,7 +92,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         assertNull(editor.getVariableProvider());
 
@@ -112,7 +112,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
         assertNull(p.getVariableValue("something"));
@@ -128,7 +128,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
 
@@ -150,7 +150,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
         p.setVariableValue("something", "bright");
@@ -168,7 +168,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         //
         // we don't install any VariableProvider
@@ -189,7 +189,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         assertNull(editor.getVariableProvider());
 
@@ -211,7 +211,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
         assertNull(p.getVariableValue("element.variable"));
@@ -231,7 +231,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
 
@@ -255,7 +255,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         VariableProviderImpl p = new VariableProviderImpl();
         p.setVariableValue("element.variable", "B");
@@ -281,7 +281,7 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
-        InLineXMLEditorWithVariableSupport editor = getInLineXmlEditorToTest(f);
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         try {
 
@@ -299,9 +299,9 @@ public class InLineXMLEditorWithVariableSupportTest extends InLineXMLEditorTest 
     // Package protected -----------------------------------------------------------------------------------------------
 
     @Override
-    protected InLineXMLEditorWithVariableSupport getInLineXmlEditorToTest(File xmlFile) throws Exception {
+    protected VariableAwareInLineXMLEditor getInLineXmlEditorToTest(File xmlFile) throws Exception {
 
-        return new InLineXMLEditorWithVariableSupport(xmlFile);
+        return new VariableAwareInLineXMLEditor(xmlFile);
     }
 
     // Protected -------------------------------------------------------------------------------------------------------
