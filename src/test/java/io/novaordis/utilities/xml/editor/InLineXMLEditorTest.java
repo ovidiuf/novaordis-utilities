@@ -134,7 +134,7 @@ public abstract class InLineXmlEditorTest {
         File f = new File(scratchDirectory, "test.xml");
         assertTrue(Files.write(f, content));
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(f);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
         assertEquals(3, editor.getLineCount());
         assertEquals(new File(scratchDirectory, "test.xml"), editor.getFile());
@@ -149,7 +149,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         String s = ed.get("/level1/level2/level3");
         assertEquals("something", s);
@@ -160,7 +160,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         String s = ed.get("/level1/level2-b/level3-b");
         assertEquals("somethingelse", s);
@@ -171,7 +171,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         String s = ed.get("/level1/level2/no-such-element");
         assertNull(s);
@@ -182,7 +182,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         String s = ed.get("/level1/list1/list1-element");
         assertEquals("a", s);
@@ -195,7 +195,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/pom-multi-module.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<String> modules = ed.getList("/project/modules/module");
 
@@ -212,7 +212,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<XMLElement> l = ed.getElements("/no/such/path");
         assertTrue(l.isEmpty());
@@ -223,7 +223,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<XMLElement> l = ed.getElements("/root/listB");
         assertTrue(l.isEmpty());
@@ -234,7 +234,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<XMLElement> l = ed.getElements("/root/listC");
         assertTrue(l.isEmpty());
@@ -245,7 +245,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<XMLElement> l = ed.getElements("/root/listA");
 
@@ -263,7 +263,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list-2.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         List<XMLElement> l = ed.getElements("/root/listA");
 
@@ -277,7 +277,7 @@ public abstract class InLineXmlEditorTest {
 
         File pomFile = Util.cp("xml/element-name-list-3.xml", scratchDirectory);
 
-        InLineXmlEditor ed = getInLineXmlEditorToTest(pomFile);
+        InLineXMLEditor ed = getInLineXmlEditorToTest(pomFile);
 
         try {
             ed.getElements("/root/listA");
@@ -300,7 +300,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a><b>x</b></a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         try {
             assertTrue(editor.set("/c", "y"));
@@ -324,7 +324,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a><b>x</b></a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         try {
             assertTrue(editor.set("/a/c", "y"));
@@ -351,7 +351,7 @@ public abstract class InLineXmlEditorTest {
 
         Files.write(xmlFile, content);
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertFalse(editor.set("/root/a", "?"));
     }
@@ -371,7 +371,7 @@ public abstract class InLineXmlEditorTest {
 
         Files.write(xmlFile, content);
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertFalse(editor.set("/root/a", "?"));
     }
@@ -385,7 +385,7 @@ public abstract class InLineXmlEditorTest {
 
         Files.write(xmlFile, content);
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/root/a", ".."));
 
@@ -411,7 +411,7 @@ public abstract class InLineXmlEditorTest {
 
         Files.write(xmlFile, content);
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/root/a", "!"));
 
@@ -436,7 +436,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<root/>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertEquals("<root/>", Files.read(xmlFile));
 
@@ -465,7 +465,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<root><a>?</a></root>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertFalse(editor.isDirty());
 
@@ -494,7 +494,7 @@ public abstract class InLineXmlEditorTest {
                         "      </a>\n" +
                         "</root>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertFalse(editor.isDirty());
 
@@ -527,7 +527,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<root/>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         // noop
         assertFalse(editor.undo());
@@ -542,7 +542,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<root/>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertFalse(editor.save());
 
@@ -559,7 +559,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a>x</a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/a", "y"));
 
@@ -589,7 +589,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a>x</a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/a", "y"));
 
@@ -621,7 +621,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a>x</a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/a", "y"));
 
@@ -656,7 +656,7 @@ public abstract class InLineXmlEditorTest {
         File xmlFile = new File(scratchDirectory, "test.xml");
         Files.write(xmlFile, "<a>0</a>");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(xmlFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         assertTrue(editor.set("/a", "1"));
         assertTrue(editor.save());
@@ -693,7 +693,7 @@ public abstract class InLineXmlEditorTest {
         File sampleFile = Util.cp(
                 baseDirectory, "src/test/resources/data/xml/simple.xml", scratchDirectory, "simple-copy.xml");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(sampleFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(sampleFile);
 
         assertFalse(editor.isDirty());
         assertEquals(3, editor.getLineCount());
@@ -720,7 +720,7 @@ public abstract class InLineXmlEditorTest {
         // make sure the change went to disk
         //
 
-        InLineXmlEditor editor2 = getInLineXmlEditorToTest(sampleFile);
+        InLineXMLEditor editor2 = getInLineXmlEditorToTest(sampleFile);
 
         String s = editor2.get("/example/color");
 
@@ -733,7 +733,7 @@ public abstract class InLineXmlEditorTest {
         File sampleFile = Util.cp(
                 baseDirectory, "src/test/resources/data/xml/pom-sample.xml", scratchDirectory, "pom-sample.xml");
 
-        InLineXmlEditor editor = getInLineXmlEditorToTest(sampleFile);
+        InLineXMLEditor editor = getInLineXmlEditorToTest(sampleFile);
 
         assertFalse(editor.isDirty());
         assertEquals(28, editor.getLineCount());
@@ -760,7 +760,7 @@ public abstract class InLineXmlEditorTest {
         // make sure the change went to disk
         //
 
-        InLineXmlEditor editor2 = getInLineXmlEditorToTest(sampleFile);
+        InLineXMLEditor editor2 = getInLineXmlEditorToTest(sampleFile);
 
         String s = editor2.get("/project/version");
 
@@ -769,7 +769,7 @@ public abstract class InLineXmlEditorTest {
 
     // Package protected -----------------------------------------------------------------------------------------------
 
-    protected abstract InLineXmlEditor getInLineXmlEditorToTest(File xmlFile) throws Exception;
+    protected abstract InLineXMLEditor getInLineXmlEditorToTest(File xmlFile) throws Exception;
 
     // Protected -------------------------------------------------------------------------------------------------------
 

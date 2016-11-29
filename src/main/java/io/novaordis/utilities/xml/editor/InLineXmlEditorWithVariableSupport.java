@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * An InLineXmlEditor implementation that is capable of handling variables in the XML content. It does that by querying
+ * An InLineXMLEditor implementation that is capable of handling variables in the XML content. It does that by querying
  * and possibly modifying the contents of a VariableProvider. If no variable provider is installed, then the editor
  * will fall back to the functionality of a basic editor and won't interact with variables in any way, leaving them
  * unresolved.
@@ -35,11 +35,11 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
+public class InLineXMLEditorWithVariableSupport implements InLineXMLEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXmlEditorWithVariableSupport.class);
+    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorWithVariableSupport.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -50,12 +50,12 @@ public class InLineXmlEditorWithVariableSupport implements InLineXmlEditor {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public InLineXmlEditorWithVariableSupport(File xmlFile) throws IOException {
+    public InLineXMLEditorWithVariableSupport(File xmlFile) throws IOException {
 
         this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
     }
 
-    // InLineXmlEditor implementation ----------------------------------------------------------------------------------
+    // InLineXMLEditor implementation ----------------------------------------------------------------------------------
 
     @Override
     public File getFile() {

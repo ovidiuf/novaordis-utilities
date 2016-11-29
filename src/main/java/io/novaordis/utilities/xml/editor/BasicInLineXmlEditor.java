@@ -38,13 +38,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A simple implementation of an InLineXmlEditor that does not recognize and handle variables. It is used internally
- * by the InLineXmlEditor implementation that is capable of handling variables.
+ * A simple implementation of an InLineXMLEditor that does not recognize and handle variables. It is used internally
+ * by the InLineXMLEditor implementation that is capable of handling variables.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class BasicInLineXMLEditor implements InLineXmlEditor {
+public class BasicInLineXMLEditor implements InLineXMLEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ public class BasicInLineXMLEditor implements InLineXmlEditor {
         staxFactory = XMLInputFactory.newFactory();
     }
 
-    // InLineXmlEditor implementation ----------------------------------------------------------------------------------
+    // InLineXMLEditor implementation ----------------------------------------------------------------------------------
 
     @Override
     public File getFile() {

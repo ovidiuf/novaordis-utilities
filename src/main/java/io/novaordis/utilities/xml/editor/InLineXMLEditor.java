@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * InLineXmlEditor is an API that can be used to modify XML files on disk directly from Java programs.
+ * InLineXMLEditor is an API that can be used to modify XML files on disk directly from Java programs.
  *
  * Depending on the implementation, it may or may not handle variables.
  *
@@ -30,12 +30,12 @@ import java.util.List;
  * For more details see https://kb.novaordis.com/index.php/In-Line_XML_Editor
  *
  * @see BasicInLineXMLEditor
- * @see InLineXmlEditorWithVariableSupport
+ * @see InLineXMLEditorWithVariableSupport
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public interface InLineXmlEditor {
+public interface InLineXMLEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ public interface InLineXmlEditor {
      * @return the text representation of the underlying file, as currently cached in memory. If the instance is
      * dirty, the content does contain changes that are not saved on disk.
      *
-     * @see InLineXmlEditor#isDirty()
+     * @see InLineXMLEditor#isDirty()
      */
     String getContent();
 
@@ -64,7 +64,7 @@ public interface InLineXmlEditor {
      * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
      * are detected. Consult implementation documentation for details.
      *
-     * @see InLineXmlEditor#getList(String)
+     * @see InLineXMLEditor#getList(String)
      */
     String get(String path);
 
@@ -75,7 +75,7 @@ public interface InLineXmlEditor {
      * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
      * are detected. Consult implementation documentation for details.
      *
-     * @see InLineXmlEditor#get(String)
+     * @see InLineXMLEditor#get(String)
      */
     List<String> getList(String path);
 
@@ -99,7 +99,7 @@ public interface InLineXmlEditor {
      *
      * @return true if state was changed on disk as result of the save operation, false otherwise.
      *
-     * @see InLineXmlEditor#undo()
+     * @see InLineXMLEditor#undo()
      */
     boolean save() throws IOException;
 
@@ -119,7 +119,7 @@ public interface InLineXmlEditor {
      *
      * @return true if disk state was changed as result of the last undo() operation, false otherwise.
      *
-     * @see InLineXmlEditor#save()
+     * @see InLineXMLEditor#save()
      *
      * @throws IOException
      */
