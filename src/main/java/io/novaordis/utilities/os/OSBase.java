@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,42 +123,48 @@ abstract class OSBase implements OS {
 
         try {
 
+            ProcessBuilder pb = new ProcessBuilder();
+
+            pb.directory(directory);
+
+            Process p = pb.command(commands).start();
+
             //
-            // TODO naive implementation, does not account for limited buffers, etc, must revisit ...
+            // we'll block this thread waiting for the child process to finish, but before we block, we start
+            // threads to consume the process' output and error streams; if we don't do that, there is potential for
+            // deadlock, where the child process exhaust stream space and blocks, and we block before even attempting
+            // to consume the content
             //
 
-            ProcessBuilder pb = new ProcessBuilder();
-            pb.directory(directory);
-            Process p = pb.command(commands).start();
+            StreamConsumer processStdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream());
+            StreamConsumer processStderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream());
+
+            processStdoutStreamConsumer.start();
+            processStderrStreamConsumer.start();
+
+            //
+            // now we can block, the streams will be consumed and the child process won't run out of space
+            //
 
             int exitCode = p.waitFor();
 
-            InputStream is = p.getInputStream();
-            InputStream es = p.getErrorStream();
+            //
+            // wait until the consumer threads unwind by themselves, or we timeout; we do this to avoid dropping
+            // in-flight stream content
+            //
 
-            StringBuilder inputBuilder = new StringBuilder();
-            StringBuilder errorBuilder = new StringBuilder();
-
-            int c;
-            while((c = is.read()) != -1) {
-                inputBuilder.append((char) c);
+            if (!processStdoutStreamConsumer.waitForShutdown(2000L)) {
+                log.warn(processStdoutStreamConsumer + " timed out waiting for the end of stream");
             }
 
-            while((c = es.read()) != -1) {
-                errorBuilder.append((char) c);
+            if (!processStderrStreamConsumer.waitForShutdown(2000L)) {
+                log.warn(processStderrStreamConsumer + " timed out waiting for the end of stream");
             }
 
-            String input = inputBuilder.toString();
-            if (input.isEmpty()) {
-                input = null;
-            }
+            String processStdoutContent = processStdoutStreamConsumer.read();
+            String processStderrContent = processStderrStreamConsumer.read();
 
-            String error = errorBuilder.toString();
-            if (error.isEmpty()) {
-                error = null;
-            }
-
-            return new NativeExecutionResult(exitCode, input, error);
+            return new NativeExecutionResult(exitCode, processStdoutContent, processStderrContent);
         }
         catch(Exception e) {
 

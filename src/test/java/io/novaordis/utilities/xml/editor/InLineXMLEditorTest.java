@@ -314,7 +314,7 @@ public abstract class InLineXmlEditorTest {
 
         // when implementing, test this:
 //        assertTrue(editor.isDirty());
-//        String content = editor.getContent();
+//        String content = editor.read();
 //        assertEquals("<a><b>x</b></a>\n<c>y</c>\n", content);
     }
 
@@ -338,7 +338,7 @@ public abstract class InLineXmlEditorTest {
 
         // when implementing, test this:
 //        assertTrue(editor.isDirty());
-//        String content = editor.getContent();
+//        String content = editor.read();
 //        assertEquals("<a><b>x</b>\n    <c>y</c>\n</a>\n", content);
     }
 
