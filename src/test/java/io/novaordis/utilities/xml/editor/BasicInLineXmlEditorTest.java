@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class BasicInLineXMLEditorTest extends InLineXmlEditorTest {
+public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 

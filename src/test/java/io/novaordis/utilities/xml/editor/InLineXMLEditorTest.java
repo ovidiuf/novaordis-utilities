@@ -38,11 +38,11 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public abstract class InLineXmlEditorTest {
+public abstract class InLineXMLEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(InLineXmlEditorTest.class);
+    private static final Logger log = LoggerFactory.getLogger(InLineXMLEditorTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
