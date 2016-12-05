@@ -24,7 +24,62 @@ public interface EnvironmentVariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    String ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY = "env.variable.provider.class.name";
+
     // Static ----------------------------------------------------------------------------------------------------------
+
+    EnvironmentVariableProvider[] INSTANCE = new EnvironmentVariableProvider[1];
+
+    /**
+     * @return the default EnvironmentVariableProvider for this JVM. If "env.variable.provider.class.name" (the exact
+     * string is defined by ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY) is defined and points to a fully
+     * qualified class name that implements EnvironmentVariableProvider, it will be instantiated, cached and used.
+     * If the system property is not defined, SystemEnvironmentVariableProvider will be used.
+     *
+     * @exception IllegalStateException if failure to instantiate the custom class is encountered.
+     */
+    static EnvironmentVariableProvider getInstance() {
+
+        synchronized (EnvironmentVariableProvider.class) {
+
+            if (INSTANCE[0] != null) {
+                return INSTANCE[0];
+            }
+
+            String className = System.getProperty(ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY);
+
+            if (className == null) {
+
+                INSTANCE[0] = new SystemEnvironmentVariableProvider();
+                return INSTANCE[0];
+            }
+
+            try {
+
+                Class c = Class.forName(className);
+                EnvironmentVariableProvider instance = (EnvironmentVariableProvider)c.newInstance();
+                INSTANCE[0] = instance;
+                return INSTANCE[0];
+             }
+            catch(Exception e) {
+
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    /**
+     * Clears the cached EnvironmentVariableProvider instance.
+     */
+    static void reset() {
+
+        synchronized (EnvironmentVariableProvider.class) {
+
+            INSTANCE[0] = null;
+        }
+    }
+
+    // Public ----------------------------------------------------------------------------------------------------------
 
     /**
      * Gets the value of the specified environment variable. An environment variable is a system-dependent external
@@ -39,6 +94,5 @@ public interface EnvironmentVariableProvider {
      */
     String getenv(String name);
 
-    // Public ----------------------------------------------------------------------------------------------------------
 
 }

@@ -3,4 +3,5 @@
   * multi-threaded consumption of stdout and stderr threads, removes potential for deadlock on small stream storage
     capacity.
 
-* Introduced package io.novaordis.utilities.env and EnvironmentVariableProvider.
+* Introduced package io.novaordis.utilities.env, EnvironmentVariableProvider and the mechanism that allows for a
+  configurable EnvironmentVariableProvider.

@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -76,6 +77,52 @@ public abstract class EnvironmentVariableProviderTest {
         String s = p.getenv("HOME");
         assertNotNull(s);
         log.info(s);
+    }
+
+    // getInstance() ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getInstance_Default() throws Exception {
+
+        assertNull(System.getProperty(
+                EnvironmentVariableProvider.ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY));
+
+        EnvironmentVariableProvider p = EnvironmentVariableProvider.getInstance();
+        assertTrue(p instanceof SystemEnvironmentVariableProvider);
+
+        EnvironmentVariableProvider p2 = EnvironmentVariableProvider.getInstance();
+        assertTrue(p == p2);
+    }
+
+    @Test
+    public void getInstance_MockInstance() throws Exception {
+
+        try {
+
+            System.setProperty(
+                    EnvironmentVariableProvider.ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY,
+                    MockEnvironmentVariableProvider.class.getName());
+
+            EnvironmentVariableProvider p = EnvironmentVariableProvider.getInstance();
+            assertTrue(p instanceof MockEnvironmentVariableProvider);
+
+            EnvironmentVariableProvider p2 = EnvironmentVariableProvider.getInstance();
+            assertTrue(p == p2);
+        }
+        finally {
+
+            System.clearProperty(EnvironmentVariableProvider.ENVIRONMENT_VARIABLE_PROVIDER_CLASS_NAME_SYSTEM_PROPERTY);
+            EnvironmentVariableProvider.reset();
+        }
+    }
+
+    // reset() ---------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void reset() throws Exception {
+
+        EnvironmentVariableProvider.reset();
+        assertNull(EnvironmentVariableProvider.INSTANCE[0]);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
