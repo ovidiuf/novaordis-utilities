@@ -25,6 +25,7 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.LinkedList;
 import java.util.Arrays;
@@ -871,6 +872,90 @@ public class Files {
         }
 
         return name;
+    }
+
+    /**
+     * The given string is interpreted as a file path to be normalized. The normalization consists in resolving the
+     * relative path elements ("." and "..") and coalescing superfluous "/".
+     *
+     * @exception IllegalArgumentException if the original path is null or the normalization process produce an invalid
+     * path
+     */
+    public static String normalizePath(String s) throws IllegalArgumentException {
+
+        if (s == null) {
+
+            throw new IllegalArgumentException("null path");
+        }
+
+        boolean absolute = s.startsWith(File.separator);
+
+        Stack<String> tokens = new Stack<>();
+
+        int length = s.length();
+        String currentToken = "";
+
+        for(int i = 0; i < length; i ++) {
+
+            char c = s.charAt(i);
+
+            if (c == '.') {
+
+                if (i == length - 1) {
+
+                    return tokensToPath(absolute, tokens);
+                }
+
+                if (s.charAt(i + 1) == '.') {
+
+                    i ++;
+
+                    //
+                    // go up one level
+                    //
+
+                    if (tokens.isEmpty()) {
+
+                        throw new IllegalArgumentException("invalid path, it unwinds over root: " + s);
+                    }
+
+                    tokens.pop();
+                }
+            }
+            else if (c == File.separatorChar) {
+
+                if (!currentToken.isEmpty()) {
+
+                    tokens.push(currentToken);
+                    currentToken = "";
+                }
+            }
+            else {
+
+                currentToken += c;
+            }
+        }
+
+        if (!currentToken.isEmpty()) {
+
+            tokens.push(currentToken);
+        }
+
+        return tokensToPath(absolute, tokens);
+    }
+
+    static String tokensToPath(boolean absolute, Stack<String> tokens) {
+
+        String path = "";
+
+        while(!tokens.isEmpty()) {
+
+            String s = tokens.pop();
+
+            path = s + (path.isEmpty() ? "" : File.separator) + path;
+        }
+
+        return (absolute ? File.separator : "") + path;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------

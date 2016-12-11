@@ -5,3 +5,5 @@
 
 * Introduced package io.novaordis.utilities.env, EnvironmentVariableProvider and the mechanism that allows for a
   configurable EnvironmentVariableProvider.
+
+* Files: introduced Files.normalizePath()

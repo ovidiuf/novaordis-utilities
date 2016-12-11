@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1765,6 +1766,157 @@ public class FilesTest {
 
         String n = Files.basename(new File("something/somethingelse.txt"), "txt");
         assertEquals("somethingelse.", n);
+    }
+
+    // normalize() -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void normalize_Null() throws Exception {
+
+        try {
+
+            Files.normalizePath(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("null path", msg);
+        }
+    }
+
+    @Test
+    public void normalize_Noop_EndsInSeparator() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/");
+
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize_Noop_DoesNotEndInSeparator() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c");
+
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize_LastCharIsADot() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/.");
+
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize_Dot_EndsInSeparator() throws Exception {
+
+        String s = Files.normalizePath("/a/b/./c/");
+
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize_Dot_DoesNotEndInSeparator() throws Exception {
+
+        String s = Files.normalizePath("/a/b/./c");
+
+        assertEquals("/a/b/c", s);
+    }
+
+    @Test
+    public void normalize_UpOnce() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/../d");
+
+        assertEquals("/a/b/d", s);
+    }
+
+    @Test
+    public void normalize_UpTwice() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/../../d");
+
+        assertEquals("/a/d", s);
+    }
+
+    @Test
+    public void normalize_DotsAndDoubleDots() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/./././d/.././e/../f/../../g");
+
+        assertEquals("/a/b/g", s);
+    }
+
+    @Test
+    public void normalize_superEdge() throws Exception {
+
+        String s = Files.normalizePath("//////////////");
+
+        assertEquals("/", s);
+    }
+
+    @Test
+    public void normalize_superEdge2() throws Exception {
+
+        String s = Files.normalizePath("////.////.////.//");
+
+        assertEquals("/", s);
+    }
+
+    @Test
+    public void normalize_superEdge3() throws Exception {
+
+        String s = Files.normalizePath("/a/b/c/../../..");
+
+        assertEquals("/", s);
+    }
+
+    @Test
+    public void normalize_TooManyUps() throws Exception {
+
+        try {
+            Files.normalizePath("/a/b/c/../../../..");
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("invalid path, it unwinds over root: /a/b/c/../../../..", msg);
+        }
+    }
+
+    // tokensToPath() --------------------------------------------------------------------------------------------------
+
+    @Test
+    public void tokensToPath_Absolute() throws Exception {
+
+        Stack<String> s = new Stack<>();
+
+        s.push("a");
+        s.push("b");
+        s.push("c");
+
+        String absolutePath = Files.tokensToPath(true, s);
+
+        assertEquals("/a/b/c", absolutePath);
+    }
+
+    @Test
+    public void tokensToPath_Relative() throws Exception {
+
+        Stack<String> s = new Stack<>();
+
+        s.push("a");
+        s.push("b");
+        s.push("c");
+
+        String relativePath = Files.tokensToPath(false, s);
+
+        assertEquals("a/b/c", relativePath);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
