@@ -7,3 +7,5 @@
   configurable EnvironmentVariableProvider.
 
 * Files: introduced Files.normalizePath()
+
+* Added async-collector under io.novaordis.utilities.ac
