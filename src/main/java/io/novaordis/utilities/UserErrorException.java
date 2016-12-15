@@ -31,6 +31,8 @@ public class UserErrorException extends Exception {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String message;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public UserErrorException() {
@@ -38,11 +40,14 @@ public class UserErrorException extends Exception {
     }
 
     public UserErrorException(String message) {
-        super(message);
+
+        this(message, null);
     }
 
     public UserErrorException(String message, Throwable cause) {
-        super(message, cause);
+
+        super(cause);
+        this.message = message;
     }
 
     public UserErrorException(Throwable cause) {
@@ -50,6 +55,31 @@ public class UserErrorException extends Exception {
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Override
+    public String getMessage() {
+
+        if (message != null) {
+
+            return message;
+        }
+
+        Throwable cause = getCause();
+
+        if (cause != null) {
+
+            String causeMessage = cause.getMessage();
+
+            if (causeMessage != null) {
+
+                return causeMessage;
+            }
+
+            return cause.getClass().getName();
+        }
+
+        return null;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

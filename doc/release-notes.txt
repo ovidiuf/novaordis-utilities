@@ -9,3 +9,7 @@
 * Files: introduced Files.normalizePath()
 
 * Added async-collector under io.novaordis.utilities.ac
+
+* Added NotYetImplementedException.
+
+* If an UserErrorException wraps a cause and it does not have its own messages, returns the cause's message.

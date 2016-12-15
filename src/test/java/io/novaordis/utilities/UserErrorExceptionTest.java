@@ -34,6 +34,8 @@ public class UserErrorExceptionTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    // Tests -----------------------------------------------------------------------------------------------------------
+
     @Test
     public void constructor() throws Exception {
 
@@ -62,9 +64,11 @@ public class UserErrorExceptionTest {
     public void constructor3() throws Exception {
 
         try {
+
             throw new UserErrorException(new RuntimeException());
         }
         catch (UserErrorException e) {
+
             assertEquals("java.lang.RuntimeException", e.getMessage());
             assertTrue(e.getCause() instanceof RuntimeException);
         }
@@ -80,6 +84,29 @@ public class UserErrorExceptionTest {
             assertEquals("test", e.getMessage());
             assertTrue(e.getCause() instanceof RuntimeException);
         }
+    }
+
+    @Test
+    public void ifWrappingACauseDelegateToTheCauseMessage() throws Exception {
+
+        Exception cause = new Exception("something");
+
+        Exception e = new UserErrorException(cause);
+
+        String s = e.getMessage();
+
+        assertEquals("something", s);
+    }
+
+    @Test
+    public void ifWrappingACauseDelegateToTheCauseMessage_MessageOverride() throws Exception {
+
+        Exception cause = new Exception("something");
+
+        Exception e = new UserErrorException("our own message", cause);
+
+        assertEquals("our own message", e.getMessage());
+
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
