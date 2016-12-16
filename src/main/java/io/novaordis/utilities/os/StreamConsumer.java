@@ -76,6 +76,7 @@ public class StreamConsumer {
     StreamConsumer(String name, InputStream is, int bufferSize) {
 
         if (name == null) {
+
             throw new IllegalArgumentException("null name");
         }
 
@@ -189,6 +190,12 @@ public class StreamConsumer {
 
             }
         }
+    }
+
+    @Override
+    public String toString() {
+
+        return getName() + " Stream Consumer";
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
