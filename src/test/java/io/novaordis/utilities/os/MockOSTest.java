@@ -48,6 +48,21 @@ public class MockOSTest extends OSTest {
         // irrelevant, noop
     }
 
+    @Test
+    public void execute_Real_NonExistentCommand() throws Exception {
+        // irrelevant, noop
+    }
+
+    @Test
+    public void execute_Real_TestScript_SimpleEcho() throws Exception {
+        // irrelevant, noop
+    }
+
+    @Test
+    public void execute_Real_DoubleQuotedStringFragment() throws Exception {
+        // irrelevant, noop
+    }
+    
     // getInstance() ---------------------------------------------------------------------------------------------------
 
     @Test

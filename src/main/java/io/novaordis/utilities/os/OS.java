@@ -16,6 +16,7 @@
 
 package io.novaordis.utilities.os;
 
+import io.novaordis.utilities.Files;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -131,12 +132,9 @@ public interface OS {
         String location = "";
 
         if (directory != null) {
+
             location = directory.getAbsolutePath();
-
-            if (location.endsWith("/.")) {
-                location = location.substring(0, location.length() - 2);
-            }
-
+            location = Files.normalizePath(location);
             location = " in " + location;
         }
 

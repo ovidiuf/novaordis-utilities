@@ -26,6 +26,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -103,7 +104,7 @@ public abstract class OSTest {
     // execute ---------------------------------------------------------------------------------------------------------
 
     @Test
-    public void execute_OneWord() throws Exception {
+    public void execute_Real_OneWord() throws Exception {
 
         OS os = getOSToTest();
         NativeExecutionResult ner = os.execute("ls");
@@ -115,7 +116,7 @@ public abstract class OSTest {
     }
 
     @Test
-    public void execute_TwoWord() throws Exception {
+    public void execute_Real_TwoWord() throws Exception {
 
         OS os = getOSToTest();
         NativeExecutionResult ner = os.execute("ls .");
@@ -127,7 +128,7 @@ public abstract class OSTest {
     }
 
     @Test
-    public void execute_NullCurrentDirectory() throws Exception {
+    public void execute_Real_NullCurrentDirectory() throws Exception {
 
         OS os = getOSToTest();
         NativeExecutionResult ner = os.execute(null, "ls");
@@ -139,7 +140,7 @@ public abstract class OSTest {
     }
 
     @Test
-    public void execute_DoubleQuotedStringFragment() throws Exception {
+    public void execute_Real_DoubleQuotedStringFragment() throws Exception {
 
         OS os = getOSToTest();
 
@@ -152,7 +153,7 @@ public abstract class OSTest {
     }
 
     @Test
-    public void execute_DifferentDirectory() throws Exception {
+    public void execute_Real_DifferentDirectory() throws Exception {
 
         OS os = getOSToTest();
 
@@ -171,6 +172,75 @@ public abstract class OSTest {
 
         assertEquals(d2, d);
     }
+
+    @Test
+    public void execute_Real_NonExistentCommand() throws Exception {
+
+        OS os = getOSToTest();
+
+        String command = "i-am-sure-there-is-no-such-command";
+
+        NativeExecutionResult r = os.execute(command);
+
+        String stdout = r.getStdout();
+        String stderr = r.getStderr();
+
+        assertEquals(127, r.getExitStatus());
+        assertNull(stdout);
+        assertNotNull(stderr);
+    }
+
+    @Test
+    public void execute_Real_TestScript_SimpleEcho() throws Exception {
+
+        OS os = getOSToTest();
+
+        File dir = new File(System.getProperty("basedir"));
+        dir = new File(dir, "src/test/resources/data/executable-scripts");
+        assertTrue(dir.isDirectory());
+        String script = "simple-echo.sh";
+        File scriptFile = new File(dir, script);
+        assertTrue(scriptFile.isFile());
+
+        String command = script + " test";
+
+        NativeExecutionResult r = os.execute(dir, command);
+
+        String stdout = r.getStdout();
+        String stderr = r.getStderr();
+
+        assertTrue(r.isSuccess());
+        assertEquals("test\n", stdout);
+        assertNull(stderr);
+    }
+
+
+    /**
+     * This is commented out as it blocks, we don't have a good way to handle processes that read, yet.
+     */
+//    @Test
+//    public void execute_Real_TheUnderlyingProcessBlocksWaitingForInput() throws Exception {
+//
+//        OS os = getOSToTest();
+//
+//        File dir = new File(System.getProperty("basedir"));
+//        dir = new File(dir, "src/test/resources/data/executable-scripts");
+//        assertTrue(dir.isDirectory());
+//        String script = "read-from-stdin.sh";
+//        File scriptFile = new File(dir, script);
+//        assertTrue(scriptFile.isFile());
+//
+//        String command = script;
+//
+//        NativeExecutionResult r = os.execute(dir, command);
+//
+//        String stdout = r.getStdout();
+//        String stderr = r.getStderr();
+//
+//        assertTrue(r.isSuccess());
+//        assertNull(stderr);
+//        assertNotNull(stdout);
+//    }
 
     // split -----------------------------------------------------------------------------------------------------------
 

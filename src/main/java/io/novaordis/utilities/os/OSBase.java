@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,9 +139,11 @@ abstract class OSBase implements OS {
 
             StreamConsumer processStdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream());
             StreamConsumer processStderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream());
+            StreamProducer processStdinStreamProducer = new StreamProducer(p.getOutputStream());
 
             processStdoutStreamConsumer.start();
             processStderrStreamConsumer.start();
+            processStdinStreamProducer.start();
 
             //
             // now we can block, the streams will be consumed and the child process won't run out of space
@@ -165,6 +168,15 @@ abstract class OSBase implements OS {
             String processStderrContent = processStderrStreamConsumer.read();
 
             return new NativeExecutionResult(exitCode, processStdoutContent, processStderrContent);
+        }
+        catch(IOException e) {
+
+            //
+            // non-existent commands produce this:
+            // java.io.Exception: Cannot run program "no-such-command" (in directory "."): error=2, No such file or directory
+            //
+
+            return new NativeExecutionResult(127, null, e.getMessage());
         }
         catch(Exception e) {
 
