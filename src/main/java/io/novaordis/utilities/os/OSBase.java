@@ -116,6 +116,9 @@ abstract class OSBase implements OS {
 
         OS.logExecution(log, directory, command);
 
+        final boolean logStdoutContent = true; // log as DEBUG is DEBUG is turned on
+        final boolean logStderrContent = true; // log as DEBUG is DEBUG is turned on
+
         //
         // Linux and MacOS implementations should be identical; for Windows, will override if necessary
         //
@@ -143,8 +146,10 @@ abstract class OSBase implements OS {
             int stdoutBufferSize = 1;
             int stderrBufferSize = 1;
 
-            StreamConsumer stdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream(), stdoutBufferSize);
-            StreamConsumer stderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream(), stderrBufferSize);
+            StreamConsumer stdoutStreamConsumer = new StreamConsumer(
+                    "stdout", p.getInputStream(), stdoutBufferSize, logStdoutContent);
+            StreamConsumer stderrStreamConsumer = new StreamConsumer(
+                    "stderr", p.getErrorStream(), stderrBufferSize, logStderrContent);
             StreamProducer stdinStreamProducer = new StreamProducer(p.getOutputStream());
 
             stdoutStreamConsumer.start();
@@ -173,7 +178,8 @@ abstract class OSBase implements OS {
             String processStdoutContent = stdoutStreamConsumer.read();
             String processStderrContent = stderrStreamConsumer.read();
 
-            return new NativeExecutionResult(exitCode, processStdoutContent, processStderrContent);
+            return new NativeExecutionResult(
+                    exitCode, processStdoutContent, processStderrContent, logStdoutContent, logStderrContent);
         }
         catch(IOException e) {
 
@@ -182,7 +188,7 @@ abstract class OSBase implements OS {
             // java.io.Exception: Cannot run program "no-such-command" (in directory "."): error=2, No such file or directory
             //
 
-            return new NativeExecutionResult(127, null, e.getMessage());
+            return new NativeExecutionResult(127, null, e.getMessage(), logStdoutContent, logStderrContent);
         }
         catch(Exception e) {
 

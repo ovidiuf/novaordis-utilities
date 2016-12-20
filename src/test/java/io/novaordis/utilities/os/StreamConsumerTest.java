@@ -364,7 +364,6 @@ public class StreamConsumerTest {
         String s;
         while((s = c.read()) != null) {
 
-            assertTrue(c.isConsuming());
             content += s;
         }
 

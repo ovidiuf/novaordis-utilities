@@ -31,7 +31,8 @@ public class NativeExecutionResult {
     private int exitStatus;
     private String stdout;
     private String stderr;
-
+    private boolean stdoutDebugLoggingWasEnabled;
+    private boolean stderrDebugLoggingWasEnabled;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -40,10 +41,17 @@ public class NativeExecutionResult {
      *                   IllegalArgumentException.
      * @param stdoutContent - null is acceptable. Multi-line content is acceptable.
      * @param stderrContent- null is acceptable. Multi-line content is acceptable.
+     * @param stdoutDebugLoggingWasEnabled set to "true" if the stdout DEBUG logging was enabled at the OS
+     *                                     implementation level so the stdout content was DEBUG logged already. Useful
+     *                                     if we try to avoid duplicate logging.
+     * @param stderrDebugLoggingWasEnabled set to "true" if the stderr DEBUG logging was enabled at the OS
+     *                                     implementation level so the stderr content was DEBUG logged already. Useful
+     *                                     if we try to avoid duplicate logging.
      *
      * @exception IllegalArgumentException
      */
-    public NativeExecutionResult(int exitStatus, String stdoutContent, String stderrContent) {
+    public NativeExecutionResult(int exitStatus, String stdoutContent, String stderrContent,
+                                 boolean stdoutDebugLoggingWasEnabled, boolean stderrDebugLoggingWasEnabled) {
 
         if (exitStatus < 0 || exitStatus > 255) {
             throw new IllegalArgumentException("illegal exit status " + exitStatus);
@@ -52,6 +60,8 @@ public class NativeExecutionResult {
         this.exitStatus = exitStatus;
         this.stdout = stdoutContent;
         this.stderr = stderrContent;
+        this.stdoutDebugLoggingWasEnabled = stdoutDebugLoggingWasEnabled;
+        this.stderrDebugLoggingWasEnabled = stderrDebugLoggingWasEnabled;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -86,6 +96,24 @@ public class NativeExecutionResult {
     public String getStderr() {
 
         return stderr;
+    }
+
+    /**
+     * @return true if stdout DEBUG logging was enabled at the OS implementation level so the stdout content was DEBUG
+     * logged already. Useful if we try to avoid duplicate logging.
+     */
+    public boolean wasStdoutDebugLoggingEnabled() {
+
+        return stdoutDebugLoggingWasEnabled;
+    }
+
+    /**
+     * @return true if stderr DEBUG logging was enabled at the OS implementation level so the stderr content was DEBUG
+     * logged already. Useful if we try to avoid duplicate logging.
+     */
+    public boolean wasStderrDebugLoggingEnabled() {
+
+        return stderrDebugLoggingWasEnabled;
     }
 
     /**

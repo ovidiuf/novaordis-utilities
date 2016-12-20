@@ -73,7 +73,7 @@ public class MockOS implements OS {
         //
 
         if (commandsThatFail.contains(command)) {
-            return new NativeExecutionResult(1, null, "synthetic failure");
+            return new NativeExecutionResult(1, null, "synthetic failure", true, true);
         }
 
 
@@ -83,7 +83,7 @@ public class MockOS implements OS {
         for(MockCommand c: commandsThatSucceed) {
 
             if (c.getCommand().equals(command)) {
-                return new NativeExecutionResult(0, c.getStdout(), c.getStderr());
+                return new NativeExecutionResult(0, c.getStdout(), c.getStderr(), true, true);
             }
         }
 
@@ -93,7 +93,7 @@ public class MockOS implements OS {
 
         if ("pwd".equals(command)) {
 
-            return new NativeExecutionResult(0, directory.toString() + "\n", null);
+            return new NativeExecutionResult(0, directory.toString() + "\n", null, true, true);
         }
 
         throw new RuntimeException("we don't know how to mock command " + command);

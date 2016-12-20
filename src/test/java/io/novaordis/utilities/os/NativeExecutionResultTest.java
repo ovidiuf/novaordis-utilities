@@ -47,7 +47,7 @@ public class NativeExecutionResultTest {
     public void invalidExitStatus() throws Exception {
 
         try {
-            new NativeExecutionResult(-1, "something", "something");
+            new NativeExecutionResult(-1, "something", "something", false, false);
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -59,7 +59,7 @@ public class NativeExecutionResultTest {
     public void invalidExitStatus2() throws Exception {
 
         try {
-            new NativeExecutionResult(256, "something", "something");
+            new NativeExecutionResult(256, "something", "something", false, false);
             fail("should have thrown exception");
         }
         catch(IllegalArgumentException e) {
@@ -70,29 +70,33 @@ public class NativeExecutionResultTest {
     @Test
     public void constructor() throws Exception {
 
-        NativeExecutionResult r = new NativeExecutionResult(0, "something", "something else");
+        NativeExecutionResult r = new NativeExecutionResult(0, "something", "something else", true, true);
 
         assertEquals(0, r.getExitStatus());
         assertTrue(r.isSuccess());
         assertFalse(r.isFailure());
         assertEquals("something", r.getStdout());
         assertEquals("something else", r.getStderr());
+        assertTrue(r.wasStdoutDebugLoggingEnabled());
+        assertTrue(r.wasStderrDebugLoggingEnabled());
     }
 
     @Test
     public void constructor2() throws Exception {
 
-        NativeExecutionResult r = new NativeExecutionResult(1, "something", "something else");
+        NativeExecutionResult r = new NativeExecutionResult(1, "something", "something else", false, false);
 
         assertEquals(1, r.getExitStatus());
         assertFalse(r.isSuccess());
         assertTrue(r.isFailure());
+        assertFalse(r.wasStdoutDebugLoggingEnabled());
+        assertFalse(r.wasStderrDebugLoggingEnabled());
     }
 
     @Test
     public void constructor_NullStdout() throws Exception {
 
-        NativeExecutionResult r = new NativeExecutionResult(0, null, "something");
+        NativeExecutionResult r = new NativeExecutionResult(0, null, "something", true, true);
 
         assertNull(r.getStdout());
         assertEquals("something", r.getStderr());
@@ -101,7 +105,7 @@ public class NativeExecutionResultTest {
     @Test
     public void constructor_NullStderr() throws Exception {
 
-        NativeExecutionResult r = new NativeExecutionResult(0, "something", null);
+        NativeExecutionResult r = new NativeExecutionResult(0, "something", null, true, true);
 
         assertEquals("something", r.getStdout());
         assertNull(r.getStderr());
