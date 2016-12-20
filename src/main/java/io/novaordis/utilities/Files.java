@@ -894,6 +894,7 @@ public class Files {
 
         int length = s.length();
         String currentToken = "";
+        boolean precededBySeparator = false;
 
         for(int i = 0; i < length; i ++) {
 
@@ -901,25 +902,55 @@ public class Files {
 
             if (c == '.') {
 
-                if (i == length - 1) {
+                if (precededBySeparator) {
 
-                    return tokensToPath(absolute, tokens);
-                }
+                    if (i == length - 1) {
 
-                if (s.charAt(i + 1) == '.') {
+                        //
+                        // path element, not "extension dot"
+                        //
 
-                    i ++;
-
-                    //
-                    // go up one level
-                    //
-
-                    if (tokens.isEmpty()) {
-
-                        throw new IllegalArgumentException("invalid path, it unwinds over root: " + s);
+                        return tokensToPath(absolute, tokens);
                     }
 
-                    tokens.pop();
+                    char next = s.charAt(i + 1);
+
+                    if (next == '/') {
+
+                        //
+                        // the dot is ignored, continue
+                        //
+                        continue;
+                    }
+                    else if (next == '.') {
+
+                        i++;
+
+                        //
+                        // go up one level
+                        //
+
+                        if (tokens.isEmpty()) {
+
+                            throw new IllegalArgumentException("invalid path, it unwinds over root: " + s);
+                        }
+
+                        tokens.pop();
+                    }
+                    else {
+
+                        //
+                        // the current dot is an "extension dot", not a path element
+                        //
+                        currentToken += c;
+                    }
+                }
+                else {
+
+                    //
+                    // "extension dot", it's part of the token
+                    //
+                    currentToken += c;
                 }
             }
             else if (c == File.separatorChar) {
@@ -929,10 +960,13 @@ public class Files {
                     tokens.push(currentToken);
                     currentToken = "";
                 }
+
+                precededBySeparator = true;
             }
             else {
 
                 currentToken += c;
+                precededBySeparator = false;
             }
         }
 

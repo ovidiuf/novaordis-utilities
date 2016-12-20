@@ -1889,6 +1889,46 @@ public class FilesTest {
         }
     }
 
+    @Test
+    public void normalize_Extension() throws Exception {
+
+        String s = "/a/b.c";
+        String n = Files.normalizePath(s);
+        assertEquals("/a/b.c", n);
+    }
+
+    @Test
+    public void normalize_Extension2() throws Exception {
+
+        String s = "/a/b.c.d";
+        String n = Files.normalizePath(s);
+        assertEquals("/a/b.c.d", n);
+    }
+
+    @Test
+    public void normalize_Extension3() throws Exception {
+
+        String s = "/a/.c";
+        String n = Files.normalizePath(s);
+        assertEquals("/a/.c", n);
+    }
+
+    @Test
+    public void normalize_Extension4() throws Exception {
+
+        String s = "/a/c.";
+        String n = Files.normalizePath(s);
+        assertEquals("/a/c.", n);
+    }
+
+    @Test
+    public void normalize_Extension5() throws Exception {
+
+        String s = "/a/c./";
+        String n = Files.normalizePath(s);
+        assertEquals("/a/c.", n);
+    }
+
     // tokensToPath() --------------------------------------------------------------------------------------------------
 
     @Test
