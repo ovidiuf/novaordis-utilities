@@ -143,13 +143,8 @@ abstract class OSBase implements OS {
             // reading from stdin.
             //
 
-            int stdoutBufferSize = 1;
-            int stderrBufferSize = 1;
-
-            StreamConsumer stdoutStreamConsumer = new StreamConsumer(
-                    "stdout", p.getInputStream(), stdoutBufferSize, logStdoutContent);
-            StreamConsumer stderrStreamConsumer = new StreamConsumer(
-                    "stderr", p.getErrorStream(), stderrBufferSize, logStderrContent);
+            StreamConsumer stdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream(), logStdoutContent);
+            StreamConsumer stderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream(), logStderrContent);
             StreamProducer stdinStreamProducer = new StreamProducer(p.getOutputStream());
 
             stdoutStreamConsumer.start();

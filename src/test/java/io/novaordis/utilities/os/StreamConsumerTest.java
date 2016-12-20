@@ -449,7 +449,9 @@ public class StreamConsumerTest {
         assertTrue(c2.isLogContent());
 
 
-        mis2.releaseChunk("1\n2\n3\n4\n5\n");
+        mis2.releaseChunk("A\nB\nC\nD\nE\nF");
+
+        Thread.sleep(150L);
 
         mis2.close();
 
@@ -466,7 +468,7 @@ public class StreamConsumerTest {
             content2 += s2;
         }
 
-        assertEquals("1\n2\n3\n4\n5\n", content2);
+        assertEquals("A\nB\nC\nD\nE\nF", content2);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

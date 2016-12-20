@@ -42,36 +42,32 @@ public class StreamConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(StreamConsumer.class);
 
-    public static final int DEFAULT_BUFFER_SIZE = 1;
+    public static final int DEFAULT_BUFFER_SIZE = 10240;
 
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private int bufferSize;
-    private boolean doLogContent;
     private byte[] buffer;
     private String name;
     final private InputStream inputStream;
     private volatile boolean stopRequested;
 
-    private Thread thread;
-
+    private Thread readingThread;
     final private ByteArrayOutputStream storage;
-
     private final CountDownLatch consumerThreadStopped;
 
-
+    private ContentLogger contentLogger;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * Starts with the default buffer size, which is 1. The implementation does not log.debug() by default the content
-     * it reads from the process.
+     * Starts with the default buffer size, which is DEFAULT_BUFFER_SIZE (in bytes). The implementation does not
+     * log.debug() by default the content it reads from the process.
      *
      * Buffer Size Note: A large buffer will will allow efficient transfers of large quantities of output. However, the
-     * output will not be immediately available for consumption, unless the buffer fills up. If you need immediate
-     * feedback on what the underlying process is producing at stdout/stdout, use small buffer size - even 1.
+     * output will not be immediately available for consumption with read() unless the buffer fills up.
      *
      * @param name will become the name of the consuming thread.
      *
@@ -102,15 +98,32 @@ public class StreamConsumer {
     }
 
     /**
+     * Starts with the default buffer size, which is DEFAULT_BUFFER_SIZE (in bytes).
+     *
+     * @param  name will become the name of the consuming thread.
+     *
+     * @param is the input stream to read from. It is usually connected to a OS process' stdout or stderr. Closing the
+     *           input stream stops the consumer.
+     *
+     * @param doLogContent if true, log.debug() the content as soon as it is read from the underlying process. By
+     *                     default, the implementation does not log.debug() by default the content it reads from the
+     *                     process. Note that the logging subsystem must be configured to allow DEBUG-level logging for
+     *                     the logged content to be visible.
+     */
+    StreamConsumer(String name, InputStream is, boolean doLogContent) {
+
+        this(name, is, DEFAULT_BUFFER_SIZE, doLogContent);
+    }
+
+    /**
      * @param  name will become the name of the consuming thread.
      *
      * @param is the input stream to read from. It is usually connected to a OS process' stdout or stderr. Closing the
      *           input stream stops the consumer.
      *
      * @param bufferSize sets the internal buffer. A large buffer will will allow efficient transfers of large
-     *                   quantities of output. However, the output will not be immediately available for consumption,
-     *                   unless the buffer fills up. If you need immediate feedback on what the underlying process is
-     *                   producing at stdout/stdout, use small buffer size - even 1.
+     *                   quantities of output. However, the output will not be immediately available for consumption
+     *                   with read() unless the buffer fills up.
      *
      * @param doLogContent if true, log.debug() the content as soon as it is read from the underlying process. By
      *                     default, the implementation does not log.debug() by default the content it reads from the
@@ -132,10 +145,16 @@ public class StreamConsumer {
 
         this.inputStream = is;
         this.bufferSize = bufferSize;
-        this.doLogContent = doLogContent;
         this.buffer = new byte[bufferSize];
         this.consumerThreadStopped = new CountDownLatch(1);
         this.storage = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
+
+        if (doLogContent) {
+
+            this.contentLogger = new ContentLogger(name + " Logger");
+
+            log.debug(this + " is configured to asynchronously log the stream");
+        }
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -155,17 +174,17 @@ public class StreamConsumer {
             throw new IllegalStateException("the stream consumer was stopped");
         }
 
-        if (thread != null) {
+        if (readingThread != null) {
 
             log.debug(this + " already started");
             return;
         }
 
-        this.thread = new Thread(StreamConsumer.this::consume, getName());
+        this.readingThread = new Thread(StreamConsumer.this::consume, getName());
 
         log.debug(this + " starting ...");
 
-        thread.start();
+        readingThread.start();
     }
 
     /**
@@ -179,7 +198,7 @@ public class StreamConsumer {
 
     public boolean isConsuming() {
 
-        return thread != null && consumerThreadStopped.getCount() == 1;
+        return readingThread != null && consumerThreadStopped.getCount() == 1;
     }
 
     public String getName() {
@@ -194,7 +213,7 @@ public class StreamConsumer {
 
     public boolean isLogContent() {
 
-        return doLogContent;
+        return contentLogger != null;
     }
 
     /**
@@ -217,14 +236,7 @@ public class StreamConsumer {
                 return null;
             }
 
-            String s = new String(content);
-
-            if (doLogContent) {
-
-                log.debug(s);
-            }
-
-            return s;
+            return new String(content);
         }
     }
 
@@ -292,6 +304,11 @@ public class StreamConsumer {
                 synchronized (storage) {
 
                     storage.write(buffer, 0, read);
+
+                    if (contentLogger != null) {
+
+                        contentLogger.log(buffer, 0, read);
+                    }
                 }
 
                 if (stopRequested) {
@@ -300,7 +317,7 @@ public class StreamConsumer {
                     // abort
                     //
 
-                    log.debug("stop requested, " + thread + " exiting ...");
+                    log.debug("stop requested, " + readingThread + " exiting ...");
 
                     //
                     // the latch will be counted down in the finally clause
@@ -328,7 +345,6 @@ public class StreamConsumer {
             consumerThreadStopped.countDown();
         }
     }
-
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 
