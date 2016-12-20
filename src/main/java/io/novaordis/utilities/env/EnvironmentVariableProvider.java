@@ -17,6 +17,8 @@
 package io.novaordis.utilities.env;
 
 /**
+ * See https://kb.novaordis.com/index.php/Nova_Ordis_Utilities_Environment_Variable_Support
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/4/16
  */
