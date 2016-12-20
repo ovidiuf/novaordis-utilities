@@ -76,7 +76,16 @@ public class StreamConsumerTest {
     // lifecycle -------------------------------------------------------------------------------------------------------
 
     @Test
-    public void lifecycle_EndOfStream() throws Exception {
+    public void identity() throws Exception {
+
+        MockInputStream mis = new MockInputStream();
+        StreamConsumer c = new StreamConsumer("test", mis);
+
+        assertEquals(StreamConsumer.DEFAULT_BUFFER_SIZE, c.getBufferSize());
+    }
+
+    @Test
+    public void lifecycle_EndOfStream_BufferSize4() throws Exception {
 
         MockInputStream mis = new MockInputStream();
 
@@ -198,6 +207,122 @@ public class StreamConsumerTest {
     }
 
     @Test
+    public void lifecycle_EndOfStream_BufferSize1() throws Exception {
+
+        MockInputStream mis = new MockInputStream();
+
+        StreamConsumer c = new StreamConsumer("test", mis, 1);
+
+        assertEquals(1, c.getBufferSize());
+
+        assertFalse(c.isConsuming());
+
+        //
+        // the consumer was not started, nothing to read
+        //
+
+        assertTrue(c.read().isEmpty());
+
+        c.start();
+
+        assertTrue(c.isConsuming());
+
+        //
+        // at this point the consumer thread is starting to consume
+        //
+
+        // this should be a noop, shouldn't block or throw exception
+        c.start();
+
+
+        String content = "";
+
+        //
+        // nothing was released so far
+        //
+
+        String s;
+
+        s = c.read();
+        assertEquals("", s);
+
+        //
+        // release 4 bytes
+        //
+
+        mis.releaseChunk("A");
+
+        //
+        // loop until we get the content
+        //
+        while((s = c.read()).isEmpty()) {
+
+            Thread.sleep(50L);
+        }
+
+        content += s;
+
+        //
+        // release 5 more bytes
+        //
+
+        mis.releaseChunk("BCD");
+
+        //
+        // loop until we get the content
+        //
+        while((s = c.read()).isEmpty()) {
+
+            Thread.sleep(50L);
+        }
+
+        content += s;
+
+        //
+        // release 5 more
+        //
+
+        mis.releaseChunk("EFGHIJKL");
+
+        //
+        // loop until we get the content
+        //
+        while((s = c.read()).isEmpty()) {
+
+            Thread.sleep(50L);
+        }
+
+        content += s;
+
+        //
+        // trigger the end the stream
+        //
+
+        mis.endTheStream();
+
+        //
+        // drain the stream
+        //
+        while((s = c.read()) != null) {
+
+            content += s;
+        }
+
+        //
+        // we reached EOS
+        //
+
+        assertNull(c.read());
+        assertNull(c.read());
+
+        assertTrue(c.waitForShutdown(10L));
+
+        assertFalse(c.isConsuming());
+
+        assertEquals("ABCDEFGHIJKL", content);
+    }
+
+    @Test
     public void lifecycle_Stop() throws Exception {
 
         MockInputStream mis = new MockInputStream();
@@ -218,7 +343,6 @@ public class StreamConsumerTest {
 
         assertFalse(c.isConsuming());
     }
-
 
     @Test
     public void lifecycle_AttemptToStartAfterDeath() throws Exception {

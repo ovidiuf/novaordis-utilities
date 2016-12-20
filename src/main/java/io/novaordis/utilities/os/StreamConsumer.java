@@ -40,7 +40,7 @@ public class StreamConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(StreamConsumer.class);
 
-    public static final int DEFAULT_BUFFER_SIZE = 10240;
+    public static final int DEFAULT_BUFFER_SIZE = 1;
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -61,7 +61,11 @@ public class StreamConsumer {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * Starts with the default buffer size, which is 10240.
+     * Starts with the default buffer size, which is 1.
+     *
+     * Buffer Size Note: A large buffer will will allow efficient transfers of large quantities of output. However, the
+     * output will not be immediately available for consumption, unless the buffer fills up. If you need immediate
+     * feedback on what the underlying process is producing at stdout/stdout, use small buffer size - even 1.
      *
      * @param name will become the name of the consuming thread.
      */
@@ -71,6 +75,11 @@ public class StreamConsumer {
     }
 
     /**
+     * @param bufferSize sets the internal buffer. A large buffer will will allow efficient transfers of large
+     *                   quantities of output. However, the output will not be immediately available for consumption,
+     *                   unless the buffer fills up. If you need immediate feedback on what the underlying process is
+     *                   producing at stdout/stdout, use small buffer size - even 1.
+
      * @param name will become the name of the consuming thread.
      */
     StreamConsumer(String name, InputStream is, int bufferSize) {

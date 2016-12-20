@@ -62,7 +62,7 @@ public class MockOSTest extends OSTest {
     public void execute_Real_DoubleQuotedStringFragment() throws Exception {
         // irrelevant, noop
     }
-    
+
     // getInstance() ---------------------------------------------------------------------------------------------------
 
     @Test
