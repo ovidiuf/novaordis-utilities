@@ -134,16 +134,22 @@ abstract class OSBase implements OS {
             // we'll block this thread waiting for the child process to finish, but before we block, we start
             // threads to consume the process' output and error streams; if we don't do that, there is potential for
             // deadlock, where the child process exhaust stream space and blocks, and we block before even attempting
-            // to consume the content
+            // to consume the content. We configure the consumers with the smallest possible buffers (1), so we can
+            // display immediately what the process is producing at stdout/stderr without waiting for the buffer to
+            // fill. This is useful when trying to understand why a process gets stuck, especially when it blocks
+            // reading from stdin.
             //
 
-            StreamConsumer processStdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream());
-            StreamConsumer processStderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream());
-            StreamProducer processStdinStreamProducer = new StreamProducer(p.getOutputStream());
+            int stdoutBufferSize = 1;
+            int stderrBufferSize = 1;
 
-            processStdoutStreamConsumer.start();
-            processStderrStreamConsumer.start();
-            processStdinStreamProducer.start();
+            StreamConsumer stdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream(), stdoutBufferSize);
+            StreamConsumer stderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream(), stderrBufferSize);
+            StreamProducer stdinStreamProducer = new StreamProducer(p.getOutputStream());
+
+            stdoutStreamConsumer.start();
+            stderrStreamConsumer.start();
+            stdinStreamProducer.start();
 
             //
             // now we can block, the streams will be consumed and the child process won't run out of space
@@ -156,16 +162,16 @@ abstract class OSBase implements OS {
             // in-flight stream content
             //
 
-            if (!processStdoutStreamConsumer.waitForShutdown(2000L)) {
-                log.warn(processStdoutStreamConsumer + " timed out waiting for the end of stream");
+            if (!stdoutStreamConsumer.waitForShutdown(2000L)) {
+                log.warn(stdoutStreamConsumer + " timed out waiting for the end of stream");
             }
 
-            if (!processStderrStreamConsumer.waitForShutdown(2000L)) {
-                log.warn(processStderrStreamConsumer + " timed out waiting for the end of stream");
+            if (!stderrStreamConsumer.waitForShutdown(2000L)) {
+                log.warn(stderrStreamConsumer + " timed out waiting for the end of stream");
             }
 
-            String processStdoutContent = processStdoutStreamConsumer.read();
-            String processStderrContent = processStderrStreamConsumer.read();
+            String processStdoutContent = stdoutStreamConsumer.read();
+            String processStderrContent = stderrStreamConsumer.read();
 
             return new NativeExecutionResult(exitCode, processStdoutContent, processStderrContent);
         }

@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
  * The current implementation does not have protection for memory overflow, but it can be implemented if the need
  * arise.
  *
+ * Closing the input stream stops the consumer.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/28/16
  */
@@ -47,6 +49,7 @@ public class StreamConsumer {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private int bufferSize;
+    private boolean doLogContent;
     private byte[] buffer;
     private String name;
     final private InputStream inputStream;
@@ -58,31 +61,63 @@ public class StreamConsumer {
 
     private final CountDownLatch consumerThreadStopped;
 
+
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * Starts with the default buffer size, which is 1.
+     * Starts with the default buffer size, which is 1. The implementation does not log.debug() by default the content
+     * it reads from the process.
      *
      * Buffer Size Note: A large buffer will will allow efficient transfers of large quantities of output. However, the
      * output will not be immediately available for consumption, unless the buffer fills up. If you need immediate
      * feedback on what the underlying process is producing at stdout/stdout, use small buffer size - even 1.
      *
      * @param name will become the name of the consuming thread.
+     *
+     * @param is the input stream to read from. It is usually connected to a OS process' stdout or stderr. Closing the
+     *           input stream stops the consumer.
      */
     public StreamConsumer(String name, InputStream is) {
 
-        this(name, is, DEFAULT_BUFFER_SIZE);
+        this(name, is, DEFAULT_BUFFER_SIZE, false);
     }
 
     /**
+     * The implementation does not log.debug() by default the content it reads from the process.
+     *
+     * @param name will become the name of the consuming thread.
+     *
+     * @param is the input stream to read from. It is usually connected to a OS process' stdout or stderr. Closing the
+     *           input stream stops the consumer.
+     *
      * @param bufferSize sets the internal buffer. A large buffer will will allow efficient transfers of large
      *                   quantities of output. However, the output will not be immediately available for consumption,
      *                   unless the buffer fills up. If you need immediate feedback on what the underlying process is
      *                   producing at stdout/stdout, use small buffer size - even 1.
-
-     * @param name will become the name of the consuming thread.
      */
     StreamConsumer(String name, InputStream is, int bufferSize) {
+
+        this(name, is, bufferSize, false);
+    }
+
+    /**
+     * @param  name will become the name of the consuming thread.
+     *
+     * @param is the input stream to read from. It is usually connected to a OS process' stdout or stderr. Closing the
+     *           input stream stops the consumer.
+     *
+     * @param bufferSize sets the internal buffer. A large buffer will will allow efficient transfers of large
+     *                   quantities of output. However, the output will not be immediately available for consumption,
+     *                   unless the buffer fills up. If you need immediate feedback on what the underlying process is
+     *                   producing at stdout/stdout, use small buffer size - even 1.
+     *
+     * @param doLogContent if true, log.debug() the content as soon as it is read from the underlying process. By
+     *                     default, the implementation does not log.debug() by default the content it reads from the
+     *                     process. Note that the logging subsystem must be configured to allow DEBUG-level logging for
+     *                     the logged content to be visible.
+     */
+    StreamConsumer(String name, InputStream is, int bufferSize, boolean doLogContent) {
 
         if (name == null) {
 
@@ -97,6 +132,7 @@ public class StreamConsumer {
 
         this.inputStream = is;
         this.bufferSize = bufferSize;
+        this.doLogContent = doLogContent;
         this.buffer = new byte[bufferSize];
         this.consumerThreadStopped = new CountDownLatch(1);
         this.storage = new ByteArrayOutputStream(DEFAULT_BUFFER_SIZE);
@@ -156,6 +192,11 @@ public class StreamConsumer {
         return bufferSize;
     }
 
+    public boolean isLogContent() {
+
+        return doLogContent;
+    }
+
     /**
      * @return the stream content accumulated since the last read, or empty string if nothing arrived while the stream
      * is not closed yet. A read empties the buffer. After the buffer was emptied, the method will return null if the
@@ -176,7 +217,14 @@ public class StreamConsumer {
                 return null;
             }
 
-            return new String(content);
+            String s = new String(content);
+
+            if (doLogContent) {
+
+                log.debug(s);
+            }
+
+            return s;
         }
     }
 
@@ -275,8 +323,9 @@ public class StreamConsumer {
         }
         finally {
 
+            long latchValue = consumerThreadStopped.getCount();
+            log.debug("counting down latch from " + latchValue + " to " + (latchValue - 1));
             consumerThreadStopped.countDown();
-
         }
     }
 

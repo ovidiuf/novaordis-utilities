@@ -2,6 +2,7 @@
 * OS
   * multi-threaded consumption of stdout and stderr threads, removes potential for deadlock on small stream storage
     capacity.
+  * StreamConsumer logs the content at DEBUG level, if configured via constructor to do so.
 
 * Introduced package io.novaordis.utilities.env, EnvironmentVariableProvider and the mechanism that allows for a
   configurable EnvironmentVariableProvider.

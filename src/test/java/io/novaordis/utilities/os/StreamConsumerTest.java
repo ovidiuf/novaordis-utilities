@@ -73,7 +73,7 @@ public class StreamConsumerTest {
         }
     }
 
-    // lifecycle -------------------------------------------------------------------------------------------------------
+    // identity --------------------------------------------------------------------------------------------------------
 
     @Test
     public void identity() throws Exception {
@@ -82,7 +82,10 @@ public class StreamConsumerTest {
         StreamConsumer c = new StreamConsumer("test", mis);
 
         assertEquals(StreamConsumer.DEFAULT_BUFFER_SIZE, c.getBufferSize());
+        assertFalse(c.isLogContent());
     }
+
+    // lifecycle -------------------------------------------------------------------------------------------------------
 
     @Test
     public void lifecycle_EndOfStream_BufferSize4() throws Exception {
@@ -345,6 +348,31 @@ public class StreamConsumerTest {
     }
 
     @Test
+    public void lifecycle_ClosingTheInputStreamStopsTheConsumer() throws Exception {
+
+        MockInputStream mis = new MockInputStream();
+
+        StreamConsumer c = new StreamConsumer("test", mis, 4);
+
+        c.start();
+
+        mis.releaseChunk("something");
+
+        mis.close();
+
+        String content = "";
+        String s;
+        while((s = c.read()) != null) {
+
+            assertTrue(c.isConsuming());
+            content += s;
+        }
+
+        assertFalse(c.isConsuming());
+        assertEquals("something", content);
+    }
+
+    @Test
     public void lifecycle_AttemptToStartAfterDeath() throws Exception {
 
         MockInputStream mis = new MockInputStream();
@@ -374,6 +402,72 @@ public class StreamConsumerTest {
             log.info(msg);
             assertEquals("the stream consumer was stopped", msg);
         }
+    }
+
+    // debug logging ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void loggingVsNotLogging() throws Exception {
+
+        //
+        // exercise a consumer that is NOT logging
+        //
+
+        MockInputStream mis = new MockInputStream();
+        StreamConsumer c = new StreamConsumer("test", mis, 1);
+        c.start();
+
+        assertFalse(c.isLogContent());
+
+
+        mis.releaseChunk("1\n2\n3\n4\n5\n");
+
+        mis.close();
+
+
+        //
+        // drain it
+        //
+
+        String content = "";
+
+        String s;
+        while((s = c.read()) != null) {
+
+            content += s;
+        }
+
+        assertEquals("1\n2\n3\n4\n5\n", content);
+
+        //
+        // exercise a consumer that IS logging
+        //
+
+        MockInputStream mis2 = new MockInputStream();
+        StreamConsumer c2 = new StreamConsumer("test", mis2, 1, true);
+        c2.start();
+
+        assertTrue(c2.isLogContent());
+
+
+        mis2.releaseChunk("1\n2\n3\n4\n5\n");
+
+        mis2.close();
+
+
+        //
+        // drain it
+        //
+
+        String content2 = "";
+
+        String s2;
+        while((s2 = c2.read()) != null) {
+
+            content2 += s2;
+        }
+
+        assertEquals("1\n2\n3\n4\n5\n", content2);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -34,6 +34,8 @@ public class MockInputStream extends InputStream {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    public static final char EOT = (char)4;
+
     private static final Logger log = Logger.getLogger(MockInputStream.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
@@ -66,7 +68,7 @@ public class MockInputStream extends InputStream {
 
             Character c = queue.take();
 
-            if ((int)c == 0) {
+            if ((int)c == EOT) {
 
                 log.info(this + " reached the end of stream");
 
@@ -82,6 +84,17 @@ public class MockInputStream extends InputStream {
         }
     }
 
+    /**
+     * Places an "EOT" character in the queue.
+     *
+     * @throws IOException
+     */
+    @Override
+    public void close() throws IOException {
+
+        endTheStream();
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
@@ -95,9 +108,12 @@ public class MockInputStream extends InputStream {
         }
     }
 
+    /**
+     * Places an "EOT" character in the queue.
+     */
     public void endTheStream() {
 
-        queue.add((char)0);
+        queue.add(EOT);
     }
 
     @Override
