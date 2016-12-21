@@ -16,13 +16,11 @@
 
 package io.novaordis.utilities.variable;
 
-import java.util.Map;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/22/16
  */
-public class Constant implements Token {
+public class VariableNotDefinedException extends Exception {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,57 +28,26 @@ public class Constant implements Token {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private String literal;
+    private String variableName;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public Constant(String literal) {
+    public VariableNotDefinedException(String variableName) {
 
-        this.literal = literal;
+        this(variableName, "\"" + variableName + "\" not defined");
     }
 
-    // Token implementation --------------------------------------------------------------------------------------------
+    public VariableNotDefinedException(String variableName, String message) {
 
-    @Override
-    public String getLiteral() {
-        return literal;
-    }
-
-    @Override
-    public String resolve(VariableProvider provider) {
-
-        return literal;
-    }
-
-    @Override
-    public String resolve(Map<String, String> map) {
-
-        return literal;
-    }
-
-    /**
-     * Never fail on missing definition, there's no definition to miss.
-     */
-    @Override
-    public boolean isFailOnMissingDefinition() {
-
-        return false;
-    }
-
-    @Override
-    public void setFailOnMissingDefinition(boolean b) {
-
-        //
-        // noop
-        //
+        super(message);
+        this.variableName = variableName;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    @Override
-    public String toString() {
+    public String getVariableName() {
 
-        return literal;
+        return variableName;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

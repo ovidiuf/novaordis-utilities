@@ -18,6 +18,7 @@ package io.novaordis.utilities.xml.editor;
 
 import io.novaordis.utilities.variable.StringWithVariables;
 import io.novaordis.utilities.variable.VariableFormatException;
+import io.novaordis.utilities.variable.VariableNotDefinedException;
 import io.novaordis.utilities.variable.VariableProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,6 +188,8 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
         try {
 
             sv = new StringWithVariables(rawContent);
+
+            return sv.resolve(variableProvider);
         }
         catch (VariableFormatException e) {
 
@@ -197,8 +200,15 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
             log.debug("invalid variable reference '" + rawContent + "'", e);
             throw new IllegalStateException("path " + path + " contains an invalid variable reference '" + rawContent + "'");
         }
+        catch (VariableNotDefinedException e) {
 
-        return sv.resolve(variableProvider);
+            //
+            // the underlying tokens have been configured to fail on attempts to resolve missing variables
+            //
+
+            throw new IllegalStateException(
+                    "path " + path + " contains a variable reference whose definition is missing", e);
+        }
     }
 
     // Protected -------------------------------------------------------------------------------------------------------

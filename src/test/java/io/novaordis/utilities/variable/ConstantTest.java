@@ -34,7 +34,27 @@ public class ConstantTest extends TokenTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    // Overrides -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void resolve_ConfiguredToFail_NullProvider() throws Exception {
+
+        //
+        // noop
+        //
+    }
+
+    @Test
+    public void resolve_ConfiguredToFail_NullMap() throws Exception {
+
+        //
+        // noop
+        //
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
     public void resolve() throws Exception {

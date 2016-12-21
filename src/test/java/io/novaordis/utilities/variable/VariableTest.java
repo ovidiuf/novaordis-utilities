@@ -17,11 +17,14 @@
 package io.novaordis.utilities.variable;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -31,6 +34,8 @@ public class VariableTest extends TokenTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    private static final Logger log = LoggerFactory.getLogger(VariableTest.class);
+
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
@@ -38,6 +43,51 @@ public class VariableTest extends TokenTest {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Overrides -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void resolve_ConfiguredToFail_NullProvider() throws Exception {
+
+        Variable v = getTokenToTest();
+
+        v.setFailOnMissingDefinition(true);
+
+        try {
+            v.resolve((VariableProvider) null);
+            fail("should throw exception");
+        }
+        catch(VariableNotDefinedException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("\"" + v.getName() + "\" not defined, missing provider", msg);
+            assertEquals(v.getName(), e.getVariableName());
+        }
+    }
+
+    @Test
+    public void resolve_ConfiguredToFail_NullMap() throws Exception {
+
+        Variable v = getTokenToTest();
+
+        v.setFailOnMissingDefinition(true);
+
+        try {
+            //noinspection unchecked
+            v.resolve((Map) null);
+            fail("should throw exception");
+        }
+        catch(VariableNotDefinedException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+            assertEquals("\"" + v.getName() + "\" not defined, missing map", msg);
+            assertEquals(v.getName(), e.getVariableName());
+        }
+    }
+
+    // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
     public void resolve_NullProvider() throws Exception {

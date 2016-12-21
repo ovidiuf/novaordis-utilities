@@ -47,6 +47,8 @@ public abstract class TokenTest {
 
         Token t = getTokenToTest();
 
+        assertFalse(t.isFailOnMissingDefinition());
+
         String literal = t.getLiteral();
 
         assertNotNull(literal);
@@ -65,22 +67,38 @@ public abstract class TokenTest {
     }
 
     @Test
-    public void resolve_NullProvider() throws Exception {
+    public void resolve_ConfiguredToNotFail_NullProvider() throws Exception {
 
         Token t = getTokenToTest();
+
+        assertFalse(t.isFailOnMissingDefinition());
 
         String v = t.resolve((VariableProvider) null);
         assertEquals(t.getLiteral(), v);
     }
 
+    /**
+     * Must be implemented differently by different implementations.
+     */
     @Test
-    public void resolve_NullMap() throws Exception {
+    public abstract void resolve_ConfiguredToFail_NullProvider() throws Exception;
+
+    @Test
+    public void resolve_ConfiguredToNotFail_NullMap() throws Exception {
 
         Token t = getTokenToTest();
+
+        assertFalse(t.isFailOnMissingDefinition());
 
         String v = t.resolve((Map<String, String>)null);
         assertEquals(t.getLiteral(), v);
     }
+
+    /**
+     * Must be implemented differently by different implementations.
+     */
+    @Test
+    public abstract void resolve_ConfiguredToFail_NullMap() throws Exception;
 
     // Package protected -----------------------------------------------------------------------------------------------
 

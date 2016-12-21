@@ -89,7 +89,7 @@ public class StringWithVariables {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public String resolve(VariableProvider provider) {
+    public String resolve(VariableProvider provider) throws VariableNotDefinedException {
 
         String s = "";
 
@@ -104,7 +104,7 @@ public class StringWithVariables {
     /**
      * @param keyValuePairs a source of key/value pairs that can be used to resolve variables.
      */
-    public String resolve(Map<String, String> keyValuePairs) {
+    public String resolve(Map<String, String> keyValuePairs) throws VariableNotDefinedException {
 
         String s = "";
 
@@ -121,7 +121,7 @@ public class StringWithVariables {
      *                            subsequent value as variable value. If the number of arguments is odd, the last
      *                            key is ignored.
      */
-    public String resolve(String ... keyValuePairs) {
+    public String resolve(String ... keyValuePairs) throws VariableNotDefinedException {
 
         Map<String, String> map = new HashMap<>();
 

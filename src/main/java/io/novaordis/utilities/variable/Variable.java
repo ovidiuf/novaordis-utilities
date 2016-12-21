@@ -31,11 +31,14 @@ public class Variable implements Token {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private String name;
+    private boolean failOnMissingDefinition;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public Variable(String variableName) {
+
         this.name = variableName;
+        this.failOnMissingDefinition = false;
     }
 
     // Token implementation --------------------------------------------------------------------------------------------
@@ -51,15 +54,27 @@ public class Variable implements Token {
     }
 
     @Override
-    public String resolve(VariableProvider provider) {
+    public String resolve(VariableProvider provider) throws VariableNotDefinedException {
 
         if (provider == null) {
+
+            if (failOnMissingDefinition) {
+
+                throw new VariableNotDefinedException(name, "\"" + name + "\" not defined, missing provider");
+            }
+
             return getLiteral();
         }
 
         String value = provider.getVariableValue(name);
 
         if (value == null) {
+
+            if (failOnMissingDefinition) {
+
+                throw new VariableNotDefinedException(name);
+            }
+
             return getLiteral();
         }
 
@@ -67,19 +82,43 @@ public class Variable implements Token {
     }
 
     @Override
-    public String resolve(Map<String, String> map) {
+    public String resolve(Map<String, String> map) throws VariableNotDefinedException {
 
         if (map == null) {
+
+            if (failOnMissingDefinition) {
+
+                throw new VariableNotDefinedException(name, "\"" + name + "\" not defined, missing map");
+            }
+
             return getLiteral();
         }
 
         String value = map.get(name);
 
         if (value == null) {
+
+            if (failOnMissingDefinition) {
+
+                throw new VariableNotDefinedException(name);
+            }
+
             return getLiteral();
         }
 
         return value;
+    }
+
+    @Override
+    public boolean isFailOnMissingDefinition() {
+
+        return failOnMissingDefinition;
+    }
+
+    @Override
+    public void setFailOnMissingDefinition(boolean b) {
+
+        this.failOnMissingDefinition = b;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
