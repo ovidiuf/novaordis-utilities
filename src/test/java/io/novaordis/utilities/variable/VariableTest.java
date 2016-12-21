@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -88,6 +90,26 @@ public class VariableTest extends TokenTest {
     }
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // constructors ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void constructor() throws Exception {
+
+        Variable v = new Variable("test");
+        assertEquals("test", v.getName());
+        assertFalse(v.isFailOnMissingDefinition());
+    }
+
+    @Test
+    public void constructor_FailOnMissingVariable() throws Exception {
+
+        Variable v = new Variable("test", true);
+        assertEquals("test", v.getName());
+        assertTrue(v.isFailOnMissingDefinition());
+    }
+
+    // resolve() -------------------------------------------------------------------------------------------------------
 
     @Test
     public void resolve_NullProvider() throws Exception {

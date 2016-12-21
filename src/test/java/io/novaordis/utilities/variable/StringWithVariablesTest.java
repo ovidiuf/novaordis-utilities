@@ -114,6 +114,7 @@ public class StringWithVariablesTest {
     public void constructor_NoVariables() throws Exception {
 
         StringWithVariables s = new StringWithVariables("something");
+        assertFalse(s.isFailOnMissingDefinition());
         assertEquals("something", s.getLiteral());
         String s2 = s.resolve((VariableProvider)null);
         assertEquals("something", s2);
@@ -123,6 +124,7 @@ public class StringWithVariablesTest {
     public void constructor_OnlyVariable() throws Exception {
 
         StringWithVariables s = new StringWithVariables("${something}");
+        assertFalse(s.isFailOnMissingDefinition());
         assertEquals("${something}", s.getLiteral());
         String s2 = s.resolve((VariableProvider)null);
         assertEquals("${something}", s2);
@@ -137,6 +139,7 @@ public class StringWithVariablesTest {
     public void constructor_VariableAndConstant() throws Exception {
 
         StringWithVariables s = new StringWithVariables("blah${something}");
+        assertFalse(s.isFailOnMissingDefinition());
         assertEquals("blah${something}", s.getLiteral());
         String s2 = s.resolve((VariableProvider)null);
         assertEquals("blah${something}", s2);
@@ -168,6 +171,7 @@ public class StringWithVariablesTest {
     public void constructor_MultipleTokens() throws Exception {
 
         StringWithVariables s = new StringWithVariables("${a}b${c}d${d}");
+        assertFalse(s.isFailOnMissingDefinition());
         assertEquals("${a}b${c}d${d}", s.getLiteral());
         String s2 = s.resolve((VariableProvider)null);
         assertEquals("${a}b${c}d${d}", s2);
@@ -184,6 +188,25 @@ public class StringWithVariablesTest {
         assertEquals("d", c2.getLiteral());
         Variable v3 = (Variable)tokens.get(4);
         assertEquals("d", v3.getName());
+    }
+
+    @Test
+    public void constructor_failOnMissingDefinition() throws Exception {
+
+        StringWithVariables s = new StringWithVariables("${a}", true);
+        assertTrue(s.isFailOnMissingDefinition());
+
+        assertEquals("A", s.resolve("a", "A"));
+
+        try {
+            s.resolve("b", "B");
+            fail("should throw exception");
+        }
+        catch(VariableNotDefinedException e) {
+
+            String msg = e.getMessage();
+            log.info(msg);
+        }
     }
 
     // resolve with key/value pair list --------------------------------------------------------------------------------

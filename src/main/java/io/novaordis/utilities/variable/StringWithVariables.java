@@ -73,10 +73,26 @@ public class StringWithVariables {
 
     private String literal;
     private List<Token> tokens;
+    private boolean failOnMissingDefinition;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * The underlying variables will NOT fail on missing definition.
+     *
+     * @see StringWithVariables(String, boolean)
+     */
     public StringWithVariables(String stringWithVariables) throws VariableFormatException {
+
+        this(stringWithVariables, false);
+    }
+
+    /**
+     * @param failOnMissingDefinition if true, a missing variable definition triggers an exception. If false, the
+     *                                variable will be simply replaced with its literal.
+     */
+    public StringWithVariables(String stringWithVariables, boolean failOnMissingDefinition)
+            throws VariableFormatException {
 
         if (stringWithVariables == null) {
             throw new IllegalArgumentException("null argument");
@@ -84,8 +100,10 @@ public class StringWithVariables {
 
         this.literal = stringWithVariables;
         this.tokens = new ArrayList<>();
+        this.failOnMissingDefinition = failOnMissingDefinition;
         parse();
     }
+
 
     // Public ----------------------------------------------------------------------------------------------------------
 
@@ -144,6 +162,15 @@ public class StringWithVariables {
         return literal;
     }
 
+    /**
+     * Default is false.
+     * @return true if an attempt to resolve the underlying variables will fail on missing definition, false otherwise.
+     */
+    public boolean isFailOnMissingDefinition() {
+
+        return failOnMissingDefinition;
+    }
+
     @Override
     public String toString() {
         return literal;
@@ -197,7 +224,7 @@ public class StringWithVariables {
                     throw new VariableFormatException("invalid variable reference, missing closing bracket");
                 }
 
-                tokens.add(new Variable(literal.substring(crt + 2, i)));
+                tokens.add(new Variable(literal.substring(crt + 2, i), failOnMissingDefinition));
 
                 crt = i + 1;
             }

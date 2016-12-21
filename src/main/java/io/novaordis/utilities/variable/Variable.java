@@ -35,10 +35,18 @@ public class Variable implements Token {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    /**
+     * Default behavior is to NOT fail on missing variable definition upon resolve.
+     */
     public Variable(String variableName) {
 
+        this(variableName, false);
+    }
+
+    public Variable(String variableName, boolean failOnMissingDefinition) {
+
         this.name = variableName;
-        this.failOnMissingDefinition = false;
+        this.failOnMissingDefinition = failOnMissingDefinition;
     }
 
     // Token implementation --------------------------------------------------------------------------------------------
