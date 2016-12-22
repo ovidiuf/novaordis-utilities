@@ -14,3 +14,5 @@
 * Added NotYetImplementedException.
 
 * If an UserErrorException wraps a cause and it does not have its own messages, returns the cause's message.
+
+* VersionUtilities: added support for arbitrary metadata files to VersionUtilities.
