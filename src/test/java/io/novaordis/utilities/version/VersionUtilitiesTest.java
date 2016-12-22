@@ -17,7 +17,6 @@
 package io.novaordis.utilities.version;
 
 import io.novaordis.utilities.Files;
-import io.novaordis.utilities.version.VersionUtilities;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,6 +108,60 @@ public class VersionUtilitiesTest {
         assertTrue(versionFile.delete());
         assertFalse(versionFile.exists());
     }
+
+    // getReleaseMetadata() --------------------------------------------------------------------------------------------
+
+    @Test
+    public void getReleaseMetadata_NoSuchFile() throws Exception {
+
+        String m = VersionUtilities.getReleaseMetadata("no-such-file", "no_such_property");
+        assertNull(m);
+    }
+
+    @Test
+    public void getReleaseMetadata_NoSuchProperty() throws Exception {
+
+        //
+        // place a metadata file in target/test-classes, which is in classpath
+        //
+
+        String fileName = "some-file";
+
+        String basedir = System.getProperty("basedir");
+        assertNotNull(basedir);
+        File d = new File(basedir, "target/test-classes");
+        assertTrue(d.isDirectory());
+        File metadataFile = new File(d, fileName);
+        assertTrue(Files.write(metadataFile, "some_property=blah"));
+
+        String version = VersionUtilities.getReleaseMetadata(fileName, "version");
+        assertNull(version);
+
+        assertTrue(metadataFile.delete());
+    }
+
+    @Test
+    public void getReleaseMetadata() throws Exception {
+
+        //
+        // place a metadata file in target/test-classes, which is in classpath
+        //
+
+        String fileName = "some-file";
+
+        String basedir = System.getProperty("basedir");
+        assertNotNull(basedir);
+        File d = new File(basedir, "target/test-classes");
+        assertTrue(d.isDirectory());
+        File metadataFile = new File(d, fileName);
+        assertTrue(Files.write(metadataFile, "some_property=blah"));
+
+        String s = VersionUtilities.getReleaseMetadata(fileName, "some_property");
+        assertEquals("blah", s);
+
+        assertTrue(metadataFile.delete());
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 
