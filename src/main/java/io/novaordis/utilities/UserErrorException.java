@@ -65,6 +65,26 @@ public class UserErrorException extends Exception {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
+     * Descend the cause hierarchy and extract the bottom-most information, or null.
+     *
+     * @return the bottom-most embedded cause, or null
+     */
+    public Throwable getOriginalCause() {
+
+        Throwable originalCause = null;
+
+        Throwable crt = getCause();
+
+        while(crt != null) {
+
+            originalCause = crt;
+            crt = crt.getCause();
+        }
+
+        return originalCause;
+    }
+
+    /**
      * @return a human-readable message, appropriate for logs and console. See Message Composition Rules above.
      *
      * May return null.
@@ -78,21 +98,13 @@ public class UserErrorException extends Exception {
         // descend the cause hierarchy and extract the bottom-most information
         //
 
-        Throwable olderCause = null;
+        Throwable originalCause = getOriginalCause();
 
-        Throwable crt = getCause();
+        if (originalCause != null) {
 
-        while(crt != null) {
+            String olderCauseMessage = originalCause.getMessage();
 
-            olderCause = crt;
-            crt = crt.getCause();
-        }
-
-        if (olderCause != null) {
-
-            String olderCauseMessage = olderCause.getMessage();
-
-            message = olderCause.getClass().getSimpleName();
+            message = originalCause.getClass().getSimpleName();
 
             if (olderCauseMessage != null) {
 

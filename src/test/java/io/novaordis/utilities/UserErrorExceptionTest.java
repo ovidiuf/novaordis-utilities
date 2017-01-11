@@ -202,6 +202,39 @@ public class UserErrorExceptionTest {
         assertEquals("this should surface in the error message: NoClassDefFoundError some/class/Definition", msg);
     }
 
+    // getOriginalCause() ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void getOriginalCause_Null() throws Exception {
+
+        UserErrorException e = new UserErrorException();
+
+        assertNull(e.getOriginalCause());
+    }
+
+    @Test
+    public void getOriginalCause_OneLevel() throws Exception {
+
+        IllegalStateException e = new IllegalStateException();
+
+        UserErrorException ue = new UserErrorException(e);
+
+        assertEquals(e, ue.getOriginalCause());
+    }
+
+    @Test
+    public void getOriginalCause_TwoLevels() throws Exception {
+
+        IllegalStateException e = new IllegalStateException();
+
+        IllegalStateException e2 = new IllegalStateException(e);
+
+        UserErrorException ue = new UserErrorException(e2);
+
+        assertEquals(e, ue.getOriginalCause());
+    }
+
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
