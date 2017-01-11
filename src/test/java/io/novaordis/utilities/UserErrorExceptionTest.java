@@ -17,6 +17,8 @@
 package io.novaordis.utilities;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -25,6 +27,8 @@ import static org.junit.Assert.assertTrue;
 public class UserErrorExceptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log = LoggerFactory.getLogger(UserErrorExceptionTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -40,9 +44,11 @@ public class UserErrorExceptionTest {
     public void constructor() throws Exception {
 
         try {
+
             throw new UserErrorException();
         }
         catch (UserErrorException e) {
+
             assertNull(e.getMessage());
             assertNull(e.getCause());
         }
@@ -52,6 +58,7 @@ public class UserErrorExceptionTest {
     public void constructor2() throws Exception {
 
         try {
+
             throw new UserErrorException("test");
         }
         catch (UserErrorException e) {
@@ -69,7 +76,7 @@ public class UserErrorExceptionTest {
         }
         catch (UserErrorException e) {
 
-            assertEquals("java.lang.RuntimeException", e.getMessage());
+            assertEquals("RuntimeException", e.getMessage());
             assertTrue(e.getCause() instanceof RuntimeException);
         }
     }
@@ -78,10 +85,11 @@ public class UserErrorExceptionTest {
     public void constructor4() throws Exception {
 
         try {
+
             throw new UserErrorException("test", new RuntimeException());
         }
         catch (UserErrorException e) {
-            assertEquals("test", e.getMessage());
+            assertEquals("test: RuntimeException", e.getMessage());
             assertTrue(e.getCause() instanceof RuntimeException);
         }
     }
@@ -95,7 +103,7 @@ public class UserErrorExceptionTest {
 
         String s = e.getMessage();
 
-        assertEquals("something", s);
+        assertEquals("Exception something", s);
     }
 
     @Test
@@ -105,8 +113,93 @@ public class UserErrorExceptionTest {
 
         Exception e = new UserErrorException("our own message", cause);
 
-        assertEquals("our own message", e.getMessage());
+        assertEquals("our own message: Exception something", e.getMessage());
+    }
 
+    // message composition rules ---------------------------------------------------------------------------------------
+
+    @Test
+    public void messageCompositionRules_NoArgConstructor() throws Exception {
+
+        assertNull(new UserErrorException().getMessage());
+    }
+
+    @Test
+    public void messageCompositionRules_ExplicitNullMessage() throws Exception {
+
+        assertNull(new UserErrorException((String) null).getMessage());
+    }
+
+    @Test
+    public void messageCompositionRules_NoCause() throws Exception {
+
+        UserErrorException e = new UserErrorException("test");
+        assertEquals("test", e.getMessage());
+    }
+
+    @Test
+    public void messageCompositionRules_RecursiveCause_NullBottomMostMessage_NullExplicitMessage() throws Exception {
+
+        NoClassDefFoundError ncdfe = new NoClassDefFoundError(null);
+
+        ClassNotFoundException cnfe = new ClassNotFoundException("will be ignored", ncdfe);
+
+        UserErrorException uee = new UserErrorException(cnfe);
+
+        String msg = uee.getMessage();
+
+        log.info(msg);
+
+        assertEquals("NoClassDefFoundError", msg);
+    }
+
+    @Test
+    public void messageCompositionRules_RecursiveCause_NonNullBottomMostMessage_NullExplicitMessage() throws Exception {
+
+        NoClassDefFoundError ncdfe = new NoClassDefFoundError("some/class/Definition");
+
+        ClassNotFoundException cnfe = new ClassNotFoundException("will be ignored", ncdfe);
+
+        UserErrorException uee = new UserErrorException(cnfe);
+
+        String msg = uee.getMessage();
+
+        log.info(msg);
+
+        assertEquals("NoClassDefFoundError some/class/Definition", msg);
+    }
+
+    @Test
+    public void messageCompositionRules_RecursiveCause_NullBottomMostMessage_NotNullExplicitMessage() throws Exception {
+
+        NoClassDefFoundError ncdfe = new NoClassDefFoundError(null);
+
+        ClassNotFoundException cnfe = new ClassNotFoundException("will be ignored", ncdfe);
+
+        UserErrorException uee = new UserErrorException("this should surface in the error message", cnfe);
+
+        String msg = uee.getMessage();
+
+        log.info(msg);
+
+        assertEquals("this should surface in the error message: NoClassDefFoundError", msg);
+    }
+
+    @Test
+    public void messageCompositionRules_RecursiveCause_NonNullBottomMostMessage_NotNullExplicitMessage()
+            throws Exception {
+
+        NoClassDefFoundError ncdfe = new NoClassDefFoundError("some/class/Definition");
+
+        ClassNotFoundException cnfe = new ClassNotFoundException("will be ignored", ncdfe);
+
+        UserErrorException uee = new UserErrorException("this should surface in the error message", cnfe);
+
+        String msg = uee.getMessage();
+
+        log.info(msg);
+
+        assertEquals("this should surface in the error message: NoClassDefFoundError some/class/Definition", msg);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

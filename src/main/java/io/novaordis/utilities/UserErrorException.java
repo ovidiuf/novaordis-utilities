@@ -17,8 +17,16 @@
 package io.novaordis.utilities;
 
 /**
- * An exception intended up to bubble up to the highest layer and put a human-readable error message at
- * stderr.
+ * An exception intended up to bubble up to the highest layer and put a human-readable error message at stderr.
+ *
+ * Message Composition Rules:
+ *
+ * 1. If there is no underlying cause, getMessage() result is the message specified in the constructor. If no message
+ *    was specified in the constructor, getMessage() returns null.
+ *
+ * 2. If there is an underlying cause, the message will contain the bottom-most (originating) cause details, translated
+ * into a log/console friendly format. If the UserErrorException instance specifies a message, it will prefix the
+ * inferred message.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/21/16
@@ -56,29 +64,48 @@ public class UserErrorException extends Exception {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * @return a human-readable message, appropriate for logs and console. See Message Composition Rules above.
+     *
+     * May return null.
+     */
     @Override
     public String getMessage() {
 
-        if (message != null) {
+        String message = null;
 
-            return message;
+        //
+        // descend the cause hierarchy and extract the bottom-most information
+        //
+
+        Throwable olderCause = null;
+
+        Throwable crt = getCause();
+
+        while(crt != null) {
+
+            olderCause = crt;
+            crt = crt.getCause();
         }
 
-        Throwable cause = getCause();
+        if (olderCause != null) {
 
-        if (cause != null) {
+            String olderCauseMessage = olderCause.getMessage();
 
-            String causeMessage = cause.getMessage();
+            message = olderCause.getClass().getSimpleName();
 
-            if (causeMessage != null) {
+            if (olderCauseMessage != null) {
 
-                return causeMessage;
+                message += " " + olderCauseMessage;
             }
-
-            return cause.getClass().getName();
         }
 
-        return null;
+        if (this.message != null) {
+
+            message = this.message + (message == null ? "" : ": " + message);
+        }
+
+        return message;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
