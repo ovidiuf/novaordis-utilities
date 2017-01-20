@@ -46,7 +46,8 @@ public interface VariableProvider {
     /**
      * Use this method to install variables into the provider.
      *
-     * @param variableValue the variable value. Can be null, in which case the semantics is to remove that variable.
+     * @param variableValue the variable value. Can be null, in which case the implied semantics of the operation is
+     *                      "remove the variable".
      *
      * @return the old value of the variable, or null if none.
      */
