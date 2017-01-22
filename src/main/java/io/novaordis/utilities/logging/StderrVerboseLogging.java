@@ -23,6 +23,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 
 import java.util.Enumeration;
 
@@ -56,7 +57,7 @@ public class StderrVerboseLogging {
 
     /**
      * Enables DEBUG level logging at stderr, by raising the root's level to DEBUG and adding a STDERR console appender
-     * if necessary.
+     * if necessary. Upon successful completion of the operation, isEnabled() will return true.
      */
     public static void enable() {
 
@@ -69,7 +70,12 @@ public class StderrVerboseLogging {
         Level currentLevel = rootLogger.getLevel();
 
         if (currentLevel.isGreaterOrEqual(Level.DEBUG)) {
-            rootLogger.setLevel(Level.DEBUG);
+
+            if (!currentLevel.equals(Level.DEBUG)) {
+
+                rootLogger.setLevel(Level.DEBUG);
+                setVerboseLoggingEnabled(true);
+            }
         }
 
         ConsoleAppender stderr = null;
@@ -79,36 +85,69 @@ public class StderrVerboseLogging {
             Appender a = (Appender)e.nextElement();
 
             if (a instanceof ConsoleAppender) {
+
                 ConsoleAppender ca = (ConsoleAppender)a;
+
                 if (STDERR_CONSOLE_APPENDER_NAME.equals(ca.getName()) && "System.err".equals(ca.getTarget())) {
+
                     stderr = ca;
                 }
             }
         }
 
         if (stderr == null) {
+
             //
             // no such appender, create and add
             //
+
             Layout layout = new PatternLayout(DEFAULT_PATTERN);
             stderr = new ConsoleAppender(layout, "System.err");
             stderr.setName(STDERR_CONSOLE_APPENDER_NAME);
             rootLogger.addAppender(stderr);
+
+            setVerboseLoggingEnabled(true);
         }
 
-        stderr.setThreshold(Level.DEBUG);
+        Priority stderrPriority = stderr.getThreshold();
+
+        if (stderrPriority == null || stderrPriority.isGreaterOrEqual(Level.DEBUG)) {
+
+            if (!Level.DEBUG.equals(stderrPriority)) {
+
+                stderr.setThreshold(Level.DEBUG);
+                setVerboseLoggingEnabled(true);
+            }
+        }
+    }
+
+    public static boolean isEnabled() {
+
+        return verboseLoggingEnabled;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private static boolean verboseLoggingEnabled;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     private StderrVerboseLogging() {
+
+        setVerboseLoggingEnabled(false);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
+
+    /**
+     * Used internally by the class and externally within the package for testing only.
+     */
+    static void setVerboseLoggingEnabled(boolean b) {
+
+        verboseLoggingEnabled = b;
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

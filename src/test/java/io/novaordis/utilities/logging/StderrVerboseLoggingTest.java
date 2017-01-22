@@ -112,6 +112,8 @@ public class StderrVerboseLoggingTest {
         if (appenderToRemove != null) {
             rootLogger.removeAppender(appenderToRemove);
         }
+
+        StderrVerboseLogging.setVerboseLoggingEnabled(false);
     }
 
     // enable() --------------------------------------------------------------------------------------------------------
@@ -123,11 +125,15 @@ public class StderrVerboseLoggingTest {
         // capture the pre-enable() logging configuration to be able to restore it
         //
 
+        assertFalse(StderrVerboseLogging.isEnabled());
+
         Logger rootLogger = LogManager.getRootLogger();
         rootLogger.setLevel(Level.INFO);
         assertEquals(Level.INFO, rootLogger.getLevel());
 
         StderrVerboseLogging.enable();
+
+        assertTrue(StderrVerboseLogging.isEnabled());
 
         Level newLevel = rootLogger.getLevel();
         assertEquals(Level.DEBUG, newLevel);
@@ -173,7 +179,11 @@ public class StderrVerboseLoggingTest {
 
         assertFalse(Boolean.getBoolean(StderrVerboseLogging.VERBOSE_SYSTEM_PROPERTY_NAME));
 
+        assertFalse(StderrVerboseLogging.isEnabled());
+
         StderrVerboseLogging.init();
+
+        assertFalse(StderrVerboseLogging.isEnabled());
 
         assertEquals(Level.INFO, rootLogger.getLevel());
 
@@ -197,7 +207,11 @@ public class StderrVerboseLoggingTest {
 
         System.setProperty(StderrVerboseLogging.VERBOSE_SYSTEM_PROPERTY_NAME, "true");
 
+        assertFalse(StderrVerboseLogging.isEnabled());
+
         StderrVerboseLogging.init();
+
+        assertTrue(StderrVerboseLogging.isEnabled());
 
         assertEquals(Level.DEBUG, rootLogger.getLevel());
 
