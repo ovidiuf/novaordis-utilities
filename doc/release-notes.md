@@ -1,1 +1,0 @@
-* __StderrVerboseLogging__ StderrVerboseLogging API improvments: added StderrVerboseLogging.isEnabled()
