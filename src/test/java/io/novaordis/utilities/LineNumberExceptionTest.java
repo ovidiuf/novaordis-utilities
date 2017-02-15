@@ -63,6 +63,39 @@ public class LineNumberExceptionTest {
         assertEquals(15, e.getPositionInLine().intValue());
     }
 
+    @Test
+    public void constructor2() throws Exception {
+
+        LineNumberException e = new LineNumberException("test");
+        assertEquals("test", e.getMessage());
+    }
+
+    @Test
+    public void constructor3() throws Exception {
+
+        RuntimeException cause = new RuntimeException();
+        LineNumberException e = new LineNumberException("test", cause);
+        assertEquals("test", e.getMessage());
+        assertEquals(cause, e.getCause());
+    }
+
+    @Test
+    public void constructor4() throws Exception {
+
+        LineNumberException e = new LineNumberException("test", 10L);
+        assertEquals("test", e.getMessage());
+        assertEquals(10L, e.getLineNumber().longValue());
+    }
+
+    @Test
+    public void constructor5() throws Exception {
+
+        LineNumberException e = new LineNumberException("test", 10L, 15);
+        assertEquals("test", e.getMessage());
+        assertEquals(10L, e.getLineNumber().longValue());
+        assertEquals(15, e.getPositionInLine().intValue());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
