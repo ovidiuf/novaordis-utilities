@@ -17,7 +17,7 @@
 package io.novaordis.utilities;
 
 /**
- * An exception that carries a line number.
+ * An exception that carries a line number, as well as a position in line. Useful for parsing errors.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 1/21/16
@@ -31,24 +31,41 @@ public class LineNumberException extends Exception {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private Long lineNumber;
+    private Integer positionInLine;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public LineNumberException(String message, Throwable cause, Long lineNumber) {
 
+        this(message, cause, lineNumber, null);
+    }
+
+    public LineNumberException(String message, Throwable cause, Long lineNumber, Integer positionInLine) {
+
         super(message, cause);
 
         this.lineNumber = lineNumber;
+        this.positionInLine = positionInLine;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * @return null if no line number.
+     * @return the line number of the line that generated the exception, or null if the information is not available.
      */
     public Long getLineNumber() {
 
         return lineNumber;
+    }
+
+
+    /**
+     * @return the position in line where the cause of the exception can be found, or null if the position is not
+     * available
+     */
+    public Integer getPositionInLine() {
+        
+        return positionInLine;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -40,13 +40,14 @@ public class LineNumberExceptionTest {
     // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void constructor_NullLineNumber() throws Exception {
+    public void constructor_NullLineNumber_NullPositionInLine() throws Exception {
 
         RuntimeException cause = new RuntimeException();
         LineNumberException e = new LineNumberException("test", cause, null);
         assertEquals("test", e.getMessage());
         assertEquals(cause, e.getCause());
         assertNull(e.getLineNumber());
+        assertNull(e.getPositionInLine());
 
         log.debug(".");
     }
@@ -55,10 +56,11 @@ public class LineNumberExceptionTest {
     public void constructor() throws Exception {
 
         RuntimeException cause = new RuntimeException();
-        LineNumberException e = new LineNumberException("test", cause, 10L);
+        LineNumberException e = new LineNumberException("test", cause, 10L, 15);
         assertEquals("test", e.getMessage());
         assertEquals(cause, e.getCause());
         assertEquals(10L, e.getLineNumber().longValue());
+        assertEquals(15, e.getPositionInLine().intValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
