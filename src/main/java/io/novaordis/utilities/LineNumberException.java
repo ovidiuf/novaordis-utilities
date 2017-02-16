@@ -86,6 +86,39 @@ public class LineNumberException extends Exception {
         return positionInLine;
     }
 
+    /**
+     * A message suitable for displaying in human-read logs.
+     */
+    public String toLogFormat() {
+
+        String s = "";
+
+        if (lineNumber != null) {
+
+            s += "line " + lineNumber;
+        }
+
+        if (positionInLine != null) {
+
+            if (!s.isEmpty()) {
+
+                s += ",";
+
+            }
+
+            s += " position " + positionInLine;
+        }
+
+        if (!s.isEmpty()) {
+
+            s += ": ";
+        }
+
+        s += getMessage();
+
+        return s;
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

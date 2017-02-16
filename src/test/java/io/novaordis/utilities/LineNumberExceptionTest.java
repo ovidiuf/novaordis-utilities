@@ -96,6 +96,17 @@ public class LineNumberExceptionTest {
         assertEquals(15, e.getPositionInLine().intValue());
     }
 
+    // toLogFormat() ---------------------------------------------------------------------------------------------------
+
+
+    @Test
+    public void toLogFormat() throws Exception {
+
+        LineNumberException e = new LineNumberException("some message", 10L, 15);
+        String expected = "line 10, position 15: some message";
+        assertEquals(expected, e.toLogFormat());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
