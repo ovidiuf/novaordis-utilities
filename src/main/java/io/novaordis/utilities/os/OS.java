@@ -30,7 +30,7 @@ import java.io.File;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/31/16
  */
-public interface OS {
+public interface OS extends NativeExecutor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -149,52 +149,6 @@ public interface OS {
      */
     OSConfiguration getConfiguration();
 
-    /**
-     * @see OS#execute(File, String)
-     */
-    NativeExecutionResult execute(String command) throws NativeExecutionException;
-
-    /**
-     * @param directory the directory to execute the command into. null is OK, it means "execute in the current
-     *                  directory"
-     *
-     * @param command A double quote enclosed sequence is sent to the underlying API as one string.
-     *
-     * Recommended usage pattern:
-     *
-     <pre>
-
-     try {
-
-     NativeExecutionResult result = os.execute(commandName);
-
-     if (result.isSuccess()) {
-     stdout = result.getStdout();
-     }
-     else {
-     log.warn(result.getStderr());
-     }
-     }
-     catch(NativeExecutionException e) {
-
-     String msg = e.getMessage();
-     String warningMsg = msg != null ? msg : "";
-     Throwable cause = e.getCause();
-     if (cause != null) {
-     String causeMsg = cause.getClass().getSimpleName();
-     if (cause.getMessage() != null) {
-     causeMsg += ": " + cause.getMessage();
-     }
-     warningMsg += ", " + causeMsg;
-     }
-     log.warn(warningMsg);
-     }
-
-     </pre>
-
-        @see OS#execute(String)
-     */
-    NativeExecutionResult execute(File directory, String command) throws NativeExecutionException;
 
     /**
      * "Linux" (OS.Linux), "MacOS" (OS.MacOS), "Windows" (OS.Windows).
