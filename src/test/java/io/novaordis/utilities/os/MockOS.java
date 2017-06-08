@@ -43,6 +43,10 @@ public class MockOS implements OS {
         commandsThatThrowException = new ArrayList<>();
         commandsThatFail = new ArrayList<>();
         commandsThatSucceed = new ArrayList<>();
+
+        commandsThatSucceed.add(new MockCommand("true", null, null));
+        commandsThatSucceed.add(new MockCommand("produces-empty-string", null, null));
+        commandsThatSucceed.add(new MockCommand("produces-a-new-line", "\n", null));
     }
 
     // OS implementation -----------------------------------------------------------------------------------------------

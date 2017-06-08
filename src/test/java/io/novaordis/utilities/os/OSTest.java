@@ -214,7 +214,6 @@ public abstract class OSTest {
         assertNull(stderr);
     }
 
-
     /**
      * This is commented out as it blocks, we don't have a good way to handle processes that read, yet.
      */
@@ -241,6 +240,78 @@ public abstract class OSTest {
 //        assertNull(stderr);
 //        assertNotNull(stdout);
 //    }
+
+    /**
+     * Command that returns successfully but that closes stdout without placing anything on it.
+     */
+    @Test
+    public void execute_true() throws Exception {
+
+        OS os = getOSToTest();
+
+        //
+        // this is an example of a command that completes successfully but does not write anything to stdout - it
+        // closes the stream without putting anything in it
+        //
+
+        NativeExecutionResult r = os.execute("true");
+
+        assertTrue(r.isSuccess());
+
+        String stdout = r.getStdout();
+
+        assertNull(stdout);
+    }
+
+    /**
+     * Command that returns successfully but that closes stdout without placing anything on it.
+     */
+    @Test
+    public void execute_CommandThatCompletesSuccessfullyAndWritesEmptyString() throws Exception {
+
+        OS os = getOSToTest();
+
+        File dir = new File(System.getProperty("basedir"));
+        dir = new File(dir, "src/test/resources/data/executable-scripts");
+        assertTrue(dir.isDirectory());
+        String command = "produces-empty-string";
+        File scriptFile = new File(dir, command);
+        assertTrue(scriptFile.isFile());
+
+        NativeExecutionResult r = os.execute(dir, command);
+
+        String stdout = r.getStdout();
+        String stderr = r.getStderr();
+
+        assertTrue(r.isSuccess());
+        assertNull(stdout);
+        assertNull(stderr);
+    }
+
+    /**
+     * Command that returns successfully and writes a new line at stdout.
+     */
+    @Test
+    public void execute_CommandThatCompletesSuccessfullyAndWritesANewLine() throws Exception {
+
+        OS os = getOSToTest();
+
+        File dir = new File(System.getProperty("basedir"));
+        dir = new File(dir, "src/test/resources/data/executable-scripts");
+        assertTrue(dir.isDirectory());
+        String command = "produces-a-new-line";
+        File scriptFile = new File(dir, command);
+        assertTrue(scriptFile.isFile());
+
+        NativeExecutionResult r = os.execute(dir, command);
+
+        String stdout = r.getStdout();
+        String stderr = r.getStderr();
+
+        assertTrue(r.isSuccess());
+        assertEquals("\n", stdout);
+        assertNull(stderr);
+    }
 
     // split -----------------------------------------------------------------------------------------------------------
 

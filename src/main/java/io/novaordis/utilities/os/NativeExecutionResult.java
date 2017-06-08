@@ -83,7 +83,10 @@ public class NativeExecutionResult {
     }
 
     /**
-     * @return the content sent by the corresponding command to stdout during the execution. May return null.
+     * @return the content sent by the corresponding command to stdout during the execution. Anything that command
+     * writes at stdout, even if it is just a new line character, will be returned. However, if the command does
+     * not write anything to stdout and closes the stream, or writes an empty string to stdout - which is
+     * equivalent to writing nothing - and closes the stream, getStdout() will return null.
      */
     public String getStdout() {
 
@@ -91,7 +94,10 @@ public class NativeExecutionResult {
     }
 
     /**
-     * @return the content sent by the corresponding command to stderr during the execution. May return null.
+     * @return the content sent by the corresponding command to stderr during the execution. Anything that command
+     * writes at stderr, even if it is just a new line character, will be returned. However, if the command does
+     * not write anything to stderr and closes the stream, or writes an empty string to stderr - which is
+     * equivalent to writing nothing - and closes the stream, getStderr() will return null.
      */
     public String getStderr() {
 

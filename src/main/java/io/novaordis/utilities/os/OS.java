@@ -22,7 +22,8 @@ import org.slf4j.Logger;
 import java.io.File;
 
 /**
- * A proxy for the underlying operating system, to be used for native command execution.
+ * A proxy for the underlying operating system. A thread-safe JVM-level singleton that can be used for native command
+ * execution.
  *
  * Implementations must correctly implement equals() and hashCode().
  *
