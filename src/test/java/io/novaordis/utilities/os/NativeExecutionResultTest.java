@@ -72,7 +72,7 @@ public class NativeExecutionResultTest {
 
         NativeExecutionResult r = new NativeExecutionResult(0, "something", "something else", true, true);
 
-        assertEquals(0, r.getExitStatus());
+        assertEquals(0, r.getExitCode());
         assertTrue(r.isSuccess());
         assertFalse(r.isFailure());
         assertEquals("something", r.getStdout());
@@ -86,7 +86,7 @@ public class NativeExecutionResultTest {
 
         NativeExecutionResult r = new NativeExecutionResult(1, "something", "something else", false, false);
 
-        assertEquals(1, r.getExitStatus());
+        assertEquals(1, r.getExitCode());
         assertFalse(r.isSuccess());
         assertTrue(r.isFailure());
         assertFalse(r.wasStdoutDebugLoggingEnabled());

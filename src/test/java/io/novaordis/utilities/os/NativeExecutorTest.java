@@ -85,7 +85,7 @@ public abstract class NativeExecutorTest {
         NativeExecutor ne =getNativeExecutorToTest();
         NativeExecutionResult ner = ne.execute("ls");
 
-        assertEquals(0, ner.getExitStatus());
+        assertEquals(0, ner.getExitCode());
         String lsContent = ner.getStdout();
         log.info(lsContent);
         assertFalse(lsContent.isEmpty());
@@ -97,7 +97,7 @@ public abstract class NativeExecutorTest {
         NativeExecutor ne =getNativeExecutorToTest();
         NativeExecutionResult ner = ne.execute("ls .");
 
-        assertEquals(0, ner.getExitStatus());
+        assertEquals(0, ner.getExitCode());
         String lsContent = ner.getStdout();
         log.info(lsContent);
         assertFalse(lsContent.isEmpty());
@@ -109,7 +109,7 @@ public abstract class NativeExecutorTest {
         NativeExecutor ne =getNativeExecutorToTest();
         NativeExecutionResult ner = ne.execute(null, "ls");
 
-        assertEquals(0, ner.getExitStatus());
+        assertEquals(0, ner.getExitCode());
         String lsContent = ner.getStdout();
         log.info(lsContent);
         assertFalse(lsContent.isEmpty());
@@ -161,7 +161,7 @@ public abstract class NativeExecutorTest {
         String stdout = r.getStdout();
         String stderr = r.getStderr();
 
-        assertEquals(127, r.getExitStatus());
+        assertEquals(127, r.getExitCode());
         assertNull(stdout);
         assertNotNull(stderr);
     }

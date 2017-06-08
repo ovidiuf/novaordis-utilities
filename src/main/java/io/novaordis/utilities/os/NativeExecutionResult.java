@@ -28,7 +28,7 @@ public class NativeExecutionResult {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private int exitStatus;
+    private int exitCode;
     private String stdout;
     private String stderr;
     private boolean stdoutDebugLoggingWasEnabled;
@@ -37,7 +37,7 @@ public class NativeExecutionResult {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * @param exitStatus an exit status that must be between 0 and 255. Anything else will trigger an
+     * @param exitCode an exit status that must be between 0 and 255. Anything else will trigger an
      *                   IllegalArgumentException.
      * @param stdoutContent - null is acceptable. Multi-line content is acceptable.
      * @param stderrContent- null is acceptable. Multi-line content is acceptable.
@@ -50,14 +50,14 @@ public class NativeExecutionResult {
      *
      * @exception IllegalArgumentException
      */
-    public NativeExecutionResult(int exitStatus, String stdoutContent, String stderrContent,
+    public NativeExecutionResult(int exitCode, String stdoutContent, String stderrContent,
                                  boolean stdoutDebugLoggingWasEnabled, boolean stderrDebugLoggingWasEnabled) {
 
-        if (exitStatus < 0 || exitStatus > 255) {
-            throw new IllegalArgumentException("illegal exit status " + exitStatus);
+        if (exitCode < 0 || exitCode > 255) {
+            throw new IllegalArgumentException("illegal exit status " + exitCode);
         }
 
-        this.exitStatus = exitStatus;
+        this.exitCode = exitCode;
         this.stdout = stdoutContent;
         this.stderr = stderrContent;
         this.stdoutDebugLoggingWasEnabled = stdoutDebugLoggingWasEnabled;
@@ -71,7 +71,7 @@ public class NativeExecutionResult {
      */
     public boolean isSuccess() {
 
-        return exitStatus == 0;
+        return exitCode == 0;
     }
 
     /**
@@ -123,17 +123,17 @@ public class NativeExecutionResult {
     }
 
     /**
-     * @return the corresponding native command exit status. Guaranteed to return a valid value between 0 and 255.
+     * @return the corresponding native command exit code. Guaranteed to return a valid value between 0 and 255.
      */
-    public int getExitStatus() {
+    public int getExitCode() {
 
-        return exitStatus;
+        return exitCode;
     }
 
     @Override
     public String toString() {
 
-        return "" + exitStatus;
+        return "" + exitCode;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
