@@ -16,16 +16,11 @@
 
 package io.novaordis.utilities.address;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public class LocalOSAddressTest extends AddressTest {
+public class AddressException extends Exception {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -35,37 +30,16 @@ public class LocalOSAddressTest extends AddressTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public AddressException(String msg) {
+
+        super(msg);
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
-
-    // Tests -----------------------------------------------------------------------------------------------------------
-
-    @Test
-    public void twoDifferentInstancesAreEqual() throws Exception {
-
-        LocalOSAddress a = new LocalOSAddress();
-        LocalOSAddress a2 = new LocalOSAddress();
-
-        assertTrue(a.equals(a2));
-        assertTrue(a2.equals(a));
-    }
-
-    @Test
-    public void hashCodeTest() throws Exception {
-
-        LocalOSAddress a = new LocalOSAddress();
-
-        assertEquals(1, a.hashCode());
-    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected Address getAddressToTest() throws Exception {
-
-        return new LocalOSAddress();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

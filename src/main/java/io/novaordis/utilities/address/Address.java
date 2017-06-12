@@ -43,7 +43,7 @@ public interface Address {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Must never return null.
+     * May return null, but in this case, equals() cannot be used.
      */
     String getProtocol();
 
