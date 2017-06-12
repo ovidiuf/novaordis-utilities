@@ -160,6 +160,36 @@ public class AddressImplTest extends AddressTest {
     }
 
     @Test
+    public void constructor_UsernameAndPassword_MissingPort() throws Exception {
+
+        try {
+
+            new AddressImpl("admin:admin123@1.2.3.4:");
+            fail("should have thrown exception");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("missing port"));
+        }
+    }
+
+    @Test
+    public void constructor_UsernameAndPassword_MissingPort2() throws Exception {
+
+        try {
+
+            new AddressImpl("admin:admin123@1.2.3.4:    ");
+            fail("should have thrown exception");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("missing port"));
+        }
+    }
+
+    @Test
     public void constructor_InvalidAddress_MissingPassword() throws Exception {
 
         try {

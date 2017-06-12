@@ -267,7 +267,12 @@ public class AddressImpl implements Address {
 
             host = hostAndPort.substring(0, i).trim();
 
-            String s = hostAndPort.substring(i + 1);
+            String s = hostAndPort.substring(i + 1).trim();
+
+            if (s.isEmpty()) {
+
+                throw new AddressException("missing port value");
+            }
 
             try {
 
