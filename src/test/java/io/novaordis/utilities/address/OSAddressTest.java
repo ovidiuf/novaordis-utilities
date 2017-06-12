@@ -20,12 +20,9 @@ package io.novaordis.utilities.address;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public class LocalOSAddress implements OSAddress {
+public abstract class OSAddressTest extends AddressTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    public static final String PROTOCOL = "localOS";
-    public static final String HOST = "localhost";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -33,60 +30,9 @@ public class LocalOSAddress implements OSAddress {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public LocalOSAddress() {
-    }
-
-    // Address implementation ------------------------------------------------------------------------------------------
-
-    @Override
-    public String getProtocol() {
-
-        return PROTOCOL;
-    }
-
-    @Override
-    public String getHost() {
-
-        return HOST;
-    }
-
-    @Override
-    public Integer getPort() {
-
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-
-        return null;
-    }
-
-    @Override
-    public char[] getPassword() {
-
-        return null;
-    }
-
-    @Override
-    public String getLiteral() {
-
-        return PROTOCOL + "://";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        return o instanceof LocalOSAddress;
-    }
-
-    @Override
-    public int hashCode() {
-
-        return 1;
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Tests -----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 

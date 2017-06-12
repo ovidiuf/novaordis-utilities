@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public class LocalOSAddressTest extends AddressTest {
+public class LocalOSAddressTest extends OSAddressTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ public class LocalOSAddressTest extends AddressTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected Address getAddressToTest() throws Exception {
+    protected OSAddress getAddressToTest() throws Exception {
 
         return new LocalOSAddress();
     }
