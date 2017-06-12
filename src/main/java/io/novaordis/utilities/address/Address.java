@@ -24,9 +24,11 @@ package io.novaordis.utilities.address;
  *
  * Examples:
  *
+ * the operating system on the local host
+ * ssh://sshuser:sshpasswd@remotehost:22
+ *
  * jmx://admin:adminpasswd@1.2.3.4:8888
  * jbosscli://admin:adminpasswd@4.5.6.7:9999
- * ssh://sshuser:sshpasswd@remotehost:22
  * http://localhost:80
  *
  * All implementations must correctly implement equals() and hashCode().
