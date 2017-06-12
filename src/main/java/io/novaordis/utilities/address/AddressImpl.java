@@ -181,7 +181,22 @@ public class AddressImpl implements Address {
     @Override
     public String toString() {
 
-        return getLiteral();
+        String s = "";
+
+        if (username != null) {
+
+            s += username + ":***@";
+        }
+
+        s += host;
+
+        if (port != null) {
+
+            s += ":";
+            s += port;
+        }
+
+        return s;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
