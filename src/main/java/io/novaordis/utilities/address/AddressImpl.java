@@ -256,6 +256,11 @@ public class AddressImpl implements Address {
 
                 throw new AddressException("invalid port \"" + s + "\"");
             }
+
+            if (port < 0 || port >= 65536) {
+
+                throw new AddressException("port value out of bounds: " + port);
+            }
         }
     }
 

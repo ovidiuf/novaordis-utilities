@@ -99,6 +99,36 @@ public class AddressImplTest extends AddressTest {
     }
 
     @Test
+    public void constructor_NoUsernamePassword_PortOutOfBounds() throws Exception {
+
+        try {
+
+            new AddressImpl("1.2.3.4:-1");
+            fail("should have thrown exception");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("port value out of bounds"));
+        }
+    }
+
+    @Test
+    public void constructor_NoUsernamePassword_PortOutOfBounds2() throws Exception {
+
+        try {
+
+            new AddressImpl("1.2.3.4:65536");
+            fail("should have thrown exception");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("port value out of bounds"));
+        }
+    }
+
+    @Test
     public void constructor_UsernameAndPassword_InvalidPort() throws Exception {
 
         try {
