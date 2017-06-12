@@ -188,6 +188,11 @@ public class AddressImpl implements Address {
 
     // Protected -------------------------------------------------------------------------------------------------------
 
+    protected void setProtocol(String p) {
+
+        this.protocol = p;
+    }
+
     // Private ---------------------------------------------------------------------------------------------------------
 
     private void parse(String address) throws AddressException {
@@ -201,7 +206,8 @@ public class AddressImpl implements Address {
 
         if (i != -1) {
 
-            this.protocol = address.substring(0, i);
+            String p = address.substring(0, i);
+            setProtocol(p);
             address = address.substring(i + PROTOCOL_SEPARATOR.length());
         }
 
