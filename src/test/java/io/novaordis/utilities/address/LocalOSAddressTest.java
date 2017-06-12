@@ -18,15 +18,14 @@ package io.novaordis.utilities.address;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public abstract class AddressTest {
+public class LocalOSAddressTest extends AddressTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -41,58 +40,32 @@ public abstract class AddressTest {
     // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void identity() throws Exception {
+    public void twoDifferentInstancesAreEqual() throws Exception {
 
-        Address a = getAddressToTest();
-
-        assertNotNull(a.getProtocol());
-        assertNotNull(a.getHost());
-        Integer port = a.getPort();
-        
-        if (port != null) {
-
-            assertTrue(port > 0);
-            assertTrue(port < 65536);
-        }
-
-        String literal = a.getLiteral();
-        assertNotNull(literal);
-    }
-
-    @Test
-    public void equality() throws Exception {
-
-        Address a = getAddressToTest();
-        Address a2 = getAddressToTest();
+        LocalOSAddress a = new LocalOSAddress();
+        LocalOSAddress a2 = new LocalOSAddress();
 
         assertTrue(a.equals(a2));
         assertTrue(a2.equals(a));
     }
 
     @Test
-    public void nonEquality() throws Exception {
+    public void hashCodeTest() throws Exception {
 
-        Address a = getAddressToTest();
-        Object o = new Object();
+        LocalOSAddress a = new LocalOSAddress();
 
-        assertFalse(a.equals(o));
-        assertFalse(o.equals(a));
-    }
-
-    @Test
-    public void equalityAndNull() throws Exception {
-
-        Address a = getAddressToTest();
-
-        final Object nullReference = null;
-        assertFalse(a.equals(nullReference));
+        assertEquals(0, a.hashCode());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected abstract Address getAddressToTest() throws Exception;
+    @Override
+    protected Address getAddressToTest() throws Exception {
+
+        return new LocalOSAddress();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

@@ -53,9 +53,10 @@ public interface Address {
     String getHost();
 
     /**
-     * Must always return a valid port number.
+     * Must always return a valid port number or null when the address does not support the concept of a port (as is the
+     * case for LocalOSAddress).
      */
-    int getPort();
+    Integer getPort();
 
     /**
      * May return null.
@@ -68,14 +69,9 @@ public interface Address {
     char[] getPassword();
 
     /**
-     * The literal representation of the address.
+     * The literal representation of the address. Must never return null.
      */
     String getLiteral();
-
-    /**
-     * The original string representation of the address. May be missing protocol, port value, etc.
-     */
-    String getOriginalLiteral();
 
     //
     // implementations must correctly implement equals()

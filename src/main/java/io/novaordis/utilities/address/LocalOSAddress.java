@@ -16,19 +16,16 @@
 
 package io.novaordis.utilities.address;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public abstract class AddressTest {
+public class LocalOSAddress implements Address {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    public static final String PROTOCOL = "localOS";
+    public static final String HOST = "localhost";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -36,63 +33,64 @@ public abstract class AddressTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    public LocalOSAddress() {
+    }
+
+    // Address implementation ------------------------------------------------------------------------------------------
+
+    @Override
+    public String getProtocol() {
+
+        return PROTOCOL;
+    }
+
+    @Override
+    public String getHost() {
+
+        return HOST;
+    }
+
+    @Override
+    public Integer getPort() {
+
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+
+        return null;
+    }
+
+    @Override
+    public char[] getPassword() {
+
+        return null;
+    }
+
+    @Override
+    public String getLiteral() {
+
+        return PROTOCOL + "://";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        return o instanceof LocalOSAddress;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 0;
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
-
-    // Tests -----------------------------------------------------------------------------------------------------------
-
-    @Test
-    public void identity() throws Exception {
-
-        Address a = getAddressToTest();
-
-        assertNotNull(a.getProtocol());
-        assertNotNull(a.getHost());
-        Integer port = a.getPort();
-        
-        if (port != null) {
-
-            assertTrue(port > 0);
-            assertTrue(port < 65536);
-        }
-
-        String literal = a.getLiteral();
-        assertNotNull(literal);
-    }
-
-    @Test
-    public void equality() throws Exception {
-
-        Address a = getAddressToTest();
-        Address a2 = getAddressToTest();
-
-        assertTrue(a.equals(a2));
-        assertTrue(a2.equals(a));
-    }
-
-    @Test
-    public void nonEquality() throws Exception {
-
-        Address a = getAddressToTest();
-        Object o = new Object();
-
-        assertFalse(a.equals(o));
-        assertFalse(o.equals(a));
-    }
-
-    @Test
-    public void equalityAndNull() throws Exception {
-
-        Address a = getAddressToTest();
-
-        final Object nullReference = null;
-        assertFalse(a.equals(nullReference));
-    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    protected abstract Address getAddressToTest() throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 
