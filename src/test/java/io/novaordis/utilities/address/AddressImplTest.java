@@ -118,6 +118,22 @@ public class AddressImplTest extends AddressTest {
 
         try {
 
+            new AddressImpl("1.2.3.4:0");
+            fail("should have thrown exception");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("port value out of bounds"));
+        }
+    }
+
+
+    @Test
+    public void constructor_NoUsernamePassword_PortOutOfBounds3() throws Exception {
+
+        try {
+
             new AddressImpl("1.2.3.4:65536");
             fail("should have thrown exception");
         }
