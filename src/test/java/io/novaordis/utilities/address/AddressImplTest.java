@@ -184,6 +184,21 @@ public class AddressImplTest extends AddressTest {
         assertEquals("admin@1.2.3.4:2345", a.getLiteral());
     }
 
+    @Test
+    public void constructor_EmptyHost() throws Exception {
+
+        try {
+
+            new AddressImpl("test://:2345");
+            fail("should have thrown exceptions");
+        }
+        catch(AddressException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("empty host name"));
+        }
+    }
+
     // equals() --------------------------------------------------------------------------------------------------------
 
     @Test

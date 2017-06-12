@@ -240,11 +240,11 @@ public class AddressImpl implements Address {
             // no port
             //
 
-            host = hostAndPort;
+            host = hostAndPort.trim();
         }
         else {
 
-            host = hostAndPort.substring(0, i);
+            host = hostAndPort.substring(0, i).trim();
 
             String s = hostAndPort.substring(i + 1);
 
@@ -261,6 +261,12 @@ public class AddressImpl implements Address {
 
                 throw new AddressException("port value out of bounds: " + port);
             }
+        }
+
+
+        if (host == null || host.isEmpty()) {
+
+            throw new AddressException("empty host name");
         }
     }
 
