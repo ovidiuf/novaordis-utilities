@@ -332,6 +332,15 @@ public class AddressImpl implements Address {
             hostAndPort = address;
         }
 
+        //
+        // allow for a trailing slash - for the time being in WILL NOT be reflected in getLiteral()
+        //
+
+        if (hostAndPort.endsWith("/")) {
+
+            hostAndPort = hostAndPort.substring(0, hostAndPort.length() - 1);
+        }
+
         i = hostAndPort.indexOf(':');
 
         if (i == -1) {

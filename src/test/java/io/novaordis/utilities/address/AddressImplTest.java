@@ -266,6 +266,39 @@ public class AddressImplTest extends AddressTest {
         assertEquals(7777, a.getPort().intValue());
     }
 
+    @Test
+    public void constructor_PortAndTrailingSlash() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://somehost:1234/");
+        assertEquals("test", a.getProtocol());
+        assertNull(a.getUsername());
+        assertNull(a.getPassword());
+        assertEquals("somehost", a.getHost());
+        assertEquals(1234, a.getPort().intValue());
+
+        //
+        // the trailing slash does not reflect in literal
+        //
+        assertEquals("somehost:1234", a.getLiteral());
+    }
+
+    @Test
+    public void constructor_HostAndTrailingSlash() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://somehost/");
+        assertEquals("test", a.getProtocol());
+        assertNull(a.getUsername());
+        assertNull(a.getPassword());
+        assertEquals("somehost", a.getHost());
+        assertNull(a.getPort());
+
+        //
+        // the trailing slash does not reflect in literal
+        //
+        assertEquals("somehost", a.getLiteral());
+
+    }
+
     // equals() --------------------------------------------------------------------------------------------------------
 
     @Test
