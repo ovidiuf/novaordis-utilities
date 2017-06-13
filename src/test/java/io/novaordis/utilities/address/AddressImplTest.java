@@ -245,6 +245,18 @@ public class AddressImplTest extends AddressTest {
         }
     }
 
+    @Test
+    public void constructor_Components() throws Exception {
+
+        AddressImpl a = new AddressImpl("test", "someuser", "somepassword", "somehost", 7777);
+
+        assertEquals("test", a.getProtocol());
+        assertEquals("someuser", a.getUsername());
+        assertEquals("somepassword", new String(a.getPassword()));
+        assertEquals("somehost", a.getHost());
+        assertEquals(7777, a.getPort().intValue());
+    }
+
     // equals() --------------------------------------------------------------------------------------------------------
 
     @Test

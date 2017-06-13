@@ -41,12 +41,20 @@ public class AddressImpl implements Address {
     /**
      * @param address the string representation of the address in the format:
      *                protocol://[username[:password]]@hostname[:port]
-     *
      * @throws AddressException
      */
     public AddressImpl(String address) throws AddressException {
 
         parse(address);
+    }
+
+    public AddressImpl(String protocol, String username, String password, String host, Integer port) {
+
+        setProtocol(protocol);
+        setUsername(username);
+        setPassword(password == null ? null : password.toCharArray());
+        setHost(host);
+        setPort(port);
     }
 
     /**
