@@ -33,6 +33,7 @@ public class AddressImpl implements Address {
     private String protocol;
     private String host;
     private Integer port;
+    private boolean portSpecifiedInLiteral;
     private String username;
     private char[] password;
 
@@ -55,6 +56,11 @@ public class AddressImpl implements Address {
         setPassword(password == null ? null : password.toCharArray());
         setHost(host);
         setPort(port);
+
+        if (port != null) {
+
+            portSpecifiedInLiteral = true;
+        }
     }
 
     /**
@@ -119,7 +125,7 @@ public class AddressImpl implements Address {
 
         s += host;
 
-        if (port != null) {
+        if (port != null && portSpecifiedInLiteral) {
 
             s += ":";
             s += port;
@@ -353,6 +359,7 @@ public class AddressImpl implements Address {
                 throw new AddressException("port value out of bounds: " + p);
             }
 
+            portSpecifiedInLiteral = true;
             setPort(p);
         }
 

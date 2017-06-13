@@ -332,6 +332,56 @@ public class AddressImplTest extends AddressTest {
         assertEquals("somepasswd", new String(a.getPassword()));
     }
 
+    // getLiteral() ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getLiteral_PortSpecifiedInOriginalLiteral() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://someuser:somepasswd@testhost:1234");
+        String literal = a.getLiteral();
+        assertEquals("someuser@testhost:1234", literal);
+    }
+
+    @Test
+    public void getLiteral_PortSpecifiedInOriginalLiteral2() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://testhost:1234");
+        String literal = a.getLiteral();
+        assertEquals("testhost:1234", literal);
+    }
+
+    @Test
+    public void getLiteral_PortSpecifiedInOriginalLiteral3() throws Exception {
+
+        AddressImpl a = new AddressImpl("testhost:1234");
+        String literal = a.getLiteral();
+        assertEquals("testhost:1234", literal);
+    }
+
+    @Test
+    public void getLiteral_PortNotSpecifiedInOriginalLiteral() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://someuser:somepasswd@testhost");
+        String literal = a.getLiteral();
+        assertEquals("someuser@testhost", literal);
+    }
+
+    @Test
+    public void getLiteral_PortNotSpecifiedInOriginalLiteral2() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://testhost");
+        String literal = a.getLiteral();
+        assertEquals("testhost", literal);
+    }
+
+    @Test
+    public void getLiteral_PortNotSpecifiedInOriginalLiteral3() throws Exception {
+
+        AddressImpl a = new AddressImpl("testhost");
+        String literal = a.getLiteral();
+        assertEquals("testhost", literal);
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
