@@ -37,6 +37,10 @@ public class AddressImpl implements Address {
     private String username;
     private char[] password;
 
+    //
+    // IMPORTANT: if adding more state here, make sure copy() copies over when creating a new instance.
+    //
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
@@ -144,6 +148,7 @@ public class AddressImpl implements Address {
         copy.setPort(getPort());
         copy.setUsername(getUsername());
         copy.setPassword(getPassword());
+        copy.portSpecifiedInLiteral = this.portSpecifiedInLiteral;
 
         return copy;
     }
@@ -272,9 +277,14 @@ public class AddressImpl implements Address {
         }
     }
 
+    protected boolean isPortSpecifiedInLiteral() {
+
+        return portSpecifiedInLiteral;
+    }
+
     protected AddressImpl createBlankInstance() {
 
-        return  new AddressImpl();
+        return new AddressImpl();
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

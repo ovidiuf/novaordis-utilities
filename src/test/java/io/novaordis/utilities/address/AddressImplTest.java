@@ -321,6 +321,36 @@ public class AddressImplTest extends AddressTest {
     // copy mutation ---------------------------------------------------------------------------------------------------
 
     @Test
+    public void copy() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://someuser:somepasswd@somehost:1234");
+
+        AddressImpl a2 = a.copy();
+
+        assertEquals("test", a2.getProtocol());
+        assertEquals("someuser", a2.getUsername());
+        assertEquals("somepasswd", new String(a2.getPassword()));
+        assertEquals("somehost", a2.getHost());
+        assertEquals(1234, a2.getPort().intValue());
+        assertTrue(a2.isPortSpecifiedInLiteral());
+    }
+
+    @Test
+    public void copy_NoPortSpecifiedInLiteral() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://someuser:somepasswd@somehost");
+
+        AddressImpl a2 = a.copy();
+
+        assertEquals("test", a2.getProtocol());
+        assertEquals("someuser", a2.getUsername());
+        assertEquals("somepasswd", new String(a2.getPassword()));
+        assertEquals("somehost", a2.getHost());
+        assertNull(a2.getPort());
+        assertFalse(a2.isPortSpecifiedInLiteral());
+    }
+
+    @Test
     public void copy_Mutation() throws Exception {
 
         AddressImpl a = new AddressImpl("test://someuser:somepasswd@somehost:1234");
