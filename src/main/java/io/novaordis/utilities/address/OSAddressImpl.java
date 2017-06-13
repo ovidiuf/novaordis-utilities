@@ -40,11 +40,31 @@ public class OSAddressImpl extends AddressImpl implements OSAddress {
         super(address);
     }
 
+    private OSAddressImpl() {
+
+        super();
+    }
+
+    // AddressImpl overrides -------------------------------------------------------------------------------------------
+
+    @Override
+    public OSAddressImpl copy() {
+
+        return (OSAddressImpl)super.copy();
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected AddressImpl createBlankInstance() {
+
+        return new OSAddressImpl();
+    }
+
 
     // Private ---------------------------------------------------------------------------------------------------------
 

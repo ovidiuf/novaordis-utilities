@@ -50,10 +50,9 @@ public class AddressImpl implements Address {
     }
 
     /**
-     * For use by copy()
+     * For use by copy().
      */
-    private AddressImpl() {
-
+    protected AddressImpl() {
     }
 
     // Address implementation ------------------------------------------------------------------------------------------
@@ -124,18 +123,13 @@ public class AddressImpl implements Address {
     @Override
     public AddressImpl copy() {
 
-        AddressImpl copy = new AddressImpl();
+        AddressImpl copy = createBlankInstance();
 
-        copy.protocol = protocol;
-        copy.host = host;
-        copy.port = port;
-        copy.username = username;
-
-        if (password != null) {
-
-            copy.password = new char[password.length];
-            System.arraycopy(password, 0, copy.password, 0, password.length);
-        }
+        copy.setProtocol(getProtocol());
+        copy.setHost(getHost());
+        copy.setPort(getPort());
+        copy.setUsername(getUsername());
+        copy.setPassword(getPassword());
 
         return copy;
     }
@@ -240,6 +234,34 @@ public class AddressImpl implements Address {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected void setHost(String host) {
+
+        this.host = host;
+    }
+
+    protected void setUsername(String username) {
+
+        this.username = username;
+    }
+
+    protected void setPassword(char[] password) {
+
+        if (password == null) {
+
+            this.password = null;
+        }
+        else {
+
+            this.password = new char[password.length];
+            System.arraycopy(password, 0, this.password, 0, this.password.length);
+        }
+    }
+
+    protected AddressImpl createBlankInstance() {
+
+        return  new AddressImpl();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

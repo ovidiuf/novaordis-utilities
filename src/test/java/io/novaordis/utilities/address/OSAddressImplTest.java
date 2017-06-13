@@ -16,6 +16,10 @@
 
 package io.novaordis.utilities.address;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
@@ -35,6 +39,29 @@ public class OSAddressImplTest extends AddressImplTest {
     // Tests -----------------------------------------------------------------------------------------------------------
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // copy mutation ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void copy_Mutation() throws Exception {
+
+        OSAddressImpl a = new OSAddressImpl("test://someuser:somepasswd@somehost:1234");
+
+        OSAddressImpl a2 = a.copy();
+
+        assertEquals("test", a2.getProtocol());
+        assertEquals("someuser", a2.getUsername());
+        assertEquals("somepasswd", new String(a2.getPassword()));
+        assertEquals("somehost", a2.getHost());
+        assertEquals(1234, a2.getPort().intValue());
+
+
+        char[] p = a2.getPassword();
+        p[0] = 'd';
+
+        assertEquals("domepasswd", new String(a2.getPassword()));
+        assertEquals("somepasswd", new String(a.getPassword()));
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

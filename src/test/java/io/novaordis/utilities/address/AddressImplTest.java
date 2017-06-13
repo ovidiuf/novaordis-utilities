@@ -300,7 +300,7 @@ public class AddressImplTest extends AddressTest {
     // copy mutation ---------------------------------------------------------------------------------------------------
 
     @Test
-    public void copyMutation() throws Exception {
+    public void copy_Mutation() throws Exception {
 
         AddressImpl a = new AddressImpl("test://someuser:somepasswd@somehost:1234");
 
