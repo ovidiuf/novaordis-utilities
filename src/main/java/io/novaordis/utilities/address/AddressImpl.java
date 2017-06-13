@@ -336,6 +336,11 @@ public class AddressImpl implements Address {
 
             host = hostAndPort.substring(0, i).trim();
 
+            if (host.isEmpty()) {
+
+                throw new AddressException("invalid host specification");
+            }
+
             String s = hostAndPort.substring(i + 1).trim();
 
             if (s.isEmpty()) {
@@ -364,9 +369,13 @@ public class AddressImpl implements Address {
         }
 
 
-        if (host == null || host.isEmpty()) {
+        if (host != null && host.isEmpty()) {
 
-            throw new AddressException("empty host name");
+            //
+            // set the host to null, give the subclass the change to implement a default host mechanism
+            //
+
+            setHost(null);
         }
     }
 

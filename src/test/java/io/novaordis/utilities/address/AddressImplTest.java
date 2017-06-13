@@ -233,6 +233,15 @@ public class AddressImplTest extends AddressTest {
     @Test
     public void constructor_EmptyHost() throws Exception {
 
+        AddressImpl a = new AddressImpl("test://");
+
+        // allow sub-classes to implement a default host mechanism
+        assertNull(a.getHost());
+    }
+
+    @Test
+    public void constructor_EmptyHost_InvalidSyntax() throws Exception {
+
         try {
 
             new AddressImpl("test://:2345");
@@ -241,7 +250,7 @@ public class AddressImplTest extends AddressTest {
         catch(AddressException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("empty host name"));
+            assertTrue(msg.contains("invalid host specification"));
         }
     }
 
