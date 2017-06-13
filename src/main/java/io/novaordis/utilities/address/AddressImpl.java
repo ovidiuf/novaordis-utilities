@@ -83,6 +83,12 @@ public class AddressImpl implements Address {
     }
 
     @Override
+    public void setPort(Integer port) {
+
+        this.port = port;
+    }
+
+    @Override
     public String getUsername() {
 
         return username;
@@ -301,19 +307,23 @@ public class AddressImpl implements Address {
                 throw new AddressException("missing port value");
             }
 
+            int p;
+
             try {
 
-                port = Integer.parseInt(s);
+                p = Integer.parseInt(s);
             }
             catch(Exception e) {
 
                 throw new AddressException("invalid port \"" + s + "\"");
             }
 
-            if (port <= 0 || port >= 65536) {
+            if (p <= 0 || p >= 65536) {
 
-                throw new AddressException("port value out of bounds: " + port);
+                throw new AddressException("port value out of bounds: " + p);
             }
+
+            setPort(p);
         }
 
 

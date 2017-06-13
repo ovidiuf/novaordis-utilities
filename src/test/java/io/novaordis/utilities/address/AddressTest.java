@@ -149,6 +149,21 @@ public abstract class AddressTest {
         assertEquals(protocol, a.getProtocol());
     }
 
+    @Test
+    public void setPort() throws Exception {
+
+        Integer port = 54362;
+
+        Address a = getAddressToTest();
+
+        assertNotEquals(port, a.getPort());
+
+        a.setPort(port);
+
+        assertEquals(port, a.getPort());
+    }
+
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

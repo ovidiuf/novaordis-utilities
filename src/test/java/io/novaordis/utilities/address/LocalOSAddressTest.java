@@ -19,6 +19,7 @@ package io.novaordis.utilities.address;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -59,6 +60,20 @@ public class LocalOSAddressTest extends OSAddressTest {
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));
         }
+    }
+
+    @Test
+    @Override
+    public void setPort() throws Exception {
+
+        LocalOSAddress a = new LocalOSAddress();
+
+        assertNull(a.getPassword());
+
+        a.setPort(1);
+
+        // noop
+        assertNull(a.getPassword());
     }
 
     @Test

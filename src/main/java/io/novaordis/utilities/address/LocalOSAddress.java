@@ -66,6 +66,14 @@ public class LocalOSAddress implements OSAddress {
     }
 
     @Override
+    public void setPort(Integer port) {
+
+        //
+        // noop
+        //
+    }
+
+    @Override
     public String getUsername() {
 
         return null;

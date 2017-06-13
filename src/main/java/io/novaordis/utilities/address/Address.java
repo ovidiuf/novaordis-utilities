@@ -62,6 +62,8 @@ public interface Address {
      */
     Integer getPort();
 
+    void setPort(Integer port);
+
     /**
      * May return null.
      */
