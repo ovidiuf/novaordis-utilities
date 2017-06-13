@@ -297,6 +297,29 @@ public class AddressImplTest extends AddressTest {
         assertTrue(a != a2);
     }
 
+    // copy mutation ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void copyMutation() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://someuser:somepasswd@somehost:1234");
+
+        AddressImpl a2 = a.copy();
+
+        assertEquals("test", a2.getProtocol());
+        assertEquals("someuser", a2.getUsername());
+        assertEquals("somepasswd", new String(a2.getPassword()));
+        assertEquals("somehost", a2.getHost());
+        assertEquals(1234, a2.getPort().intValue());
+
+
+        char[] p = a2.getPassword();
+        p[0] = 'd';
+
+        assertEquals("domepasswd", new String(a2.getPassword()));
+        assertEquals("somepasswd", new String(a.getPassword()));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

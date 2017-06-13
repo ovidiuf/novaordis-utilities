@@ -75,6 +75,12 @@ public class LocalOSAddress implements OSAddress {
     }
 
     @Override
+    public LocalOSAddress copy() {
+
+        return new LocalOSAddress();
+    }
+
+    @Override
     public boolean equals(Object o) {
 
         return o instanceof LocalOSAddress;

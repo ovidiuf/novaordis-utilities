@@ -49,6 +49,13 @@ public class AddressImpl implements Address {
         parse(address);
     }
 
+    /**
+     * For use by copy()
+     */
+    private AddressImpl() {
+
+    }
+
     // Address implementation ------------------------------------------------------------------------------------------
 
     @Override
@@ -100,6 +107,25 @@ public class AddressImpl implements Address {
         }
 
         return s;
+    }
+
+    @Override
+    public AddressImpl copy() {
+
+        AddressImpl copy = new AddressImpl();
+
+        copy.protocol = protocol;
+        copy.host = host;
+        copy.port = port;
+        copy.username = username;
+
+        if (password != null) {
+
+            copy.password = new char[password.length];
+            System.arraycopy(password, 0, copy.password, 0, password.length);
+        }
+
+        return copy;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

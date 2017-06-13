@@ -18,6 +18,7 @@ package io.novaordis.utilities.address;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -86,6 +87,53 @@ public abstract class AddressTest {
 
         final Object nullReference = null;
         assertFalse(a.equals(nullReference));
+    }
+
+    @Test
+    public void copy() throws Exception {
+
+        Address a = getAddressToTest();
+
+        Address a2 = a.copy();
+
+        assertFalse(a == a2);
+
+        assertTrue(a.equals(a2));
+        assertTrue(a2.equals(a));
+
+        String protocol = a.getProtocol();
+
+        if (protocol != null) {
+
+            assertEquals(protocol, a2.getProtocol());
+        }
+
+        String host = a.getHost();
+
+        assertEquals(host, a2.getHost());
+
+        Integer port = a.getPort();
+
+        if (port != null) {
+
+            assertEquals(port, a2.getPort());
+        }
+
+        String username = a.getUsername();
+
+        if (username != null) {
+
+            assertEquals(username, a2.getUsername());
+        }
+
+        char[] password = a.getPassword();
+
+        if (password != null) {
+
+            assertEquals(new String(password), new String(a2.getPassword()));
+        }
+
+
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

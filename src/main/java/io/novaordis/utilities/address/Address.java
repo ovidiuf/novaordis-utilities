@@ -75,6 +75,8 @@ public interface Address {
      */
     String getLiteral();
 
+    Address copy();
+
     //
     // implementations must correctly implement equals()
     //
@@ -88,5 +90,6 @@ public interface Address {
 
     @Override
     int hashCode();
+
 
 }
