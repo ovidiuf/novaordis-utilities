@@ -65,6 +65,12 @@ public class AddressImpl implements Address {
     }
 
     @Override
+    public void setProtocol(String p) {
+
+        this.protocol = p;
+    }
+
+    @Override
     public String getHost() {
 
         return host;
@@ -228,11 +234,6 @@ public class AddressImpl implements Address {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    protected void setProtocol(String p) {
-
-        this.protocol = p;
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

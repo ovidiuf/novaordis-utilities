@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -38,6 +39,27 @@ public class LocalOSAddressTest extends OSAddressTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // Overrides
+
+    @Test
+    @Override
+    public void setProtocol() throws Exception {
+
+        LocalOSAddress a = new LocalOSAddress();
+
+        a.setProtocol(LocalOSAddress.PROTOCOL);
+
+        try {
+            a.setProtocol("something");
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("cannot"));
+        }
+    }
 
     @Test
     public void twoDifferentInstancesAreEqual() throws Exception {

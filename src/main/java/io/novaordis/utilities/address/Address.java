@@ -49,6 +49,8 @@ public interface Address {
      */
     String getProtocol();
 
+    void setProtocol(String protocol);
+
     /**
      * Must never return null.
      */

@@ -45,6 +45,15 @@ public class LocalOSAddress implements OSAddress {
     }
 
     @Override
+    public void setProtocol(String protocol) {
+
+        if (!PROTOCOL.equals(protocol)) {
+
+            throw new IllegalArgumentException("cannot change protocol to " + protocol);
+        }
+    }
+
+    @Override
     public String getHost() {
 
         return HOST;

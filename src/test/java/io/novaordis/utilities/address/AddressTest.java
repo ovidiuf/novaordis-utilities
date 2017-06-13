@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -132,8 +133,20 @@ public abstract class AddressTest {
 
             assertEquals(new String(password), new String(a2.getPassword()));
         }
+    }
 
+    @Test
+    public void setProtocol() throws Exception {
 
+        String protocol = "some-random-protocol";
+
+        Address a = getAddressToTest();
+
+        assertNotEquals(protocol, a.getProtocol());
+
+        a.setProtocol(protocol);
+
+        assertEquals(protocol, a.getProtocol());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
