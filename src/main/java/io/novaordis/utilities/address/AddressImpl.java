@@ -232,7 +232,7 @@ public class AddressImpl implements Address {
     @Override
     public String toString() {
 
-        String s = "";
+        String s = protocol == null ? "" : protocol + PROTOCOL_SEPARATOR;
 
         if (username != null) {
 
