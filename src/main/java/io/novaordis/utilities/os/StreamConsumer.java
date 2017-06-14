@@ -41,6 +41,7 @@ public class StreamConsumer {
     // Constants -------------------------------------------------------------------------------------------------------
 
     private static final Logger log = LoggerFactory.getLogger(StreamConsumer.class);
+    private static final boolean trace = log.isTraceEnabled();
 
     public static final int DEFAULT_BUFFER_SIZE = 10240;
 
@@ -249,7 +250,7 @@ public class StreamConsumer {
 
             try {
 
-                log.debug("blocking to wait for the end of stream");
+                if (trace) { log.trace("blocking to wait for the end of stream"); }
 
                 return consumerThreadStopped.await(timeoutMs, TimeUnit.MILLISECONDS);
             }
@@ -292,7 +293,7 @@ public class StreamConsumer {
                     // end of stream
                     //
 
-                    log.debug(this + " reached the end of stream");
+                    if (trace) { log.trace(this + " reached the end of stream"); }
 
                     //
                     // the latch will be counted down in the finally clause
@@ -341,7 +342,7 @@ public class StreamConsumer {
         finally {
 
             long latchValue = consumerThreadStopped.getCount();
-            log.debug("counting down latch from " + latchValue + " to " + (latchValue - 1));
+            if (trace) { log.trace("counting down latch from " + latchValue + " to " + (latchValue - 1)); }
             consumerThreadStopped.countDown();
         }
     }
