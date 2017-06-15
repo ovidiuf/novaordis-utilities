@@ -331,9 +331,19 @@ public class AddressImplTest extends AddressTest {
     }
 
     @Test
-    public void nonEqualityOnNullProtocol() throws Exception {
+    public void equalityOnNullProtocol() throws Exception {
 
         AddressImpl a = new AddressImpl("1.2.3.4");
+        AddressImpl a2 = new AddressImpl("1.2.3.4");
+
+        assertTrue(a.equals(a2));
+        assertTrue(a2.equals(a));
+    }
+
+    @Test
+    public void nonEqualityWhenAnAddressHasANullProtocolAndTheOtherDoesNott() throws Exception {
+
+        AddressImpl a = new AddressImpl("test://1.2.3.4");
         AddressImpl a2 = new AddressImpl("1.2.3.4");
 
         assertFalse(a.equals(a2));

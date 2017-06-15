@@ -172,10 +172,12 @@ public class AddressImpl implements Address {
 
         if (this.protocol == null) {
 
-            return false;
-        }
+            if (that.protocol != null) {
 
-        if (!this.protocol.equals(that.protocol)) {
+                return false;
+            }
+        }
+        else if (!this.protocol.equals(that.protocol)) {
 
             return false;
         }
