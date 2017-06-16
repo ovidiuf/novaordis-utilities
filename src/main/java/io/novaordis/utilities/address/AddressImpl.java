@@ -323,11 +323,13 @@ public class AddressImpl implements Address {
 
             if (i == -1) {
 
-                throw new AddressException("missing password");
+                this.username = usernameAndPassword;
             }
+            else {
 
-            this.username = usernameAndPassword.substring(0, i);
-            this.password = usernameAndPassword.substring(i + 1).toCharArray();
+                this.username = usernameAndPassword.substring(0, i);
+                this.password = usernameAndPassword.substring(i + 1).toCharArray();
+            }
         }
         else {
 

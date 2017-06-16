@@ -128,7 +128,6 @@ public class AddressImplTest extends AddressTest {
         }
     }
 
-
     @Test
     public void constructor_NoUsernamePassword_PortOutOfBounds3() throws Exception {
 
@@ -190,18 +189,16 @@ public class AddressImplTest extends AddressTest {
     }
 
     @Test
-    public void constructor_InvalidAddress_MissingPassword() throws Exception {
+    public void constructor_PasswordCanMiss() throws Exception {
 
-        try {
+        AddressImpl a = new AddressImpl("admin@1.2.3.4:2222");
+        assertNull(a.getProtocol());
+        assertEquals("admin", a.getUsername());
+        assertEquals("1.2.3.4", a.getHost());
+        assertEquals(2222, a.getPort().intValue());
+        assertEquals("admin@1.2.3.4:2222", a.getLiteral());
 
-            new AddressImpl("admin@1.2.3.4:2222");
-            fail("should have thrown exception");
-        }
-        catch(AddressException e) {
-
-            String msg = e.getMessage();
-            assertTrue(msg.contains("missing password"));
-        }
+        assertNull(a.getPassword());
     }
 
     @Test
