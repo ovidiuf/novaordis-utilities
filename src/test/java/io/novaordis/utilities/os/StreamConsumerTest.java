@@ -108,6 +108,8 @@ public class StreamConsumerTest {
 
         assertTrue(c.isConsuming());
 
+        assertTrue(c.getThread().isDaemon());
+
         //
         // at this point the consumer thread is starting to consume
         //

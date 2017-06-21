@@ -182,6 +182,11 @@ public class StreamConsumer {
 
         this.readingThread = new Thread(StreamConsumer.this::consume, getName());
 
+        //
+        // make the reading thread daemon, so it won't prevent the JVM from exiting when it is the only one remaining
+        //
+        this.readingThread.setDaemon(true);
+
         log.debug(this + " starting ...");
 
         readingThread.start();
@@ -267,7 +272,16 @@ public class StreamConsumer {
         return getName() + " Stream Consumer";
     }
 
+
     // Package protected -----------------------------------------------------------------------------------------------
+
+    /**
+     * For testing. May return null.
+     */
+    Thread getThread() {
+
+        return readingThread;
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

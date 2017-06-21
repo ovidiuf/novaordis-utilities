@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Nova Ordis LLC
+ * Copyright (c) 2017 Nova Ordis LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,111 +16,69 @@
 
 package io.novaordis.utilities.os;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
- * A component managing an output stream that goes into the process' stdin.
- *
- * Experimental implementation, not ready for real use yet.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/28/16
  */
-public class StreamProducer {
+public class StreamProducerTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    private static final Logger log = LoggerFactory.getLogger(StreamProducer.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private final OutputStream outputStream;
-
-    private volatile Thread thread;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    StreamProducer(OutputStream os) {
-
-        this.outputStream = os;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public synchronized void start() {
+    // Tests -----------------------------------------------------------------------------------------------------------
 
-        if (isStarted()) {
+    // lifecycle -------------------------------------------------------------------------------------------------------
 
-            log.debug(this + " already started");
-            return;
-        }
+    @Test
+    public void lifecycle() throws Exception {
 
-        this.thread = new Thread(StreamProducer.this::produce);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        //
-        // make the writing thread daemon, so it won't prevent the JVM from exiting when it is the only one remaining
-        //
-        thread.setDaemon(true);
+        StreamProducer p = new StreamProducer(baos);
 
-        thread.start();
+        assertFalse(p.isStarted());
 
-        log.debug(this + " started");
-    }
+        p.start();
 
-    public synchronized boolean isStarted() {
+        assertTrue(p.isStarted());
 
-        return thread != null;
-    }
+        assertTrue(p.getThread().isDaemon());
 
-    public synchronized void stop() {
+        p.start();
 
-        if (!isStarted()) {
+        assertTrue(p.isStarted());
 
-            log.debug(this + " already stopped");
-            return;
-        }
+        p.stop();
 
-        this.thread = null;
+        assertFalse(p.isStarted());
 
-        log.debug(this + " stopped");
+        p.stop();
+
+        assertFalse(p.isStarted());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
-    /**
-     * Used for testing. May return null.
-     */
-    Thread getThread() {
-
-        return thread;
-    }
-
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
-
-    private void produce() {
-
-        try {
-
-            int count = 0;
-
-            while (thread != null && count < 10) {
-
-                outputStream.write(1);
-                count ++;
-            }
-        }
-        catch (Exception e) {
-
-            log.error("" + e);
-        }
-    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 
