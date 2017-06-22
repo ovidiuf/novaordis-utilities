@@ -13,7 +13,18 @@
     <version>4.7.7-SNAPSHOT-1</version>
 
     <properties>
-        <slf4j-version>1.7.12</slf4j-version>
+
+        <!--
+            Dependencies
+        -->
+
+        <slf4j.version>1.7.12</slf4j.version>
+        <log4j.version>1.2.16</log4j.version>
+        <junit.version>4.11</junit.version>
+        <!--
+            End of Dependencies
+        -->
+
         <test.scratch.directory>target/test-scratch</test.scratch.directory>
         <test.log.directory>target</test.log.directory>
     </properties>
@@ -29,41 +40,36 @@
             </resource>
         </resources>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <argLine>-Xms64m -Xmx1024m</argLine>
-                        <systemProperties>
-                            <property>
-                                <name>test.scratch.directory</name>
-                                <value>${test.scratch.directory}</value>
-                            </property>
-                            <property>
-                                <name>test.log.directory</name>
-                                <value>${test.log.directory}</value>
-                            </property>
-                            <property>
-                                <name>basedir</name>
-                                <value>${basedir}</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-Xms64m -Xmx1024m</argLine>
+                    <systemProperties>
+                        <property>
+                            <name>test.scratch.directory</name>
+                            <value>${test.scratch.directory}</value>
+                        </property>
+                        <property>
+                            <name>test.log.directory</name>
+                            <value>${test.log.directory}</value>
+                        </property>
+                        <property>
+                            <name>basedir</name>
+                            <value>${basedir}</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -108,48 +114,27 @@
         </plugins>
     </build>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j-version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.16</version>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.11</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 
