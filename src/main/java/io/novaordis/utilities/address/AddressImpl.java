@@ -155,6 +155,32 @@ public class AddressImpl implements Address {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    /**
+     * This method is public because there are situations when an externally specified username (for example, on
+     * command line with --username=) must be set on the address.
+     */
+    public void setUsername(String username) {
+
+        this.username = username;
+    }
+
+    /**
+     * This method is public because there are situations when an externally specified password (for example, on
+     * command line with --password=) must be set on the address.
+     */
+    public void setPassword(char[] password) {
+
+        if (password == null) {
+
+            this.password = null;
+        }
+        else {
+
+            this.password = new char[password.length];
+            System.arraycopy(password, 0, this.password, 0, this.password.length);
+        }
+    }
+
     @Override
     public boolean equals(Object o)  {
 
@@ -259,24 +285,6 @@ public class AddressImpl implements Address {
     protected void setHost(String host) {
 
         this.host = host;
-    }
-
-    protected void setUsername(String username) {
-
-        this.username = username;
-    }
-
-    protected void setPassword(char[] password) {
-
-        if (password == null) {
-
-            this.password = null;
-        }
-        else {
-
-            this.password = new char[password.length];
-            System.arraycopy(password, 0, this.password, 0, this.password.length);
-        }
     }
 
     protected boolean isPortSpecifiedInLiteral() {
