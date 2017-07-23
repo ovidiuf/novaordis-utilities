@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.logging;
 
+import io.novaordis.utilities.logging.log4j.Log4jLevel;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
@@ -29,6 +31,6 @@ public interface LoggerConfiguration {
     // Public ----------------------------------------------------------------------------------------------------------
 
     String getName();
-    String getLevel();
+    Log4jLevel getLevel();
 
 }

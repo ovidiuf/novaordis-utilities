@@ -17,6 +17,7 @@
 package io.novaordis.utilities.logging;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,14 +38,14 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
 
     public static final String LOGGERS_KEY = "loggers";
 
-
-
     // Static ----------------------------------------------------------------------------------------------------------
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    // Constructors ----------------------------------------------------------------------------------------------------
+    private File file;
+    private List<LoggerConfiguration> loggerConfigurations;
 
+    // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
      * @param loggingConfigurationMap the map extracted from the larger YAML configuration tree, which contains the
@@ -59,12 +60,9 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
             throw new IllegalArgumentException("null logging configuration map");
         }
 
-        Object o = loggingConfigurationMap.get(LOGGING_KEY);
+        this.loggerConfigurations = new ArrayList<>();
 
-        if (o == null) {
-
-            throw new LoggingConfigurationException("missing top level '" + LOGGING_KEY + "' key");
-        }
+        parse(loggingConfigurationMap);
     }
 
     // LoggingConfiguration implementation -----------------------------------------------------------------------------
@@ -72,13 +70,13 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
     @Override
     public List<LoggerConfiguration> getLoggerConfiguration() {
 
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+        return loggerConfigurations;
     }
 
     @Override
     public File getFile() {
 
-        throw new RuntimeException("getFile() NOT YET IMPLEMENTED");
+        return file;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -88,6 +86,56 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    private void parse(Map loggingConfigurationMap) throws LoggingConfigurationException {
+
+        Object o = loggingConfigurationMap.get(LOGGING_KEY);
+
+        if (o == null) {
+
+            throw new LoggingConfigurationException("missing top level '" + LOGGING_KEY + "' key");
+        }
+
+        if (!(o instanceof Map)) {
+
+            throw new LoggingConfigurationException(
+                    "'" + LOGGING_KEY + "' must contain a Map, but it contains a " + o.getClass().getSimpleName());
+        }
+
+        Map m = (Map)o;
+
+        o = m.get(FILE_KEY);
+
+        if (o != null) {
+
+            if (!(o instanceof String)) {
+
+                throw new LoggingConfigurationException(
+                        "'" + FILE_KEY + "' must contain a String, but it contains a " + o.getClass().getSimpleName());
+            }
+
+            file = new File((String)o);
+        }
+
+        o = m.get(LOGGERS_KEY);
+
+        if (o != null) {
+
+            if (!(o instanceof List)) {
+
+                throw new LoggingConfigurationException(
+                        "'" + LOGGERS_KEY + "' must contain a List, but it contains a " + o.getClass().getSimpleName());
+            }
+
+            List l = (List)o;
+
+            for(Object le: l) {
+
+                LoggerConfiguration c = new YamlLoggerConfiguration(le);
+                loggerConfigurations.add(c);
+            }
+        }
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

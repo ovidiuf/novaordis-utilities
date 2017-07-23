@@ -16,6 +16,10 @@
 
 package io.novaordis.utilities.logging;
 
+import io.novaordis.utilities.logging.log4j.Log4jLevel;
+
+import java.util.Map;
+
 /**
  * The configuration associated with a log4j Logger.
  *
@@ -30,20 +34,37 @@ public class YamlLoggerConfiguration implements LoggerConfiguration {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String name;
+    private Log4jLevel level;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    /**
+     * @param o - the "loggers" list element returned by the Yaml parser. We expect it to be a Map<String, String>
+     *          with one element, where the key is the logger definition and the value is the logging level.
+     */
+    public YamlLoggerConfiguration(Object o) throws LoggingConfigurationException {
+
+        if (o == null) {
+
+            throw new IllegalArgumentException("null logger configuration");
+        }
+
+        parse(o);
+    }
 
     // LoggerConfiguration implementation ------------------------------------------------------------------------------
 
     @Override
     public String getName() {
 
-        throw new RuntimeException("NYE");
+        return name;
     }
 
     @Override
-    public String getLevel() {
+    public Log4jLevel getLevel() {
 
-        throw new RuntimeException("getLevel() NOT YET IMPLEMENTED");
+        return level;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -53,6 +74,47 @@ public class YamlLoggerConfiguration implements LoggerConfiguration {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    private void parse(Object o) throws LoggingConfigurationException {
+
+        if (!(o instanceof Map)) {
+
+            throw new LoggingConfigurationException("expecting a Map but got a " + o.getClass().getSimpleName());
+        }
+
+        Map m = (Map)o;
+
+        if (m.size() != 1) {
+
+            throw new LoggingConfigurationException(
+                    "expecting a single element Map but got a Map with " + m.size() + " elements");
+        }
+
+        Object oKey = m.keySet().iterator().next();
+
+        if (!(oKey instanceof String)) {
+
+            throw new LoggingConfigurationException(
+                    "the key of the single element Map should be a String but is a " + oKey.getClass().getSimpleName());
+        }
+
+        this.name = (String) oKey;
+
+        Object value = m.get(name);
+
+        if (!(value instanceof String)) {
+
+            throw new LoggingConfigurationException(
+                    "the value associated with logger '" + name + "' is not a String: '" + value + "'");
+        }
+
+        this.level = Log4jLevel.fromLiteral((String)value);
+
+        if (this.level == null) {
+
+            throw new LoggingConfigurationException("not a valid logging level: " + value);
+        }
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

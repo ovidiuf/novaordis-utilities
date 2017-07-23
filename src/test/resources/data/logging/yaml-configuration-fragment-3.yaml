@@ -1,0 +1,3 @@
+
+logging:
+  loggers: "not a List"

@@ -16,6 +16,7 @@
 
 package io.novaordis.utilities.logging;
 
+import io.novaordis.utilities.logging.log4j.Log4jLevel;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
@@ -103,12 +104,12 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
         assertEquals(2, lcs.size());
 
         LoggerConfiguration lc = lcs.get(0);
-        assertEquals("", lc.getName());
-        assertEquals("", lc.getLevel());
+        assertEquals("com.example", lc.getName());
+        assertEquals(Log4jLevel.INFO, lc.getLevel());
 
         LoggerConfiguration lc2 = lcs.get(1);
-        assertEquals("", lc2.getName());
-        assertEquals("", lc2.getLevel());
+        assertEquals("org.example2", lc2.getName());
+        assertEquals(Log4jLevel.TRACE, lc2.getLevel());
     }
 
     @Test
@@ -126,7 +127,45 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
 
         YamlLoggingConfiguration c = new YamlLoggingConfiguration(m2);
 
-        fail("return here");
+        File file = c.getFile();
+        assertEquals(new File("/tmp/some-file.log"), file);
+
+        List<LoggerConfiguration> lcs = c.getLoggerConfiguration();
+
+        assertEquals(2, lcs.size());
+
+        LoggerConfiguration lc = lcs.get(0);
+        assertEquals("com.example", lc.getName());
+        assertEquals(Log4jLevel.INFO, lc.getLevel());
+
+        LoggerConfiguration lc2 = lcs.get(1);
+        assertEquals("org.example2", lc2.getName());
+        assertEquals(Log4jLevel.TRACE, lc2.getLevel());
+    }
+
+    @Test
+    public void constructor_LoggersDoesNotContainAList() throws Exception {
+
+        File reference = new File(System.getProperty("basedir"),
+                "src/test/resources/data/logging/yaml-configuration-fragment-3.yaml");
+        assertTrue(reference.isFile());
+        FileInputStream fis = new FileInputStream(reference);
+        Yaml yaml = new Yaml();
+        Map m = (Map)yaml.load(fis);
+        fis.close();
+
+        try {
+
+            new YamlLoggingConfiguration(m);
+            fail("should have thrown exception");
+        }
+        catch(LoggingConfigurationException e) {
+
+            String msg = e.getMessage();
+            String expected =
+                    "'" + YamlLoggingConfiguration.LOGGERS_KEY + "' must contain a List, but it contains a String";
+            assertEquals(expected, msg);
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
