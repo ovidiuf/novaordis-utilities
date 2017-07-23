@@ -28,7 +28,10 @@ import org.apache.log4j.Priority;
 import java.util.Enumeration;
 
 /**
- * Logic to dynamically enable DEBUG level logging at stderr.
+ * A pattern that consists in routing all log4j logging information to stderr if -v or --verbose command line options
+ * are used. This class contains logic to dynamically enable DEBUG level logging at stderr.
+ *
+ * See https://kb.novaordis.com/index.php/Project_log4j_Debugging_on_--verbose#Overview
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/6/16
