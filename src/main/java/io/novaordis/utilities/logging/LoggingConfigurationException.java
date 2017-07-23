@@ -16,22 +16,15 @@
 
 package io.novaordis.utilities.logging;
 
-import io.novaordis.utilities.UserErrorException;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
  */
-public class AlternativeLoggingConfiguration {
+public class LoggingConfigurationException extends Exception {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    public static void configureLogging(LoggingConfiguration c) throws LoggingConfigurationException {
-
-        throw new RuntimeException("NYE");
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
