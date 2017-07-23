@@ -20,16 +20,11 @@ package io.novaordis.utilities.logging;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
  */
-public class AlternativeLoggingConfiguration {
+public class YamlLoggerConfigurationTest extends LoggerConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    public static void configureLogging(LoggingConfiguration lc) throws LoggingConfigurationException {
-
-        throw new RuntimeException("NYE");
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
@@ -40,6 +35,12 @@ public class AlternativeLoggingConfiguration {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected YamlLoggerConfiguration getLoggerConfigurationToTest() throws Exception {
+
+        return new YamlLoggerConfiguration();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

@@ -14,35 +14,48 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.logging;
+package io.novaordis.utilities.logging.log4j;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/23/17
+ * @since 4/28/17
  */
-public class LoggingConfigurationException extends Exception {
+public enum Log4jLevel {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    OFF,
+    FATAL,
+    ERROR,
+    WARN,
+    INFO,
+    DEBUG,
+    TRACE,
+    ALL;
+
     // Static ----------------------------------------------------------------------------------------------------------
 
-    // Attributes ------------------------------------------------------------------------------------------------------
+    /**
+     * @return null on invalid value, that cannot be converted
+     */
+    public static Log4jLevel fromLiteral(String s) {
 
-    // Constructors ----------------------------------------------------------------------------------------------------
+        for(Log4jLevel l: values()) {
 
-    public LoggingConfigurationException(String msg) {
+            if (l.toLiteral().equals(s)) {
 
-        super(msg);
+                return l;
+            }
+        }
+
+        return null;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Package protected -----------------------------------------------------------------------------------------------
+    public String toLiteral() {
 
-    // Protected -------------------------------------------------------------------------------------------------------
-
-    // Private ---------------------------------------------------------------------------------------------------------
-
-    // Inner classes ---------------------------------------------------------------------------------------------------
+        return toString();
+    }
 
 }

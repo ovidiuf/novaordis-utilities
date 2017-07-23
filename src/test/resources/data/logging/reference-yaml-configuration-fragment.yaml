@@ -1,0 +1,5 @@
+logging:
+  file: /tmp/some-file.log
+  loggers:
+    - com.example: INFO
+    - org.example2: TRACE

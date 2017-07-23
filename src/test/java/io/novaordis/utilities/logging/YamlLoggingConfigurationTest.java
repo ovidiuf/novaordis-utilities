@@ -16,6 +16,19 @@
 
 package io.novaordis.utilities.logging;
 
+import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
@@ -34,14 +47,109 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
 
     // Tests -----------------------------------------------------------------------------------------------------------
 
+    // constructor -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void constructor_NullMap() throws Exception {
+
+        try {
+
+            new YamlLoggingConfiguration(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null logging configuration map"));
+        }
+    }
+
+    @Test
+    public void constructor_MissingTopLevelLoggingKey() throws Exception {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("something", "something else");
+
+        try {
+
+            new YamlLoggingConfiguration(map);
+            fail("should have thrown exception");
+        }
+        catch(LoggingConfigurationException e) {
+
+            String msg = e.getMessage();
+            assertEquals("missing top level '" + YamlLoggingConfiguration.LOGGING_KEY + "' key", msg);
+        }
+    }
+
+    @Test
+    public void constructor_Reference() throws Exception {
+
+        File reference = new File(System.getProperty("basedir"),
+                "src/test/resources/data/logging/reference-yaml-configuration-fragment.yaml");
+        assertTrue(reference.isFile());
+        FileInputStream fis = new FileInputStream(reference);
+        Yaml yaml = new Yaml();
+        Map m = (Map)yaml.load(fis);
+        fis.close();
+
+        YamlLoggingConfiguration c = new YamlLoggingConfiguration(m);
+
+        File file = c.getFile();
+        assertEquals(new File("/tmp/some-file.log"), file);
+
+        List<LoggerConfiguration> lcs = c.getLoggerConfiguration();
+
+        assertEquals(2, lcs.size());
+
+        LoggerConfiguration lc = lcs.get(0);
+        assertEquals("", lc.getName());
+        assertEquals("", lc.getLevel());
+
+        LoggerConfiguration lc2 = lcs.get(1);
+        assertEquals("", lc2.getName());
+        assertEquals("", lc2.getLevel());
+    }
+
+    @Test
+    public void constructor_Embedded() throws Exception {
+
+        File reference = new File(System.getProperty("basedir"),
+                "src/test/resources/data/logging/yaml-configuration-fragment-2.yaml");
+        assertTrue(reference.isFile());
+        FileInputStream fis = new FileInputStream(reference);
+        Yaml yaml = new Yaml();
+        Map m = (Map)yaml.load(fis);
+        fis.close();
+
+        Map m2 = (Map)m.get("superstructure");
+
+        YamlLoggingConfiguration c = new YamlLoggingConfiguration(m2);
+
+        fail("return here");
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected LoggingConfiguration getLoggingConfigurationToTest() throws Exception {
+    protected YamlLoggingConfiguration getLoggingConfigurationToTest() throws Exception {
 
-        return new YamlLoggingConfiguration();
+        File reference = new File(System.getProperty("basedir"),
+                "src/test/resources/data/logging/reference-yaml-configuration-fragment.yaml");
+
+        assertTrue(reference.isFile());
+
+        FileInputStream fis = new FileInputStream(reference);
+
+        Yaml yaml = new Yaml();
+
+        Map m = (Map)yaml.load(fis);
+
+        fis.close();
+
+        return new YamlLoggingConfiguration(m);
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

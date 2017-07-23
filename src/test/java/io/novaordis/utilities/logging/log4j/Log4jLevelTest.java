@@ -14,28 +14,97 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.logging;
+package io.novaordis.utilities.logging.log4j;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 7/23/17
+ * @since 4/28/17
  */
-public class AlternativeLoggingConfiguration {
+public class Log4jLevelTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
-
-    public static void configureLogging(LoggingConfiguration lc) throws LoggingConfigurationException {
-
-        throw new RuntimeException("NYE");
-    }
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Tests -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void toLiteral_OFF() {
+
+        assertEquals("OFF", Log4jLevel.OFF.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_FATAL() {
+
+        assertEquals("FATAL", Log4jLevel.FATAL.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_ERROR() {
+
+        assertEquals("ERROR", Log4jLevel.ERROR.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_WARN() {
+
+        assertEquals("WARN", Log4jLevel.WARN.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_INFO() {
+
+        assertEquals("INFO", Log4jLevel.INFO.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_DEBUG() {
+
+        assertEquals("DEBUG", Log4jLevel.DEBUG.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_TRACE() {
+
+        assertEquals("TRACE", Log4jLevel.TRACE.toLiteral());
+    }
+
+    @Test
+    public void toLiteral_ALL() {
+
+        assertEquals("ALL", Log4jLevel.ALL.toLiteral());
+    }
+
+    // fromLiteral() ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void fromLiteral() throws Exception {
+
+        for(Log4jLevel l: Log4jLevel.values()) {
+
+            String literal = l.toLiteral();
+
+            assertEquals(l, Log4jLevel.fromLiteral(literal));
+        }
+    }
+
+    @Test
+    public void fromLiteral_InvalidVAlue() throws Exception {
+
+        assertNull(Log4jLevel.fromLiteral("invalid value"));
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

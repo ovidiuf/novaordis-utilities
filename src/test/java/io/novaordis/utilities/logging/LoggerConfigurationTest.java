@@ -20,7 +20,7 @@ package io.novaordis.utilities.logging;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
  */
-public class LoggerConfigurationTest {
+public abstract class LoggerConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -37,6 +37,8 @@ public class LoggerConfigurationTest {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    protected abstract LoggerConfiguration getLoggerConfigurationToTest() throws Exception;
 
     // Private ---------------------------------------------------------------------------------------------------------
 

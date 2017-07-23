@@ -17,7 +17,7 @@
 package io.novaordis.utilities.logging;
 
 import java.io.File;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -32,12 +32,14 @@ public interface LoggingConfiguration {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * Configuration for individual log4j Loggers.
+     * Configuration for individual log4j Loggers. The logger configuration instances are returned in the order in
+     * which they are declared in the configuration file.
      */
-    Set<LoggerConfiguration> getConfiguration();
+    List<LoggerConfiguration> getLoggerConfiguration();
 
     /**
-     * The file the log information is supposed to go to.
+     * The file the log information is supposed to go to. May return null if there is no alternative logging
+     * configuration, or no file is configured.
      */
     File getFile();
 

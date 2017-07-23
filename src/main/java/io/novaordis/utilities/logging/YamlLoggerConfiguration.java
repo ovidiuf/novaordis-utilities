@@ -16,28 +16,15 @@
 
 package io.novaordis.utilities.logging;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
 /**
- * Contains all the knowledge to turn a YAML configuration fragment into a LoggingConfiguration instance, which can be
- * used as a delegate, part of a larger configuration instance.
+ * The configuration associated with a log4j Logger.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
  */
-public class YamlLoggingConfiguration implements LoggingConfiguration {
+public class YamlLoggerConfiguration implements LoggerConfiguration {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    public static final String LOGGING_KEY = "logging";
-
-    public static final String FILE_KEY = "file";
-
-    public static final String LOGGERS_KEY = "loggers";
-
-
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -45,40 +32,18 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-
-    /**
-     * @param loggingConfigurationMap the map extracted from the larger YAML configuration tree, which contains the
-     *                                LOGGING_KEY and the rest of the logging configuration.
-     *
-     * @throws LoggingConfigurationException
-     */
-    public YamlLoggingConfiguration(Map loggingConfigurationMap) throws LoggingConfigurationException {
-
-        if (loggingConfigurationMap == null) {
-
-            throw new IllegalArgumentException("null logging configuration map");
-        }
-
-        Object o = loggingConfigurationMap.get(LOGGING_KEY);
-
-        if (o == null) {
-
-            throw new LoggingConfigurationException("missing top level '" + LOGGING_KEY + "' key");
-        }
-    }
-
-    // LoggingConfiguration implementation -----------------------------------------------------------------------------
+    // LoggerConfiguration implementation ------------------------------------------------------------------------------
 
     @Override
-    public List<LoggerConfiguration> getLoggerConfiguration() {
+    public String getName() {
 
-        throw new RuntimeException("getConfiguration() NOT YET IMPLEMENTED");
+        throw new RuntimeException("NYE");
     }
 
     @Override
-    public File getFile() {
+    public String getLevel() {
 
-        throw new RuntimeException("getFile() NOT YET IMPLEMENTED");
+        throw new RuntimeException("getLevel() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
