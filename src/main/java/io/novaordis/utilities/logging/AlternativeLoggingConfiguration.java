@@ -122,7 +122,10 @@ public class AlternativeLoggingConfiguration {
 
                 Logger logger = Logger.getLogger(loggerName);
                 logger.setLevel(loggerLevel.getLog4jNativeLevel());
-                logger.addAppender(fileAppender);
+
+                // no need to set appender on the logger, it's already set on the root logger, if we do this
+                // everyting will be duplicated
+                //logger.addAppender(fileAppender);
             }
         }
     }

@@ -90,6 +90,12 @@ public class StreamProducer {
         log.debug(this + " stopped");
     }
 
+    @Override
+    public String toString() {
+
+        return "StreamProducer[" + Integer.toHexString(System.identityHashCode(this)) + "]";
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     /**

@@ -155,7 +155,7 @@ public class StreamConsumer {
 
             this.contentLogger = new ContentLogger(name + " Logger");
 
-            log.debug(this + " is configured to asynchronously log the stream");
+            log.debug(this + " is configured to log the stream asynchronously");
         }
 
         if (trace) {
@@ -348,7 +348,6 @@ public class StreamConsumer {
 
                     return;
                 }
-
             }
         }
         catch (Exception e) {
