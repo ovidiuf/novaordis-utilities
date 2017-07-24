@@ -154,7 +154,6 @@ public class StreamConsumer {
         if (doLogContent) {
 
             this.contentLogger = new ContentLogger(name + " Logger");
-
             log.debug(this + " is configured to log the stream asynchronously");
         }
 
@@ -378,14 +377,16 @@ public class StreamConsumer {
         }
         finally {
 
-            long latchValue = consumerThreadStopped.getCount();
+            if (trace) {
 
-            if (trace) { log.trace(this + " counting down latch from " + latchValue + " to " + (latchValue - 1)); }
+                long latchValue = consumerThreadStopped.getCount();
+                log.trace(this + " counting down latch from " + latchValue + " to " + (latchValue - 1));
+            }
 
             consumerThreadStopped.countDown();
 
             //
-            // we don't need the thread anymore and we want to prevent if from leaking, so we aggressively sever
+            // we don't need the thread anymore and we want to prevent if from leaking, so we aggressively clean
             // references
             //
 
