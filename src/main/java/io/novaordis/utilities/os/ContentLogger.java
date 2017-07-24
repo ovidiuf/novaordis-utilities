@@ -28,12 +28,16 @@ import java.util.TimerTask;
  * is blocked in reading from stdin but it displays a question at stdout (or stderr) before that. It helps detecting
  * that situation.
  *
+ * IMPORTANT: when the logger is not needed anymore, call cancel(), otherwise timer threads may leak.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/19/16
  */
 public class ContentLogger extends TimerTask {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final Logger log2 = LoggerFactory.getLogger(ContentLogger.class);
 
     public static final int DEFAULT_INITIAL_BUFFER_SIZE = 1024;
 
@@ -49,6 +53,8 @@ public class ContentLogger extends TimerTask {
 
     // the position in the buffer where the next character goes
     private int next;
+
+    private Timer loggingTimer;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
@@ -69,8 +75,10 @@ public class ContentLogger extends TimerTask {
         // register a timer that will flush the buffer periodically
         //
 
-        Timer loggingTimer = new Timer(name);
+        this.loggingTimer = new Timer(name);
         loggingTimer.scheduleAtFixedRate(this, POLLING_INTERVAL_MS, POLLING_INTERVAL_MS);
+
+        log2.debug(this + " created");
     }
 
     // TimerTask implementation ----------------------------------------------------------------------------------------
@@ -79,6 +87,20 @@ public class ContentLogger extends TimerTask {
     public void run() {
 
         logContentAccumulatedSoFar();
+    }
+
+    // TimerTask overrides ---------------------------------------------------------------------------------------------
+
+    @Override
+    public boolean cancel() {
+
+        loggingTimer.cancel();
+        loggingTimer = null;
+        boolean result = super.cancel();
+
+        log2.debug(this + " canceled, returning " + result);
+
+        return result;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

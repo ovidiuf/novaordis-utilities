@@ -213,6 +213,10 @@ public class StreamConsumer {
         log.debug("stop requested on " + this);
 
         stopRequested = true;
+
+        //
+        // we will cancel the content logger, if exists, on the reading thread
+        //
     }
 
     public boolean isConsuming() {
@@ -392,6 +396,11 @@ public class StreamConsumer {
 
             readingThread = null;
 
+            if (contentLogger != null) {
+
+                contentLogger.cancel();
+                contentLogger = null;
+            }
         }
     }
 

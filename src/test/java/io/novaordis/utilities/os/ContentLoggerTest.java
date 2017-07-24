@@ -19,6 +19,10 @@ package io.novaordis.utilities.os;
 import org.junit.Test;
 import org.slf4j.Logger;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -598,6 +602,51 @@ public class ContentLoggerTest {
 
         String s2 = ml.getDebugContent();
         assertEquals("d", s2);
+    }
+
+    // production ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void timerThreadLeak() throws Exception {
+
+        MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        Integer initialThreadCount = (Integer)mBeanServer.
+                getAttribute(new ObjectName("java.lang:type=Threading"), "ThreadCount");
+
+        ContentLogger cl = new ContentLogger("logger 1");
+
+        Integer tc = (Integer)mBeanServer.getAttribute(new ObjectName("java.lang:type=Threading"), "ThreadCount");
+
+        //
+        // the logger started a new timer thread, so we should see a difference of 1 here
+        //
+
+        assertEquals(1, tc - initialThreadCount);
+
+        ContentLogger cl2 = new ContentLogger("logger 2");
+
+        Integer tc2 = (Integer)mBeanServer.getAttribute(new ObjectName("java.lang:type=Threading"), "ThreadCount");
+
+        assertEquals(1, tc2 - tc);
+
+        cl.cancel();
+        cl2.cancel();
+
+        //noinspection UnusedAssignment
+        cl = null;
+
+
+        //noinspection UnusedAssignment
+        cl2 = null;
+
+        System.gc();
+
+        Integer finalThreadCount = (Integer)mBeanServer.
+                getAttribute(new ObjectName("java.lang:type=Threading"), "ThreadCount");
+
+
+        int delta = finalThreadCount - initialThreadCount;
+        assertEquals(0, delta);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
