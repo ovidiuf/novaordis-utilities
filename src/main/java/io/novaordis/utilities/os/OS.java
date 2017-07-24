@@ -69,6 +69,7 @@ public interface OS extends NativeExecutor {
         synchronized (instance) {
 
             if (instance[0] != null) {
+
                 return instance[0];
             }
 
@@ -127,6 +128,7 @@ public interface OS extends NativeExecutor {
     static void logExecution(Logger log, File directory, String command) {
 
         if (log == null) {
+
             return;
         }
 

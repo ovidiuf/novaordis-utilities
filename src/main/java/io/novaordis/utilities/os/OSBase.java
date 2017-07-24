@@ -33,6 +33,7 @@ abstract class OSBase implements OS {
     // Constants -------------------------------------------------------------------------------------------------------
 
     private static final Logger log = LoggerFactory.getLogger(OSBase.class);
+    private static final boolean trace = log.isTraceEnabled();
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -103,6 +104,7 @@ abstract class OSBase implements OS {
 
     @Override
     public NativeExecutionResult execute(String command) throws NativeExecutionException {
+
         return execute(null, command);
     }
 
@@ -113,6 +115,8 @@ abstract class OSBase implements OS {
 
             directory = new File(".");
         }
+
+        if (trace) { log.trace(this + " executing command \"" + command + "\" in " + (directory == null ? "the current directory" : directory.getPath())); }
 
         OS.logExecution(log, directory, command);
 
@@ -132,6 +136,8 @@ abstract class OSBase implements OS {
             pb.directory(directory);
 
             Process p = pb.command(commands).start();
+
+            if (trace) { log.trace(this + " created process " + p); }
 
             //
             // we'll block this thread waiting for the child process to finish, but before we block, we start
@@ -196,8 +202,7 @@ abstract class OSBase implements OS {
     @Override
     public String toString() {
 
-        String s = getClass().getSimpleName();
-        return s.substring(0, s.length() - 2);
+        return getClass().getSimpleName() + "[" + Integer.toHexString(System.identityHashCode(this)) + "]";
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

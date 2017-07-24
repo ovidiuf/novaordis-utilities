@@ -41,6 +41,7 @@ public class StreamConsumer {
     // Constants -------------------------------------------------------------------------------------------------------
 
     private static final Logger log = LoggerFactory.getLogger(StreamConsumer.class);
+    private static final boolean trace = log.isTraceEnabled();
 
     public static final int DEFAULT_BUFFER_SIZE = 10240;
 
@@ -125,10 +126,10 @@ public class StreamConsumer {
      *                   quantities of output. However, the output will not be immediately available for consumption
      *                   with read() unless the buffer fills up.
      *
-     * @param doLogContent if true, log.debug() the content as soon as it is read from the underlying process. By
-     *                     default, the implementation does not log.debug() by default the content it reads from the
-     *                     process. Note that the logging subsystem must be configured to allow DEBUG-level logging for
-     *                     the logged content to be visible.
+     * @param doLogContent if true, log.debug() the content as soon as it is read from the underlying process. If not
+     *                     specifically configured to do so, the implementation does not log by default the content it
+     *                     reads from the process. Note that the logging subsystem must be configured to allow
+     *                     DEBUG-level logging for the logged content to be visible.
      */
     StreamConsumer(String name, InputStream is, int bufferSize, boolean doLogContent) {
 
@@ -140,6 +141,7 @@ public class StreamConsumer {
         this.name = name;
 
         if (is == null) {
+
             throw new IllegalArgumentException("null input stream");
         }
 
@@ -154,6 +156,11 @@ public class StreamConsumer {
             this.contentLogger = new ContentLogger(name + " Logger");
 
             log.debug(this + " is configured to asynchronously log the stream");
+        }
+
+        if (trace) {
+            log.trace("StreamConsumer[" + Integer.toHexString(System.identityHashCode(this)) + "] constructed, name: " +
+                    name + ", buffer size: " + bufferSize + ", log content: " + doLogContent);
         }
     }
 
@@ -197,6 +204,8 @@ public class StreamConsumer {
      * has no effect until the read completes.
      */
     public void stop() {
+
+        log.debug("stop requested on " + this);
 
         stopRequested = true;
     }
@@ -269,7 +278,7 @@ public class StreamConsumer {
     @Override
     public String toString() {
 
-        return getName() + " Stream Consumer";
+        return getName() + " Stream Consumer[" + Integer.toHexString(System.identityHashCode(this)) + "]";
     }
 
 
