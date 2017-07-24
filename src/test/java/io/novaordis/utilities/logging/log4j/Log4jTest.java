@@ -225,6 +225,45 @@ public class Log4jTest {
         assertTrue(Log4j.removeFileAppender("TEST-FILE-APPENDER"));
     }
 
+    // removeConsoleAppender() -----------------------------------------------------------------------------------------------
+
+    @Test
+    public void removeConsoleAppender_NoSuchConsole() throws Exception {
+
+        assertNull(Log4j.removeConsoleAppender("I-AM-SURE-THERE-IS-NO-SUCH-CONSOLE", "System.out"));
+    }
+
+    @Test
+    public void removeConsoleAppender() throws Exception {
+
+        ConsoleAppender original = null;
+
+        try {
+
+            original = Log4j.removeConsoleAppender("CONSOLE", "System.out");
+
+            assertNotNull(original);
+
+            //
+            // we must not have any Console appender named "CONSOLE" to System.out
+            //
+
+            assertNull(Log4j.getConsoleAppender("CONSOLE", "System.out"));
+        }
+        finally {
+
+            //
+            // restore the console
+            //
+
+            if (original != null) {
+
+                RootLogger logger = Log4j.getRootLogger();
+                logger.addAppender(original);
+            }
+        }
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

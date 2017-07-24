@@ -19,6 +19,7 @@ package io.novaordis.utilities.logging;
 import io.novaordis.utilities.Files;
 import io.novaordis.utilities.logging.log4j.Log4j;
 import io.novaordis.utilities.logging.log4j.Log4jLevel;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -61,11 +63,14 @@ public class AlternativeLoggingConfigurationTest {
         assertNull(mlc.getFile());
         assertTrue(mlc.getLoggerConfiguration().isEmpty());
 
-        AlternativeLoggingConfiguration.apply(mlc);
+        AlternativeLoggingConfiguration.apply(mlc, true);
     }
 
     @Test
     public void apply() throws Exception {
+
+        ConsoleAppender originalConsoleAppender = Log4j.getConsoleAppender("CONSOLE", "System.out");
+        assertNotNull(originalConsoleAppender);
 
         //noinspection ConstantConditions
         String originalFile = Log4j.getFileAppender("FILE").getFile();
@@ -90,7 +95,7 @@ public class AlternativeLoggingConfigurationTest {
 
         try {
 
-            AlternativeLoggingConfiguration.apply(mlc);
+            AlternativeLoggingConfiguration.apply(mlc, true);
 
             String randomString = UUID.randomUUID().toString();
 
@@ -120,8 +125,24 @@ public class AlternativeLoggingConfigurationTest {
 
             assertFalse(content.contains(randomString3));
 
+            //
+            // make sure the Console was removed
+            //
+
+            assertNull(Log4j.getConsoleAppender("CONSOLE", "System.out"));
+            assertNull(Log4j.getConsoleAppender("CONSOLE", "System.err"));
+
         }
         finally {
+
+            //
+            // restore the CONSOLE appender
+            //
+
+            if (Log4j.getConsoleAppender("CONSOLE", "System.out") == null) {
+
+                Log4j.getRootLogger().addAppender(originalConsoleAppender);
+            }
 
             //
             // cleanup, revert logging into the original file, with DEBUG level.
@@ -131,7 +152,7 @@ public class AlternativeLoggingConfigurationTest {
             cleanupMlc.setFile(new File(originalFile));
             cleanupMlc.setLoggerConfiguration(Collections.singletonList(
                     new YamlLoggerConfiguration("something", Log4jLevel.DEBUG)));
-            AlternativeLoggingConfiguration.apply(cleanupMlc);
+            AlternativeLoggingConfiguration.apply(cleanupMlc, false);
             log.info("restored");
         }
     }

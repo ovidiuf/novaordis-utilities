@@ -219,7 +219,8 @@ public class Log4j {
     /**
      * Removes the file appender with the specified name from the root logger.
      *
-     * @return true if state was changed, false if no such file appender exists and state was not changed.
+     * @return true if state was changed, false if no such file appender exists and in consequence, state was not
+     * changed.
      */
     public static boolean removeFileAppender(String name) {
 
@@ -238,10 +239,39 @@ public class Log4j {
 
         if (fa != null) {
 
-            throw new IllegalStateException("failed to remove appender " + fa);
+            throw new IllegalStateException("failed to remove file appender " + fa);
         }
 
         return true;
+    }
+
+    /**
+     * Removes the console appender with the specified name from the root logger.
+     *
+     * @return the console appender instance that was remove, or null if no such console appender exists and in
+     * consequence, state was not changed.
+     */
+    public static ConsoleAppender removeConsoleAppender(String name, String expectedTarget) {
+
+        ConsoleAppender original = getConsoleAppender(name, expectedTarget);
+
+        if (original == null) {
+
+            return null;
+        }
+
+        Logger rootLogger = getRootLogger();
+
+        rootLogger.removeAppender(original);
+
+        ConsoleAppender ca = getConsoleAppender(name, expectedTarget);
+
+        if (ca != null) {
+
+            throw new IllegalStateException("failed to remove console appender " + ca);
+        }
+
+        return original;
     }
 
     /**

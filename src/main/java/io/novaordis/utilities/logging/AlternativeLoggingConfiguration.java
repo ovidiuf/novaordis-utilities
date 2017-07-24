@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * A pattern that consists in applying alternative log4j configuration for applications that run in background.
- * The application rely on a base log4j configuration file, usually shipped as part of the application's installation
+ * The application relies on a base log4j configuration file, usually shipped as part of the application's installation
  * bundle, but it can change its logging behavior based on logging configuration present in the application's
  * configuration file. Configuration that comes from the application's configuration file takes priority over
  * configuration stored in log4j.xml.
@@ -47,7 +47,21 @@ public class AlternativeLoggingConfiguration {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    public static void apply(LoggingConfiguration c) throws IOException, LoggingConfigurationException {
+    /**
+     * Apply alternative log4j configuration. The application relies on a base log4j configuration file, usually shipped
+     * as part of the application's installation bundle. This method changes the application's logging behavior,
+     * superimposing log4j configuration provided as a LoggingConfiguration instance - usually read from an application
+     * specific configuration file. Configuration that comes from the LoggingConfiguration instance takes priority over
+     * configuration stored in log4j.xml.
+     *
+     * @param removeConsole because the application is supposed to run in background, the CONSOLE, if present in the
+     *                      log4j runtime state, may be removed, and it will be if this argument is true.
+     *
+     * @throws IOException
+     * @throws LoggingConfigurationException
+     */
+    public static void apply(LoggingConfiguration c, boolean removeConsole)
+            throws IOException, LoggingConfigurationException {
 
         log.debug("configuring alternative logging");
 
@@ -70,6 +84,16 @@ public class AlternativeLoggingConfiguration {
 
                 Log4j.removeFileAppender("FILE");
                 fileAppender = Log4j.addFileAppender("FILE", file, HARDCODED_FILE_LOGGING_PATTERN);
+            }
+
+            //
+            // if we have a file we want the output to go to, remove the console, because this pattern is supposed
+            // to be apply to background applications.
+            //
+
+            if (removeConsole) {
+
+                Log4j.removeConsoleAppender("CONSOLE", "System.out");
             }
         }
 
