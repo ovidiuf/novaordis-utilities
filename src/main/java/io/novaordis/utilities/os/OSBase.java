@@ -169,11 +169,13 @@ abstract class OSBase implements OS {
             //
 
             if (!stdoutStreamConsumer.waitForShutdown(2000L)) {
-                log.warn(stdoutStreamConsumer + " timed out waiting for the end of stream");
+
+                log.warn(stdoutStreamConsumer + " timed out waiting for the consumer thread to exit");
             }
 
             if (!stderrStreamConsumer.waitForShutdown(2000L)) {
-                log.warn(stderrStreamConsumer + " timed out waiting for the end of stream");
+
+                log.warn(stderrStreamConsumer + " timed out waiting for the consumer thread to exit");
             }
 
             String processStdoutContent = stdoutStreamConsumer.read();

@@ -255,22 +255,32 @@ public class StreamConsumer {
     }
 
     /**
-     * @return true if the consumer shut down in time (due to end of stream or forcible stop), false if timeout occured
+     * @return true if the consumer shut down in time (due to end of stream or forcible stop), false if timeout occurred
      */
     public boolean waitForShutdown(long timeoutMs) {
+
+        if (trace) { log.trace(this + " waiting for shutdown with a timeout of " + timeoutMs + " ms"); }
 
         while (true) {
 
             try {
 
-                log.debug("blocking to wait for the end of stream");
+                log.debug(this + " blocking to wait for the consumer thread exit as part of the shutdown sequence");
 
-                return consumerThreadStopped.await(timeoutMs, TimeUnit.MILLISECONDS);
+                boolean result = consumerThreadStopped.await(timeoutMs, TimeUnit.MILLISECONDS);
+
+                if (trace) {
+                    log.trace(this + ": " +
+                            (result ?
+                                    "notified of consumer thread exit" :
+                                    "timed out while waiting on consumer thread exit"));
+                }
+
+                return result;
             }
             catch (InterruptedException e) {
 
-                log.debug("interrupted while waiting for the end of stream, re-enlisting ...");
-
+                log.debug("interrupted while waiting for consumer thread exit, re-enlisting ...");
             }
         }
     }
@@ -363,7 +373,7 @@ public class StreamConsumer {
         finally {
 
             long latchValue = consumerThreadStopped.getCount();
-            log.debug("counting down latch from " + latchValue + " to " + (latchValue - 1));
+            log.debug(this + " counting down latch from " + latchValue + " to " + (latchValue - 1));
             consumerThreadStopped.countDown();
         }
     }
