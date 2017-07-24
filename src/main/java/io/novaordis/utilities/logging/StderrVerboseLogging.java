@@ -16,16 +16,10 @@
 
 package io.novaordis.utilities.logging;
 
-import org.apache.log4j.Appender;
+import io.novaordis.utilities.logging.log4j.Log4j;
+import io.novaordis.utilities.logging.log4j.Log4jLevel;
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Level;
-import org.apache.log4j.Priority;
-
-import java.util.Enumeration;
 
 /**
  * A pattern that consists in routing all log4j logging information to stderr if -v or --verbose command line options
@@ -64,63 +58,30 @@ public class StderrVerboseLogging {
      */
     public static void enable() {
 
-        Logger rootLogger = LogManager.getRootLogger();
+        Logger rootLogger = Log4j.getRootLogger();
 
         //
         // control logging level and add the appender, if necessary
         //
 
-        Level currentLevel = rootLogger.getLevel();
+        Log4j.setLevel(rootLogger, Log4jLevel.DEBUG);
+        setVerboseLoggingEnabled(true);
 
-        if (currentLevel.isGreaterOrEqual(Level.DEBUG)) {
+        ConsoleAppender ca = Log4j.getConsoleAppender(STDERR_CONSOLE_APPENDER_NAME, "System.err");
 
-            if (!currentLevel.equals(Level.DEBUG)) {
-
-                rootLogger.setLevel(Level.DEBUG);
-                setVerboseLoggingEnabled(true);
-            }
-        }
-
-        ConsoleAppender stderr = null;
-
-        for(Enumeration e = rootLogger.getAllAppenders(); e.hasMoreElements(); ) {
-
-            Appender a = (Appender)e.nextElement();
-
-            if (a instanceof ConsoleAppender) {
-
-                ConsoleAppender ca = (ConsoleAppender)a;
-
-                if (STDERR_CONSOLE_APPENDER_NAME.equals(ca.getName()) && "System.err".equals(ca.getTarget())) {
-
-                    stderr = ca;
-                }
-            }
-        }
-
-        if (stderr == null) {
+        if (ca == null) {
 
             //
-            // no such appender, create and add
+            // no such appender, create and add one
             //
 
-            Layout layout = new PatternLayout(DEFAULT_PATTERN);
-            stderr = new ConsoleAppender(layout, "System.err");
-            stderr.setName(STDERR_CONSOLE_APPENDER_NAME);
-            rootLogger.addAppender(stderr);
-
+            ca = Log4j.addConsoleAppender(STDERR_CONSOLE_APPENDER_NAME, "System.err", DEFAULT_PATTERN);
             setVerboseLoggingEnabled(true);
         }
 
-        Priority stderrPriority = stderr.getThreshold();
+        if (Log4j.setLevel(ca, Log4jLevel.DEBUG)) {
 
-        if (stderrPriority == null || stderrPriority.isGreaterOrEqual(Level.DEBUG)) {
-
-            if (!Level.DEBUG.equals(stderrPriority)) {
-
-                stderr.setThreshold(Level.DEBUG);
-                setVerboseLoggingEnabled(true);
-            }
+            setVerboseLoggingEnabled(true);
         }
     }
 

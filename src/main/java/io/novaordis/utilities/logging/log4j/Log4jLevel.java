@@ -16,7 +16,12 @@
 
 package io.novaordis.utilities.logging.log4j;
 
+import org.apache.log4j.Level;
+
 /**
+ * Comparable implementation: it is based on the idea that a verbose logging level is "greater" than a less verbose
+ * logging level. For example TRACE.compareTo(INFO) > 0, which is logically equivalent with TRACE > INFO.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 4/28/17
  */
@@ -56,6 +61,46 @@ public enum Log4jLevel {
     public String toLiteral() {
 
         return toString();
+    }
+
+    public Level getLog4jNativeLevel() {
+
+        if (this.equals(OFF)) {
+
+            return Level.OFF;
+        }
+        else if (this.equals(FATAL)) {
+
+            return Level.FATAL;
+        }
+        else if (this.equals(ERROR)) {
+
+            return Level.ERROR;
+        }
+        else if (this.equals(WARN)) {
+
+            return Level.WARN;
+        }
+        else if (this.equals(INFO)) {
+
+            return Level.INFO;
+        }
+        else if (this.equals(DEBUG)) {
+
+            return Level.DEBUG;
+        }
+        else if (this.equals(TRACE)) {
+
+            return Level.TRACE;
+        }
+        else if (this.equals(ALL)) {
+
+            return Level.ALL;
+        }
+        else {
+
+            throw new IllegalStateException("none of the known log4j levels");
+        }
     }
 
 }

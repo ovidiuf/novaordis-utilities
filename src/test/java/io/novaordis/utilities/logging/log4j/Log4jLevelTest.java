@@ -16,10 +16,12 @@
 
 package io.novaordis.utilities.logging.log4j;
 
+import org.apache.log4j.Level;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -105,6 +107,139 @@ public class Log4jLevelTest {
 
         assertNull(Log4jLevel.fromLiteral("invalid value"));
     }
+
+    // native ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void native_OFF() {
+
+        assertEquals(Level.OFF, Log4jLevel.OFF.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_FATAL() {
+
+        assertEquals(Level.FATAL, Log4jLevel.FATAL.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_ERROR() {
+
+        assertEquals(Level.ERROR, Log4jLevel.ERROR.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_WARN() {
+
+        assertEquals(Level.WARN, Log4jLevel.WARN.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_INFO() {
+
+        assertEquals(Level.INFO, Log4jLevel.INFO.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_DEBUG() {
+
+        assertEquals(Level.DEBUG, Log4jLevel.DEBUG.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_TRACE() {
+
+        assertEquals(Level.TRACE, Log4jLevel.TRACE.getLog4jNativeLevel());
+    }
+
+    @Test
+    public void native_ALL() {
+
+        assertEquals(Level.ALL, Log4jLevel.ALL.getLog4jNativeLevel());
+    }
+
+    // Comparable tests ------------------------------------------------------------------------------------------------
+
+    @Test
+    public void compareTo() throws Exception {
+
+        //
+        // a more verbose logging level is "greater" than a less verbose logging level
+        //
+
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.ALL) == 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.TRACE) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.DEBUG) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.INFO) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.WARN) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.ERROR) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.ALL.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.TRACE) == 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.DEBUG) > 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.INFO) > 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.WARN) > 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.ERROR) > 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.TRACE.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.DEBUG) == 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.INFO) > 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.WARN) > 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.ERROR) > 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.DEBUG.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.DEBUG) < 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.INFO) == 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.WARN) > 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.ERROR) > 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.INFO.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.DEBUG) < 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.INFO) < 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.WARN) == 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.ERROR) > 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.WARN.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.DEBUG) < 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.INFO) < 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.WARN) < 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.ERROR) == 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.FATAL) > 0);
+        assertTrue(Log4jLevel.ERROR.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.DEBUG) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.INFO) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.WARN) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.ERROR) < 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.FATAL) == 0);
+        assertTrue(Log4jLevel.FATAL.compareTo(Log4jLevel.OFF) > 0);
+
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.ALL) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.TRACE) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.DEBUG) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.INFO) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.WARN) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.ERROR) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.FATAL) < 0);
+        assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.OFF) == 0);
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 

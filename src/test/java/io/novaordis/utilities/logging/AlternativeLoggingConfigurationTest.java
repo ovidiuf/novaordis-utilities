@@ -16,21 +16,31 @@
 
 package io.novaordis.utilities.logging;
 
+import io.novaordis.utilities.Files;
+import io.novaordis.utilities.logging.log4j.Log4j;
+import io.novaordis.utilities.logging.log4j.Log4jLevel;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
- * A pattern that consists in applying alternative log4j configuration for applications that run in background.
- * The application rely on a base log4j configuration file, usually shipped as part of the application's installation
- * bundle, but it can change its logging behavior based on logging configuration present in the application's
- * configuration file. Configuration that comes from the application's configuration file takes priority over
- * configuration stored in log4j.xml.
- *
- * See https://kb.novaordis.com/index.php/Project_Alternative_log4j_Configuration#API
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 7/23/17
  */
 public class AlternativeLoggingConfigurationTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AlternativeLoggingConfigurationTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -41,6 +51,90 @@ public class AlternativeLoggingConfigurationTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // configureLogging() ----------------------------------------------------------------------------------------------
+
+    @Test
+    public void apply_Noop() throws Exception {
+
+        MockLoggingConfiguration mlc = new MockLoggingConfiguration();
+        assertNull(mlc.getFile());
+        assertTrue(mlc.getLoggerConfiguration().isEmpty());
+
+        AlternativeLoggingConfiguration.apply(mlc);
+    }
+
+    @Test
+    public void apply() throws Exception {
+
+        //noinspection ConstantConditions
+        String originalFile = Log4j.getFileAppender("FILE").getFile();
+
+        //
+        // we come up with random files and categories and we insure the logging infrastructure is configured
+        // to use those
+        //
+
+        MockLoggingConfiguration mlc = new MockLoggingConfiguration();
+
+        File f = new File(
+                System.getProperty("basedir"), "target/test-logging-" + UUID.randomUUID().toString() + ".log");
+
+        assertFalse(f.isFile());
+        mlc.setFile(f);
+
+        LoggerConfiguration c = new YamlLoggerConfiguration("test.logger.config.A", Log4jLevel.TRACE);
+        LoggerConfiguration c2 = new YamlLoggerConfiguration("test.logger.config.B", Log4jLevel.INFO);
+
+        mlc.setLoggerConfiguration(Arrays.asList(c, c2));
+
+        try {
+
+            AlternativeLoggingConfiguration.apply(mlc);
+
+            String randomString = UUID.randomUUID().toString();
+
+            Logger.getLogger("test.logger.config.A").trace(randomString);
+
+            String randomString2 = UUID.randomUUID().toString();
+
+            Logger.getLogger("test.logger.config.A").info(randomString2);
+
+            String randomString3 = UUID.randomUUID().toString();
+
+            Logger.getLogger("test.logger.config.B").trace(randomString3);
+
+            String randomString4 = UUID.randomUUID().toString();
+
+            Logger.getLogger("test.logger.config.B").error(randomString4);
+
+            //
+            // we should find randomString, randomString2 and randomString4 in the file
+            //
+
+            String content = Files.read(f);
+
+            assertTrue(content.contains(randomString));
+            assertTrue(content.contains(randomString2));
+            assertTrue(content.contains(randomString4));
+
+            assertFalse(content.contains(randomString3));
+
+        }
+        finally {
+
+            //
+            // cleanup, revert logging into the original file, with DEBUG level.
+            //
+
+            MockLoggingConfiguration cleanupMlc = new MockLoggingConfiguration();
+            cleanupMlc.setFile(new File(originalFile));
+            cleanupMlc.setLoggerConfiguration(Collections.singletonList(
+                    new YamlLoggerConfiguration("something", Log4jLevel.DEBUG)));
+            AlternativeLoggingConfiguration.apply(cleanupMlc);
+            log.info("restored");
+        }
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

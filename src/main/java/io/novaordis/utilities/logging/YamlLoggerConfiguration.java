@@ -53,6 +53,23 @@ public class YamlLoggerConfiguration implements LoggerConfiguration {
         parse(o);
     }
 
+    public YamlLoggerConfiguration(String name, Log4jLevel level) {
+
+        if (name == null) {
+
+            throw new IllegalArgumentException("null name");
+        }
+
+        if (level == null) {
+
+            throw new IllegalArgumentException("null level");
+        }
+
+        this.name = name;
+        this.level = level;
+    }
+
+
     // LoggerConfiguration implementation ------------------------------------------------------------------------------
 
     @Override
@@ -68,6 +85,15 @@ public class YamlLoggerConfiguration implements LoggerConfiguration {
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    @Override
+    public String toString() {
+
+        String s = name == null ? "UNINITIALIZED" : name;
+        s += ": ";
+        s += (level == null ? "UNINITIALIZED" : level.toString());
+        return s;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
