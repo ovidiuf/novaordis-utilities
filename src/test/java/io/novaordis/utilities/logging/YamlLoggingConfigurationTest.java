@@ -22,7 +22,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,24 +65,6 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
     }
 
     @Test
-    public void constructor_MissingTopLevelLoggingKey() throws Exception {
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("something", "something else");
-
-        try {
-
-            new YamlLoggingConfiguration(map);
-            fail("should have thrown exception");
-        }
-        catch(LoggingConfigurationException e) {
-
-            String msg = e.getMessage();
-            assertEquals("missing top level '" + YamlLoggingConfiguration.LOGGING_KEY + "' key", msg);
-        }
-    }
-
-    @Test
     public void constructor_Reference() throws Exception {
 
         File reference = new File(System.getProperty("basedir"),
@@ -94,7 +75,9 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
         Map m = (Map)yaml.load(fis);
         fis.close();
 
-        YamlLoggingConfiguration c = new YamlLoggingConfiguration(m);
+        Map loggingConfig = (Map)m.get(YamlLoggingConfiguration.LOGGING_KEY);
+
+        YamlLoggingConfiguration c = new YamlLoggingConfiguration(loggingConfig);
 
         File file = c.getFile();
         assertEquals(new File("/tmp/some-file.log"), file);
@@ -125,7 +108,9 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
 
         Map m2 = (Map)m.get("superstructure");
 
-        YamlLoggingConfiguration c = new YamlLoggingConfiguration(m2);
+        Map loggingConfig = (Map)m2.get(YamlLoggingConfiguration.LOGGING_KEY);
+
+        YamlLoggingConfiguration c = new YamlLoggingConfiguration(loggingConfig);
 
         File file = c.getFile();
         assertEquals(new File("/tmp/some-file.log"), file);
@@ -154,9 +139,11 @@ public class YamlLoggingConfigurationTest extends LoggingConfigurationTest {
         Map m = (Map)yaml.load(fis);
         fis.close();
 
+        Map loggingConfig = (Map)m.get(YamlLoggingConfiguration.LOGGING_KEY);
+
         try {
 
-            new YamlLoggingConfiguration(m);
+            new YamlLoggingConfiguration(loggingConfig);
             fail("should have thrown exception");
         }
         catch(LoggingConfigurationException e) {

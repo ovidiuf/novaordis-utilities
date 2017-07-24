@@ -48,8 +48,8 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
-     * @param loggingConfigurationMap the map extracted from the larger YAML configuration tree, which contains the
-     *                                LOGGING_KEY and the rest of the logging configuration.
+     * @param loggingConfigurationMap the value corresponding with the LOGGING_KEY in the larger YAML configuration
+     *                                tree. It is a map.
      *
      * @throws LoggingConfigurationException
      */
@@ -89,22 +89,7 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
 
     private void parse(Map loggingConfigurationMap) throws LoggingConfigurationException {
 
-        Object o = loggingConfigurationMap.get(LOGGING_KEY);
-
-        if (o == null) {
-
-            throw new LoggingConfigurationException("missing top level '" + LOGGING_KEY + "' key");
-        }
-
-        if (!(o instanceof Map)) {
-
-            throw new LoggingConfigurationException(
-                    "'" + LOGGING_KEY + "' must contain a Map, but it contains a " + o.getClass().getSimpleName());
-        }
-
-        Map m = (Map)o;
-
-        o = m.get(FILE_KEY);
+        Object o = loggingConfigurationMap.get(FILE_KEY);
 
         if (o != null) {
 
@@ -117,7 +102,7 @@ public class YamlLoggingConfiguration implements LoggingConfiguration {
             file = new File((String)o);
         }
 
-        o = m.get(LOGGERS_KEY);
+        o = loggingConfigurationMap.get(LOGGERS_KEY);
 
         if (o != null) {
 
