@@ -55,7 +55,7 @@ public class StreamConsumer {
     final private InputStream inputStream;
     private volatile boolean stopRequested;
 
-    private Thread readingThread;
+    private volatile Thread readingThread;
     final private ByteArrayOutputStream storage;
     private final CountDownLatch consumerThreadStopped;
 
@@ -204,6 +204,12 @@ public class StreamConsumer {
      * has no effect until the read completes.
      */
     public void stop() {
+
+        if (consumerThreadStopped.getCount() <= 0 || readingThread == null) {
+
+            log.debug(this + " already stopped");
+            return;
+        }
 
         log.debug("stop requested on " + this);
 
@@ -373,8 +379,18 @@ public class StreamConsumer {
         finally {
 
             long latchValue = consumerThreadStopped.getCount();
-            log.debug(this + " counting down latch from " + latchValue + " to " + (latchValue - 1));
+
+            if (trace) { log.trace(this + " counting down latch from " + latchValue + " to " + (latchValue - 1)); }
+
             consumerThreadStopped.countDown();
+
+            //
+            // we don't need the thread anymore and we want to prevent if from leaking, so we aggressively sever
+            // references
+            //
+
+            readingThread = null;
+
         }
     }
 

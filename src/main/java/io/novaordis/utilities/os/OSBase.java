@@ -129,6 +129,10 @@ abstract class OSBase implements OS {
 
         String[] commands = split(command);
 
+        StreamConsumer stdoutStreamConsumer = null;
+        StreamConsumer stderrStreamConsumer = null;
+        StreamProducer stdinStreamProducer = null;
+
         try {
 
             ProcessBuilder pb = new ProcessBuilder();
@@ -149,13 +153,13 @@ abstract class OSBase implements OS {
             // reading from stdin.
             //
 
-            StreamConsumer stdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream(), logStdoutContent);
-            StreamConsumer stderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream(), logStderrContent);
-            StreamProducer stdinStreamProducer = new StreamProducer(p.getOutputStream());
+            stdoutStreamConsumer = new StreamConsumer("stdout", p.getInputStream(), logStdoutContent);
+            stderrStreamConsumer = new StreamConsumer("stderr", p.getErrorStream(), logStderrContent);
+            //stdinStreamProducer = new StreamProducer(p.getOutputStream());
 
             stdoutStreamConsumer.start();
             stderrStreamConsumer.start();
-            stdinStreamProducer.start();
+            //stdinStreamProducer.start();
 
             //
             // now we can block, the streams will be consumed and the child process won't run out of space
@@ -196,6 +200,23 @@ abstract class OSBase implements OS {
         catch(Exception e) {
 
             throw new NativeExecutionException("failed to execute command \"" + command + "\"", e);
+        }
+        finally {
+
+            if (stdoutStreamConsumer != null) {
+
+                stdoutStreamConsumer.stop();
+            }
+
+            if (stderrStreamConsumer != null) {
+
+                stderrStreamConsumer.stop();
+            }
+
+//            if (stdinStreamProducer != null) {
+//
+//                stdinStreamProducer.stop();
+//            }
         }
     }
 
