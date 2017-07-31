@@ -45,8 +45,13 @@ public class InLineHelp {
     }
 
     /**
+     * Return in-line help text, if the corresponding file is found in the classpath, or throws exception the
+     * calling layer will have to handle.
+     *
      * @param applicationName optional, may be null. The human-readable application name, to create meaningful error
      *                        messages.
+     *
+     * @exception UserErrorException if the in-line help file is not found in the classpath.
      */
     public static String get(String applicationName) throws UserErrorException {
 
