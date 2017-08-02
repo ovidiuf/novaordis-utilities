@@ -42,6 +42,8 @@ public class StderrVerboseLogging {
 
     // Static ----------------------------------------------------------------------------------------------------------
 
+    private static String EFFECTIVE_PATTERN = DEFAULT_PATTERN;
+
     /**
      * Enables DEBUG level logging at stderr if the "verbose" system property is set to true.
      */
@@ -50,6 +52,11 @@ public class StderrVerboseLogging {
         if (Boolean.getBoolean(VERBOSE_SYSTEM_PROPERTY_NAME)) {
             enable();
         }
+    }
+
+    public static void setLoggingPattern(String s) {
+
+        EFFECTIVE_PATTERN = s;
     }
 
     /**
@@ -75,7 +82,7 @@ public class StderrVerboseLogging {
             // no such appender, create and add one
             //
 
-            ca = Log4j.addConsoleAppender(STDERR_CONSOLE_APPENDER_NAME, "System.err", DEFAULT_PATTERN);
+            ca = Log4j.addConsoleAppender(STDERR_CONSOLE_APPENDER_NAME, "System.err", EFFECTIVE_PATTERN);
             setVerboseLoggingEnabled(true);
         }
 
@@ -88,6 +95,11 @@ public class StderrVerboseLogging {
     public static boolean isEnabled() {
 
         return verboseLoggingEnabled;
+    }
+
+    public static String getLoggingPattern() {
+
+        return EFFECTIVE_PATTERN;
     }
 
     // Attributes ------------------------------------------------------------------------------------------------------

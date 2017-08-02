@@ -236,6 +236,23 @@ public class StderrVerboseLoggingTest {
         assertEquals(Level.DEBUG, c.getThreshold());
     }
 
+    @Test
+    public void setLoggingPattern() throws Exception {
+
+
+        String current = StderrVerboseLogging.getLoggingPattern();
+
+        try {
+
+            StderrVerboseLogging.setLoggingPattern("something");
+            assertEquals("something", StderrVerboseLogging.getLoggingPattern());
+        }
+        finally {
+
+            StderrVerboseLogging.setLoggingPattern(current);
+        }
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
