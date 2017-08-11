@@ -33,6 +33,9 @@ package io.novaordis.utilities.address;
  *
  * All implementations must correctly implement equals() and hashCode().
  *
+ * TODO: We currently rely on the fact that if two Addresses are equal(), their getLiteral() representation is also
+ *       equal() and vice-versa. Formalize and document this, add assertion testing.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
