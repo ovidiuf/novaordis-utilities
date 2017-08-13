@@ -338,13 +338,55 @@ public class AddressImplTest extends AddressTest {
     }
 
     @Test
-    public void nonEqualityWhenAnAddressHasANullProtocolAndTheOtherDoesNott() throws Exception {
+    public void nonEqualityWhenAnAddressHasANullProtocolAndTheOtherDoesNot() throws Exception {
 
         AddressImpl a = new AddressImpl("test://1.2.3.4");
         AddressImpl a2 = new AddressImpl("1.2.3.4");
 
         assertFalse(a.equals(a2));
         assertFalse(a2.equals(a));
+    }
+
+    /**
+     * A similar test can be added to other Address implementation.
+     */
+    @Test
+    public void equality_AddressEqualityMeansLiteralEquality() throws Exception {
+
+        String definition = "some-protocol://some-user@some-host:1000/";
+        String definition2 = "some-protocol://some-user:some-password@some-host:1000/";
+
+        AddressImpl a = new AddressImpl(definition);
+        AddressImpl a2 = new AddressImpl(definition2);
+
+        assertTrue(a.equals(a2));
+        assertTrue(a2.equals(a));
+
+        String literal = a.getLiteral();
+        String literal2 = a2.getLiteral();
+
+        assertTrue(literal.equals(literal2));
+    }
+
+    /**
+     * A similar test can be added to other Address implementation.
+     */
+    @Test
+    public void equality_AddressEqualityMeansLiteralEquality2() throws Exception {
+
+        String definition = "some-protocol://some-user@some-host:1000/";
+        String definition2 = "some-protocol://some-user:@some-host:1000";
+
+        AddressImpl a = new AddressImpl(definition);
+        AddressImpl a2 = new AddressImpl(definition2);
+
+        assertTrue(a.equals(a2));
+        assertTrue(a2.equals(a));
+
+        String literal = a.getLiteral();
+        String literal2 = a2.getLiteral();
+
+        assertTrue(literal.equals(literal2));
     }
 
     // hashCode() ------------------------------------------------------------------------------------------------------

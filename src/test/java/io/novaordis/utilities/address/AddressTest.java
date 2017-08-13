@@ -69,6 +69,10 @@ public abstract class AddressTest {
 
         assertTrue(a.equals(a2));
         assertTrue(a2.equals(a));
+
+        String literal = a.getLiteral();
+        String literal2 = a2.getLiteral();
+        assertEquals(literal, literal2);
     }
 
     @Test
