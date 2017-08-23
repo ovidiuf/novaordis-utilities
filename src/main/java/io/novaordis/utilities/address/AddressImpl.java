@@ -122,6 +122,11 @@ public class AddressImpl implements Address {
 
         String s = "";
 
+        if (protocol != null) {
+
+            s += protocol + PROTOCOL_SEPARATOR;
+        }
+
         if (username != null) {
 
             s += username + "@";

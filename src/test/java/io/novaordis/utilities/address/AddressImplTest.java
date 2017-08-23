@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -224,7 +225,7 @@ public class AddressImplTest extends AddressTest {
         assertEquals(2345, a.getPort().intValue());
         assertEquals("adminpasswd", new String(a.getPassword()));
         assertEquals("admin", a.getUsername());
-        assertEquals("admin@1.2.3.4:2345", a.getLiteral());
+        assertEquals("jmx://admin@1.2.3.4:2345", a.getLiteral());
     }
 
     @Test
@@ -276,7 +277,7 @@ public class AddressImplTest extends AddressTest {
         //
         // the trailing slash does not reflect in literal
         //
-        assertEquals("somehost:1234", a.getLiteral());
+        assertEquals("test://somehost:1234", a.getLiteral());
     }
 
     @Test
@@ -292,7 +293,7 @@ public class AddressImplTest extends AddressTest {
         //
         // the trailing slash does not reflect in literal
         //
-        assertEquals("somehost", a.getLiteral());
+        assertEquals("test://somehost", a.getLiteral());
 
     }
 
@@ -460,7 +461,7 @@ public class AddressImplTest extends AddressTest {
 
         AddressImpl a = new AddressImpl("test://someuser:somepasswd@testhost:1234");
         String literal = a.getLiteral();
-        assertEquals("someuser@testhost:1234", literal);
+        assertEquals("test://someuser@testhost:1234", literal);
     }
 
     @Test
@@ -468,7 +469,7 @@ public class AddressImplTest extends AddressTest {
 
         AddressImpl a = new AddressImpl("test://testhost:1234");
         String literal = a.getLiteral();
-        assertEquals("testhost:1234", literal);
+        assertEquals("test://testhost:1234", literal);
     }
 
     @Test
@@ -484,7 +485,7 @@ public class AddressImplTest extends AddressTest {
 
         AddressImpl a = new AddressImpl("test://someuser:somepasswd@testhost");
         String literal = a.getLiteral();
-        assertEquals("someuser@testhost", literal);
+        assertEquals("test://someuser@testhost", literal);
     }
 
     @Test
@@ -492,7 +493,7 @@ public class AddressImplTest extends AddressTest {
 
         AddressImpl a = new AddressImpl("test://testhost");
         String literal = a.getLiteral();
-        assertEquals("testhost", literal);
+        assertEquals("test://testhost", literal);
     }
 
     @Test
@@ -501,6 +502,44 @@ public class AddressImplTest extends AddressTest {
         AddressImpl a = new AddressImpl("testhost");
         String literal = a.getLiteral();
         assertEquals("testhost", literal);
+    }
+
+    @Test
+    public void getLiteral_Protocol() throws Exception {
+
+        AddressImpl a = new AddressImpl("someprotocol://someuser:somepassword@somehost:1000");
+        String literal = a.getLiteral();
+        assertEquals("someprotocol://someuser@somehost:1000", literal);
+    }
+
+    @Test
+    public void getLiteral_Equality_AllElements() throws Exception {
+
+        AddressImpl a = new AddressImpl("someprotocol://someuser:somepassword@somehost:1000");
+        AddressImpl a2 = new AddressImpl("someprotocol://someuser:somepassword@somehost:1000");
+
+        assertEquals(a, a2);
+        assertEquals(a2, a);
+
+        String literal = a.getLiteral();
+        String literal2 = a2.getLiteral();
+
+        assertEquals(literal, literal2);
+    }
+
+    @Test
+    public void getLiteral_NotEquality_AllElements() throws Exception {
+
+        AddressImpl a = new AddressImpl("someprotocol://someuser:somepassword@somehost:1000");
+        AddressImpl a2 = new AddressImpl("someprotocol2://someuser:somepassword@somehost:1000");
+
+        assertNotEquals(a, a2);
+        assertNotEquals(a2, a);
+
+        String literal = a.getLiteral();
+        String literal2 = a2.getLiteral();
+
+        assertNotEquals(literal, literal2);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
