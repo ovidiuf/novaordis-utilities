@@ -36,23 +36,28 @@ public class LineNumberException extends Exception {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public LineNumberException(String message) {
-        this(message, null, null, null);
+
+        this(null, null, message, null);
     }
 
     public LineNumberException(String message, Throwable cause) {
-        this(message, cause, null, null);
+
+        this(null, null, message, cause);
     }
 
-    public LineNumberException(String message, Long lineNumber) {
-        this(message, null, lineNumber, null);
+    public LineNumberException(Long lineNumber, String message) {
+
+        this(lineNumber, null, message, null);
     }
 
-    public LineNumberException(String message, Throwable cause, Long lineNumber) {
-        this(message, cause, lineNumber, null);
+    public LineNumberException(Long lineNumber, String message, Throwable cause) {
+
+        this(lineNumber, null, message, cause);
     }
 
-    public LineNumberException(String message, Long lineNumber, Integer positionInLine) {
-        this(message, null, lineNumber, positionInLine);
+    public LineNumberException(Long lineNumber, Integer positionInLine, String message) {
+
+        this(lineNumber, positionInLine, message, null);
     }
 
     /**
@@ -61,7 +66,8 @@ public class LineNumberException extends Exception {
      * @param positionInLine the position in line where the exception occurred. Null is acceptable if the position is
      *                       not known.
      */
-    public LineNumberException(String message, Throwable cause, Long lineNumber, Integer positionInLine) {
+    public LineNumberException(Long lineNumber, Integer positionInLine, String message, Throwable cause) {
+
         super(message, cause);
         this.lineNumber = lineNumber;
         this.positionInLine = positionInLine;

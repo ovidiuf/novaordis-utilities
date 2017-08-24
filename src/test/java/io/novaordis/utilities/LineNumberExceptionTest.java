@@ -43,7 +43,7 @@ public class LineNumberExceptionTest {
     public void constructor_NullLineNumber_NullPositionInLine() throws Exception {
 
         RuntimeException cause = new RuntimeException();
-        LineNumberException e = new LineNumberException("test", cause, null);
+        LineNumberException e = new LineNumberException(null, "test", cause);
         assertEquals("test", e.getMessage());
         assertEquals(cause, e.getCause());
         assertNull(e.getLineNumber());
@@ -56,7 +56,7 @@ public class LineNumberExceptionTest {
     public void constructor() throws Exception {
 
         RuntimeException cause = new RuntimeException();
-        LineNumberException e = new LineNumberException("test", cause, 10L, 15);
+        LineNumberException e = new LineNumberException(10L, 15, "test", cause);
         assertEquals("test", e.getMessage());
         assertEquals(cause, e.getCause());
         assertEquals(10L, e.getLineNumber().longValue());
@@ -82,7 +82,7 @@ public class LineNumberExceptionTest {
     @Test
     public void constructor4() throws Exception {
 
-        LineNumberException e = new LineNumberException("test", 10L);
+        LineNumberException e = new LineNumberException(10L, "test");
         assertEquals("test", e.getMessage());
         assertEquals(10L, e.getLineNumber().longValue());
     }
@@ -90,7 +90,7 @@ public class LineNumberExceptionTest {
     @Test
     public void constructor5() throws Exception {
 
-        LineNumberException e = new LineNumberException("test", 10L, 15);
+        LineNumberException e = new LineNumberException(10L, 15, "test");
         assertEquals("test", e.getMessage());
         assertEquals(10L, e.getLineNumber().longValue());
         assertEquals(15, e.getPositionInLine().intValue());
@@ -102,7 +102,7 @@ public class LineNumberExceptionTest {
     @Test
     public void toLogFormat() throws Exception {
 
-        LineNumberException e = new LineNumberException("some message", 10L, 15);
+        LineNumberException e = new LineNumberException(10L, 15, "some message");
         String expected = "line 10, position 15: some message";
         assertEquals(expected, e.toLogFormat());
     }
