@@ -35,7 +35,7 @@ public class InLineHelp {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    public static String HELP_FILE_NAME="help.txt";
+    private static final String HELP_FILE_NAME = "help.txt";
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -44,22 +44,29 @@ public class InLineHelp {
         return get(null);
     }
 
+    public static String get(String applicationName) throws UserErrorException {
+
+        return get(applicationName, HELP_FILE_NAME);
+    }
+
     /**
      * Return in-line help text, if the corresponding file is found in the classpath, or throws exception the
      * calling layer will have to handle.
      *
      * @param applicationName optional, may be null. The human-readable application name, to create meaningful error
      *                        messages.
+     * @param helpFileName the name of the file, expected to be available on the classpath, that contains the help
+     *                     content.
      *
      * @exception UserErrorException if the in-line help file is not found in the classpath.
      */
-    public static String get(String applicationName) throws UserErrorException {
+    public static String get(String applicationName, String helpFileName) throws UserErrorException {
 
-        InputStream is = InLineHelp.class.getClassLoader().getResourceAsStream(HELP_FILE_NAME);
+        InputStream is = InLineHelp.class.getClassLoader().getResourceAsStream(helpFileName);
 
         if (is == null) {
 
-            String msg = "no " + HELP_FILE_NAME + " file found on the classpath; this usually means that ";
+            String msg = "no " + helpFileName + " file found on the classpath; this usually means that ";
             msg += applicationName == null ? "the application" : applicationName;
             msg += " was not built or installed correctly";
 
@@ -109,11 +116,6 @@ public class InLineHelp {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Static package protected ----------------------------------------------------------------------------------------
-
-    static void setHelpFileName(String s) {
-
-        HELP_FILE_NAME = s;
-    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

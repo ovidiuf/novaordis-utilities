@@ -19,7 +19,6 @@ package io.novaordis.utilities.help;
 import io.novaordis.utilities.UserErrorException;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -42,14 +41,28 @@ public class InLineHelpTest {
     // Tests -----------------------------------------------------------------------------------------------------------
 
     @Test
-    public void get_NoHelpFile() throws Exception {
-
-        String defaultHelpFileName = InLineHelp.HELP_FILE_NAME;
+    public void get_NoHelpFile_ApplicationNameSpecified() throws Exception {
 
         try {
 
-            InLineHelp.setHelpFileName("i-am-sure-there-is-no-such-file-on-classpath.txt");
-            InLineHelp.get();
+            InLineHelp.get("something", "i-am-sure-there-is-no-such-file-on-classpath.txt");
+            fail("should have thrown exception");
+        }
+        catch(UserErrorException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.matches("^no.*file found on the classpath.*"));
+            assertTrue(msg.contains("i-am-sure-there-is-no-such-file-on-classpath.txt"));
+            assertTrue(msg.contains("something"));
+        }
+    }
+
+    @Test
+    public void get_NoHelpFile_ApplicationNameNotSpecified() throws Exception {
+
+        try {
+
+            InLineHelp.get(null, "i-am-sure-there-is-no-such-file-on-classpath.txt");
             fail("should have thrown exception");
         }
         catch(UserErrorException e) {
@@ -59,28 +72,22 @@ public class InLineHelpTest {
             assertTrue(msg.contains("i-am-sure-there-is-no-such-file-on-classpath.txt"));
             assertTrue(msg.contains("application"));
         }
-        finally {
-
-            InLineHelp.setHelpFileName(defaultHelpFileName);
-        }
     }
 
     @Test
     public void get() throws Exception {
 
-        String defaultHelpFileName = InLineHelp.HELP_FILE_NAME;
-
-        try {
-
-            InLineHelp.setHelpFileName("test-help.txt");
-            String content = InLineHelp.get();
-            assertTrue(content.contains("This is test in-line help."));
-        }
-        finally {
-
-            InLineHelp.setHelpFileName(defaultHelpFileName);
-        }
+        String content = InLineHelp.get("something", "test-help.txt");
+        assertTrue(content.contains("This is test in-line help."));
     }
+
+    @Test
+    public void get_DefaultHelpFileName() throws Exception {
+
+        String content = InLineHelp.get("something");
+        assertTrue(content.contains("synthetic help in help.txt"));
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 
