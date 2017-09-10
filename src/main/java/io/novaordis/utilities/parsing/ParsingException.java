@@ -37,7 +37,12 @@ public class ParsingException extends LineNumberException {
 
     public ParsingException(String message) {
 
-        super(message);
+        this(null, null, message, null);
+    }
+
+    public ParsingException(Throwable cause) {
+
+        this(null, null, null, cause);
     }
 
     public ParsingException(String message, Throwable cause) {

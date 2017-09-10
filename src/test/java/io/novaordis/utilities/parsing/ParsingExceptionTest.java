@@ -19,6 +19,7 @@ package io.novaordis.utilities.parsing;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -47,6 +48,17 @@ public class ParsingExceptionTest {
         assertEquals(cause, e.getCause());
         assertEquals(10L, e.getLineNumber().longValue());
         assertEquals(11, e.getPositionInLine().intValue());
+    }
+
+    @Test
+    public void constructor2() throws Exception {
+
+        RuntimeException cause = new RuntimeException();
+        ParsingException e = new ParsingException(cause);
+        assertNull(e.getMessage());
+        assertEquals(cause, e.getCause());
+        assertNull(e.getLineNumber());
+        assertNull(e.getPositionInLine());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
