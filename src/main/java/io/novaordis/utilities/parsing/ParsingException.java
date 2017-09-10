@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+package io.novaordis.utilities.parsing;
 
 /**
+ * A parsing exception. Provides line number and position in line information related to where the parsing error
+ * occurred.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 2/14/17
  */
-public class ParsingExceptionTest {
+public class ParsingException extends LineNumberException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -36,17 +35,39 @@ public class ParsingExceptionTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Tests -----------------------------------------------------------------------------------------------------------
+    public ParsingException(String message) {
 
-    @Test
-    public void constructor() throws Exception {
+        super(message);
+    }
 
-        RuntimeException cause = new RuntimeException();
-        ParsingException e = new ParsingException(10L, 11, "test", cause);
-        assertEquals("test", e.getMessage());
-        assertEquals(cause, e.getCause());
-        assertEquals(10L, e.getLineNumber().longValue());
-        assertEquals(11, e.getPositionInLine().intValue());
+    public ParsingException(String message, Throwable cause) {
+
+        super(message, cause);
+    }
+
+    public ParsingException(Long lineNumber, String message) {
+
+        super(lineNumber, null, message, null);
+    }
+
+    public ParsingException(Long lineNumber, Throwable cause) {
+
+        super(lineNumber, null, null, cause);
+    }
+
+    public ParsingException(Long lineNumber, String message, Throwable cause) {
+
+        super(lineNumber, null, message, cause);
+    }
+
+    public ParsingException(Long lineNumber, Integer positionInLine, String message) {
+
+        super(lineNumber, positionInLine, message, null);
+    }
+
+    public ParsingException(Long lineNumber, Integer positionInLine, String message, Throwable cause) {
+
+        super(lineNumber, positionInLine, message, cause);
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
+package io.novaordis.utilities.parsing;
 
 /**
  * An exception that carries a line number, as well as a position in line. Useful for parsing errors.

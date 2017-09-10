@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities;
+package io.novaordis.utilities.parsing;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * A parsing exception. Provides line number and position in line information related to where the parsing error
- * occurred.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 2/14/17
  */
-public class ParsingException extends LineNumberException {
+public class ParsingExceptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -35,39 +36,17 @@ public class ParsingException extends LineNumberException {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public ParsingException(String message) {
+    // Tests -----------------------------------------------------------------------------------------------------------
 
-        super(message);
-    }
+    @Test
+    public void constructor() throws Exception {
 
-    public ParsingException(String message, Throwable cause) {
-
-        super(message, cause);
-    }
-
-    public ParsingException(Long lineNumber, String message) {
-
-        super(lineNumber, null, message, null);
-    }
-
-    public ParsingException(Long lineNumber, Throwable cause) {
-
-        super(lineNumber, null, null, cause);
-    }
-
-    public ParsingException(Long lineNumber, String message, Throwable cause) {
-
-        super(lineNumber, null, message, cause);
-    }
-
-    public ParsingException(Long lineNumber, Integer positionInLine, String message) {
-
-        super(lineNumber, positionInLine, message, null);
-    }
-
-    public ParsingException(Long lineNumber, Integer positionInLine, String message, Throwable cause) {
-
-        super(lineNumber, positionInLine, message, cause);
+        RuntimeException cause = new RuntimeException();
+        ParsingException e = new ParsingException(10L, 11, "test", cause);
+        assertEquals("test", e.getMessage());
+        assertEquals(cause, e.getCause());
+        assertEquals(10L, e.getLineNumber().longValue());
+        assertEquals(11, e.getPositionInLine().intValue());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
