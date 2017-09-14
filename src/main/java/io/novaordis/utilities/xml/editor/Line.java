@@ -83,7 +83,7 @@ public class Line {
     /**
      * @return direct access to the underlying char[] storage, for efficiency reasons. If the line ended with a
      * terminator in the original source ('\n' or '\r\n'), the terminator is also part of the returned char[]. If you
-     * need only the string, without the terminator, use getValue()
+     * need only the string, without the terminator, use get()
      *
      * @see Line#getValue();
      */
