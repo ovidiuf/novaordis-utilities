@@ -17,9 +17,11 @@
 package io.novaordis.utilities.variable2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
@@ -31,8 +33,8 @@ public class ScopeImpl implements Scope {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    // variable declarations - these instances are never exposes, only copies; they are maintain in the order of
-    // the declaration
+    // variable declarations in this scope - these instances are never exposes, only copies; they are maintain in the
+    // order of the declaration
     private List<Variable> declarations;
 
     //
@@ -92,10 +94,24 @@ public class ScopeImpl implements Scope {
         return v;
     }
 
-//    @Override
-//    public List<Variable> getDeclaredVariables() {
-//        throw new RuntimeException("getDeclaredVariables() NOT YET IMPLEMENTED");
-//    }
+    @Override
+    public List<Variable> getVariablesDeclaredInScope() {
+
+        if (declarations.isEmpty()) {
+
+            return Collections.emptyList();
+        }
+
+        List<Variable> result = new ArrayList<>();
+
+        //noinspection Convert2streamapi
+        for(Variable d: declarations) {
+
+            result.add(((VariableBase)d).copy());
+        }
+
+        return result;
+    }
 
     @Override
     public Variable getVariable(String name) {

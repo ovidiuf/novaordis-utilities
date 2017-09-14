@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.variable2;
 
+import java.util.List;
+
 /**
  * A scope for variables. All scopes are hierarchical by default, they may have zero or one parents.
  *
@@ -52,6 +54,12 @@ public interface Scope {
      * @exception IllegalTypeException if variable of the specified type are not supported.
      */
     <T> Variable<T> declare(String name, Class<? extends T> type, T value);
+
+    /**
+     * @return the list of variables declared in <b>this</b> scope, in the order in which they were declared. Note that
+     * variables declared in enclosing scopes are not returned by this method, even if they are visible in scope.
+     */
+    List<Variable> getVariablesDeclaredInScope();
 
     /**
      * @return a variable declared in this scope, or within the closest enclosing scope in which the variable was

@@ -18,6 +18,8 @@ package io.novaordis.utilities.variable2;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -449,6 +451,116 @@ public abstract class ScopeTest {
         assertEquals("gobbledygook", result);
     }
 
+    // getVariablesDeclaredInScope() -----------------------------------------------------------------------------------
+
+    @Test
+    public void getVariablesDeclaredInScope_NoVariables() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        List<Variable> declaredInScope = scope.getVariablesDeclaredInScope();
+
+        assertTrue(declaredInScope.isEmpty());
+    }
+
+    @Test
+    public void getVariablesDeclaredInScope() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        scope.declare("z", String.class);
+
+        List<Variable> declaredInScope = scope.getVariablesDeclaredInScope();
+
+        assertEquals(1, declaredInScope.size());
+
+        Variable v = declaredInScope.get(0);
+
+        assertEquals("z", v.name());
+        assertNull(v.get());
+
+        //
+        // make sure a copy was returned, not the variable itself
+        //
+
+        //noinspection unchecked
+        v.set("dirty");
+        assertEquals("dirty", v.get());
+
+        List<Variable> declaredInScope2 = scope.getVariablesDeclaredInScope();
+
+        Variable v2 = declaredInScope2.get(0);
+
+        assertEquals("z", v2.name());
+        assertNull(v2.get());
+
+        //
+        // declare another variable
+        //
+
+        scope.declare("a", String.class);
+
+        List<Variable> declaredInScope3 = scope.getVariablesDeclaredInScope();
+
+        assertEquals(2, declaredInScope3.size());
+
+        Variable v3 = declaredInScope3.get(0);
+        assertEquals("z", v3.name());
+        assertNull(v3.get());
+
+        Variable v4 = declaredInScope3.get(1);
+        assertEquals("a", v4.name());
+        assertNull(v4.get());
+
+        //
+        // make sure a copy was returned, not the variable itself
+        //
+
+        //noinspection unchecked
+        v3.set("dirty");
+        assertEquals("dirty", v3.get());
+
+        //noinspection unchecked
+        v4.set("dirty");
+        assertEquals("dirty", v4.get());
+
+        List<Variable> declaredInScope4 = scope.getVariablesDeclaredInScope();
+
+        assertEquals(2, declaredInScope4.size());
+
+        Variable v5 = declaredInScope4.get(0);
+        assertEquals("z", v5.name());
+        assertNull(v5.get());
+
+        Variable v6 = declaredInScope4.get(1);
+        assertEquals("a", v6.name());
+        assertNull(v6.get());
+    }
+
+    @Test
+    public void getVariablesDeclaredInScope_EnclosingScopesAreNotVisibleToThisMethod() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        Scope enclosing = getScopeToTest();
+
+        enclosing.enclose(scope);
+
+        enclosing.declare("color", String.class, "blue");
+
+        assertTrue(scope.getVariablesDeclaredInScope().isEmpty());
+
+        assertEquals("blue", scope.getVariable("color").get());
+
+        List<Variable> declaredInScope = enclosing.getVariablesDeclaredInScope();
+
+        assertEquals(1, declaredInScope.size());
+
+        Variable v = declaredInScope.get(0);
+
+        assertEquals("color", v.name());
+        assertEquals("blue", v.get());
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
