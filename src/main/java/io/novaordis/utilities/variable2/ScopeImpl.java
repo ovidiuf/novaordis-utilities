@@ -23,7 +23,7 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-class ScopeImpl implements Scope {
+public class ScopeImpl implements Scope {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
