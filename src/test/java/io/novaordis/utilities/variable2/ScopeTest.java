@@ -162,6 +162,23 @@ public abstract class ScopeTest {
         assertEquals("something", variableInBottomMost.get());
     }
 
+    @Test
+    public void visibility2() throws Exception {
+
+        Scope upper = new ScopeImpl();
+        Scope intermediate = new ScopeImpl();
+        Scope lower = new ScopeImpl();
+
+        upper.enclose(intermediate);
+        intermediate.enclose(lower);
+
+        intermediate.declare("color", String.class, "blue");
+
+        assertNull(upper.getVariable("color"));
+        assertEquals("blue", intermediate.getVariable("color").get());
+        assertEquals("blue", lower.getVariable("color").get());
+    }
+
     // getVariable() ---------------------------------------------------------------------------------------------------
 
     @Test
