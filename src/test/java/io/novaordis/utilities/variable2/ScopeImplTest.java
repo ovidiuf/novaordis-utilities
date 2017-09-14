@@ -16,6 +16,11 @@
 
 package io.novaordis.utilities.variable2;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
@@ -33,6 +38,60 @@ public class ScopeImplTest extends ScopeTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // toStringValue() -------------------------------------------------------------------------------------------------
+
+    @Test
+    public void toStringValue_VariableDoesNotExistInScope_UseBraces() throws Exception {
+
+        ScopeImpl s = new ScopeImpl();
+
+        String result = s.toStringValue("no-such-var", true);
+
+        assertEquals("${no-such-var}", result);
+    }
+
+    @Test
+    public void toStringValue_VariableDoesNotExistInScope_DoNotUseBraces() throws Exception {
+
+        ScopeImpl s = new ScopeImpl();
+
+        String result = s.toStringValue("no-such-var", false);
+
+        assertEquals("$no-such-var", result);
+    }
+
+    @Test
+    public void toStringValue_VariableExistsButItHasNullValue() throws Exception {
+
+        ScopeImpl s = new ScopeImpl();
+        s.declare("a", String.class);
+        assertNull(s.getVariable("a").get());
+
+        String result = s.toStringValue("a", true);
+
+        assertEquals("", result);
+
+        String result2 = s.toStringValue("a", false);
+
+        assertEquals("", result2);
+    }
+
+    @Test
+    public void toStringValue_VariableExistsAndItHasNullNonValue() throws Exception {
+
+
+        ScopeImpl s = new ScopeImpl();
+        s.declare("a", String.class, "b");
+
+        String result = s.toStringValue("a", true);
+
+        assertEquals("b", result);
+
+        String result2 = s.toStringValue("a", false);
+
+        assertEquals("b", result2);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

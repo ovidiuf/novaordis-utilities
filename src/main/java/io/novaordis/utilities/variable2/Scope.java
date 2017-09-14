@@ -53,37 +53,23 @@ public interface Scope {
      */
     <T> Variable<T> declare(String name, Class<? extends T> type, T value);
 
-//    /**
-//     * TODO uncomment and implement if needed
-//     *
-//     * @return the variables declared in scope, in the order in which they were declared.
-//     */
-//    List<Variable> getDeclaredVariables();
-
     /**
      * @return a variable declared in this scope, or within the closest enclosing scope in which the variable was
-     * declared, that matches the name.
-     *
-     *
-     *
-     *
-     *
-     * If the variable was not declared in scope, the method
-     * will return null. If the variable was declared, but it has a null value, getVariable() will return a non-null
-     * instance with a null value.
+     * declared, that matches the name. If the variable was not declared in scope, the method will return null. If the
+     * variable was declared, but it has a null value, getVariable() will return a non-null instance with a null value.
      */
     Variable getVariable(String name);
-
-//    /**
-//     * TODO uncomment and implement if needed
-//     *
-//     * @return the parent scope. May return null if this is the top-most scope.
-//     */
-//    Scope getParent();
 
     /**
      * Declare an enclosed scope.
      */
     void enclose(Scope scope);
+
+    /**
+     * Resolves variables and evaluates expressions.
+     *
+     * @exception IllegalNameException if the variable name references are not valid variable names.
+     */
+    String evaluate(String stringContainingVariables);
 
 }

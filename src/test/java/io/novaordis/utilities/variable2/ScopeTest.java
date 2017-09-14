@@ -21,6 +21,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -240,6 +241,214 @@ public abstract class ScopeTest {
         assertNotNull(v2);
         assertEquals("something", v2.get());
     }
+
+    @Test
+    public void getVariable_NullValue() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("test", String.class);
+
+        Variable v = scope.getVariable("test");
+        assertNotNull(v);
+        assertNull(v.get());
+        assertEquals("test", v.name());
+    }
+
+    // evaluate() ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void evaluate_NoVariables() throws Exception {
+
+        Scope scope = getScopeToTest();
+        String result = scope.evaluate("gobbledygook");
+        assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_CompleteDeclaration_VariableDefinedAndNonNull() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("b", String.class, "x");
+
+        String result = scope.evaluate("a${b}c");
+
+        assertEquals("axc", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_CompleteDeclaration_VariableDefinedButNull() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("b", String.class);
+
+        String result = scope.evaluate("a${b}c");
+
+        assertEquals("ac", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_CompleteDeclaration_VariableNotDefined() throws Exception {
+
+        Scope scope = getScopeToTest();
+        assertNull(scope.getVariable("b"));
+
+        String result = scope.evaluate("a${b}c");
+
+        assertEquals("a${b}c", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_SimpleDeclaration_VariableDefinedAndNonNull() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("b", String.class, "x");
+
+        String result = scope.evaluate("a$b");
+
+        assertEquals("ax", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_SimpleDeclaration_VariableDefinedButNull() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("b", String.class);
+
+        String result = scope.evaluate("a$b");
+
+        assertEquals("a", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_SimpleDeclaration_VariableNotDefined() throws Exception {
+
+        Scope scope = getScopeToTest();
+        assertNull(scope.getVariable("b"));
+
+        String result = scope.evaluate("a$b");
+
+        assertEquals("a$b", result);
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_UnbalancedClosingBrace() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate("$b}");
+            fail("Should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced closing }"));
+        }
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_UnbalancedClosingBrace2() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate("$b}c");
+            fail("Should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced closing }"));
+        }
+    }
+
+    @Test
+    public void evaluate_VariableNameParsing_UnbalancedClosingBrace3() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate("$b} ");
+            fail("Should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced closing }"));
+        }
+    }
+
+    @Test
+    public void evaluate_VariableCannotBeResolved() throws Exception {
+
+        Scope scope = getScopeToTest();
+        String result = scope.evaluate("gobble${dy}gook");
+        assertEquals("gobble${dy}gook", result);
+    }
+
+    @Test
+    public void evaluate_VariableCannotBeResolved_TwoVariables() throws Exception {
+
+        Scope scope = getScopeToTest();
+        String result = scope.evaluate("gobble${dy}go${ok}");
+        assertEquals("gobble${dy}go${ok}", result);
+    }
+
+    @Test
+    public void evaluate_SimpleVariableReplacement() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("a", String.class, "gook");
+        String result = scope.evaluate("gobbledy${a}");
+        assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void evaluate_SimpleVariableReplacement2() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("a", String.class, "gobble");
+        String result = scope.evaluate("${a}dygook");
+        assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void evaluate_SimpleVariableReplacement3() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("a", String.class, "gobbledygook");
+        String result = scope.evaluate("${a}");
+        assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void evaluate_SimpleVariableReplacement4() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("a", String.class, "bbledygo");
+        String result = scope.evaluate("go${a}ok");
+        assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void evaluate_MultipleVariableReplacement() throws Exception {
+
+        Scope scope = getScopeToTest();
+        scope.declare("b", String.class, "b");
+        scope.declare("d", String.class, "d");
+        scope.declare("e", String.class, "e");
+        scope.declare("g", String.class, "g");
+        scope.declare("k", String.class, "k");
+        scope.declare("l", String.class, "l");
+        scope.declare("o", String.class, "o");
+        scope.declare("y", String.class, "y");
+        String result = scope.evaluate("${g}${o}${b}${b}${l}${e}${d}${y}${g}${o}${o}${k}");
+        assertEquals("gobbledygook", result);
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 

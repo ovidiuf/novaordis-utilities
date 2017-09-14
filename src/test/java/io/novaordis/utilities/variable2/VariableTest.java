@@ -167,6 +167,25 @@ public abstract class VariableTest {
         assertEquals(type, v.type());
     }
 
+    // validVariableNameChar() -----------------------------------------------------------------------------------------
+
+    @Test
+    public void validVariableNameChar() throws Exception {
+
+        assertTrue(Variable.validVariableNameChar('a'));
+        assertTrue(Variable.validVariableNameChar('b'));
+        assertTrue(Variable.validVariableNameChar('x'));
+        assertTrue(Variable.validVariableNameChar('z'));
+        assertTrue(Variable.validVariableNameChar('A'));
+        assertTrue(Variable.validVariableNameChar('B'));
+        assertTrue(Variable.validVariableNameChar('X'));
+        assertTrue(Variable.validVariableNameChar('Z'));
+        assertTrue(Variable.validVariableNameChar('0'));
+        assertTrue(Variable.validVariableNameChar('9'));
+        assertTrue(Variable.validVariableNameChar('-'));
+        assertTrue(Variable.validVariableNameChar('_'));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

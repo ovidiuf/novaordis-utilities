@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.variable2;
 
+import java.util.regex.Pattern;
+
 /**
  * A scoped, typed and named placeholder for values. Variable instances can only be created by declaring them in a
  * scope, with Scope.declare(). Once declared in a scope, the variable is available to all enclosed scopes.The same
@@ -30,7 +32,54 @@ public interface Variable<T> {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
+    String VARIABLE_NAME_PATTERN_STRING = "[a-zA-z][a-zA-z0-9_\\-]*";
+
+    Pattern VARIABLE_NAME_PATTERN = Pattern.compile("^" + VARIABLE_NAME_PATTERN_STRING + "$");
+
+    String[] RESERVED_NAMES = {
+
+            "null"
+    };
+
     // Static ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * @return the valid variable name.
+     *
+     * @throws IllegalNameException in case of illegal variable name. The message contains the variable name.
+     */
+    static String validateVariableName(String s) {
+
+        if (s == null) {
+
+            throw new IllegalNameException("null");
+        }
+
+        if (!VARIABLE_NAME_PATTERN.matcher(s).matches()) {
+
+            throw new IllegalNameException(s);
+        }
+
+        for(String rv: RESERVED_NAMES){
+
+            if (rv.equals(s)) {
+
+                throw new IllegalNameException("reserved name: '" + s + "'");
+            }
+        }
+
+        return s;
+    }
+
+    static boolean validVariableNameChar(char c) {
+
+        return
+                ((int)'a' <= c && c <= (int)'z') ||
+                        ((int)'A' <= c && c <= (int)'Z') ||
+                        ((int)'0' <= c && c <= (int)'9') ||
+                        c == '-' ||
+                        c == '_';
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 

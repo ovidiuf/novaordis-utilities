@@ -126,6 +126,95 @@ public class ScopeImpl implements Scope {
         ((ScopeImpl)scope).setParent(this);
     }
 
+    @Override
+    public String evaluate(String stringContainingVariables) {
+
+        StringBuilder sb = new StringBuilder();
+
+        int from = 0;
+        int to = 0;
+
+        boolean expectingOptionalLeftBrace = false;
+        boolean optionalLeftBraceFound = false;
+        String variableName = null;
+
+        for(; to < stringContainingVariables.length(); to ++) {
+
+            char c = stringContainingVariables.charAt(to);
+
+            if (expectingOptionalLeftBrace) {
+
+                from = to;
+                variableName = "";
+                expectingOptionalLeftBrace = false;
+
+                if ('{' == c) {
+
+                    optionalLeftBraceFound = true;
+
+                    continue;
+                }
+            }
+
+            if (variableName != null) {
+
+                if (Variable.validVariableNameChar(c)) {
+
+                    variableName += c;
+                }
+                else {
+
+                    //
+                    // end of variable name
+                    //
+
+                    if (c == '}') {
+
+                        if (!optionalLeftBraceFound) {
+
+                            throw new IllegalReferenceException("unbalanced closing }");
+                        }
+
+                        from = to + 1;
+                    }
+                    else {
+
+                        from = to;
+                    }
+
+                    variableName = Variable.validateVariableName(variableName);
+                    String s = toStringValue(variableName, optionalLeftBraceFound);
+                    sb.append(s);
+                    variableName = null;
+                }
+            }
+            else if ('$' == c) {
+
+                //
+                // variable detected
+                //
+
+                sb.append(stringContainingVariables.substring(from, to));
+                expectingOptionalLeftBrace = true;
+            }
+        }
+
+        if (variableName != null) {
+
+            //
+            // the string ends with a variable name declared with simplified notation
+            //
+
+            sb.append(toStringValue(variableName, optionalLeftBraceFound));
+        }
+        else {
+
+            sb.append(stringContainingVariables.substring(from, to));
+        }
+
+        return sb.toString();
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -135,6 +224,54 @@ public class ScopeImpl implements Scope {
     void setParent(Scope parent) {
 
         this.parent = parent;
+    }
+
+    /**
+     * @param  useBraces if the variable is not declared in scope, the string representation is the variable reference
+     *                   which is rendered surrounded by braces or not, depending the value of this flag.
+     * @return the string value of a variable whose name was specified.
+     */
+    String toStringValue(String variableName, boolean useBraces) {
+
+        String s;
+
+        Variable v = getVariable(variableName);
+
+        if (v == null) {
+
+            if (useBraces) {
+
+                s = "${";
+            }
+            else {
+
+                s = "$";
+            }
+
+            s += variableName;
+
+            if (useBraces) {
+
+                s += "}";
+            }
+        }
+        else {
+
+            Object value = v.get();
+
+            //
+            // null value translates to empty space
+            //
+
+            if (value == null) {
+
+                value = "";
+            }
+
+            s = value.toString();
+        }
+
+        return s;
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

@@ -16,8 +16,6 @@
 
 package io.novaordis.utilities.variable2;
 
-import java.util.regex.Pattern;
-
 /**
  * Basic variable implementation. It keeps track of the scopes it was declared in.
  *
@@ -27,13 +25,6 @@ import java.util.regex.Pattern;
 abstract class VariableBase<T> implements Variable<T>, Cloneable {
 
     // Constants -------------------------------------------------------------------------------------------------------
-
-    public static final Pattern VARIABLE_NAME_PATTERN = Pattern.compile("^[a-zA-z][a-zA-z0-9_\\-]*$");
-
-    public static final String[] RESERVED_NAMES = {
-
-            "null"
-    };
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -50,25 +41,7 @@ abstract class VariableBase<T> implements Variable<T>, Cloneable {
      */
     VariableBase(String name) {
 
-        if (name == null) {
-
-            throw new IllegalNameException("null");
-        }
-
-        if (!VARIABLE_NAME_PATTERN.matcher(name).matches()) {
-
-            throw new IllegalNameException(name);
-        }
-
-        for(String s: RESERVED_NAMES){
-
-            if (name.equals(s)) {
-
-                throw new IllegalNameException("reserved name: '" + name + "'");
-            }
-        }
-
-        setName(name);
+        setName(Variable.validateVariableName(name));
     }
 
     // Variable implementation -----------------------------------------------------------------------------------------
