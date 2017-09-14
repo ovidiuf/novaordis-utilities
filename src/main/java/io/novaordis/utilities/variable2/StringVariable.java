@@ -20,7 +20,7 @@ package io.novaordis.utilities.variable2;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-class StringVariable extends VariableBase {
+public class StringVariable extends VariableBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
