@@ -92,15 +92,10 @@ public interface Scope {
     void enclose(Scope scope);
 
     /**
-     * Resolves variables and evaluates expressions.
+     * Resolves variable references and evaluates expressions.
      *
      * @exception IllegalNameException if the variable name references are not valid variable names.
      */
-    String evaluate(String stringContainingVariables);
-
-    //
-    // TODO: when adding a method that exposes a Variable instance, add corresponding tests to
-    // ScopeTest.insureAllExposedVariablesAreCopies() that insure all exposed variable instances are copies
-    //
+    String evaluate(String stringWithVariableReferences);
 
 }

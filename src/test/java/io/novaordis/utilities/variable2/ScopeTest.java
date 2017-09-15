@@ -421,7 +421,7 @@ public abstract class ScopeTest {
         assertEquals("test", v.name());
     }
 
-    // evaluate() ------------------------------------------------------------------------------------------------------
+    // resolve() ------------------------------------------------------------------------------------------------------
 
     @Test
     public void evaluate_NoVariables() throws Exception {
