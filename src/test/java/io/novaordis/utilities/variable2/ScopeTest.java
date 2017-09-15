@@ -45,6 +45,46 @@ public abstract class ScopeTest {
 
     // Tests -----------------------------------------------------------------------------------------------------------
 
+    // variable exposure -----------------------------------------------------------------------------------------------
+
+    // @Test
+    public void insureAllExposedVariablesAreCopies() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        Variable<String> v = s.declare("a", String.class);
+
+        assertNull(v.get());
+        v.set("something");
+
+        Variable v2 = s.getVariable("a");
+        assertNull(v2.get());
+
+        Variable<String> v3 = s.declare("b", String.class, "something");
+
+        assertEquals("something", v3.get());
+        v3.set("something else");
+
+        Variable v4 = s.getVariable("b");
+        assertEquals("something", v4.get());
+
+        Variable<String> v5 = s.declare("c", "something");
+
+        assertEquals("something", v5.get());
+        v5.set("something else");
+
+        Variable v6 = s.getVariable("c");
+        assertEquals("something", v6.get());
+
+        List<Variable> vs = s.getVariablesDeclaredInScope();
+
+        assertEquals(3, vs.size());
+
+        //
+        // TODO continue here ...
+        //
+    }
+
     // declare() -------------------------------------------------------------------------------------------------------
 
     @Test

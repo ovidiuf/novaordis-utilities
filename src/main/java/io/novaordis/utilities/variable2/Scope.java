@@ -92,4 +92,9 @@ public interface Scope {
      */
     String evaluate(String stringContainingVariables);
 
+    //
+    // TODO: when adding a method that exposes a Variable instance, add corresponding tests to
+    // ScopeTest.insureAllExposedVariablesAreCopies() that insure all exposed variable instances are copies
+    //
+
 }
