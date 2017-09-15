@@ -477,6 +477,26 @@ public abstract class ScopeTest {
 
         try {
 
+            scope.evaluate("${some${thing}}");
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("misplaced"));
+            assertTrue(msg.contains("$"));
+            assertTrue(msg.contains("in variable reference"));
+        }
+    }
+
+
+    @Test
+    public void evaluate_InvalidVariableReference3() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
             scope.evaluate("${s");
             fail("should have thrown exception");
         }
