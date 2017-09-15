@@ -44,13 +44,23 @@ public class VariableReferenceResolverTest {
     // resolve() -------------------------------------------------------------------------------------------------------
 
     @Test
-    public void resolve_NoVariables() throws Exception {
+    public void resolve_NoVariableReferences() throws Exception {
 
         Scope scope = new ScopeImpl();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
         
         String result = resolver.resolve("gobbledygook", scope);
         assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void resolve_NoVariableReferences2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("", scope);
+        assertEquals("", result);
     }
 
     @Test
@@ -242,16 +252,43 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeImpl();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("b", String.class, "b");
-        scope.declare("d", String.class, "d");
-        scope.declare("e", String.class, "e");
-        scope.declare("g", String.class, "g");
-        scope.declare("k", String.class, "k");
-        scope.declare("l", String.class, "l");
-        scope.declare("o", String.class, "o");
-        scope.declare("y", String.class, "y");
+        scope.declare("b", "b");
+        scope.declare("d", "d");
+        scope.declare("e", "e");
+        scope.declare("g", "g");
+        scope.declare("k", "k");
+        scope.declare("l", "l");
+        scope.declare("o", "o");
+        scope.declare("y", "y");
         String result = resolver.resolve("${g}${o}${b}${b}${l}${e}${d}${y}${g}${o}${o}${k}", scope);
         assertEquals("gobbledygook", result);
+    }
+
+    @Test
+    public void resolve_MultipleVariableReplacement2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("${a}b${c}d${d}", scope);
+
+        assertEquals("${a}b${c}d${d}", result);
+
+        scope.declare("a", "a");
+
+        String result2 = resolver.resolve("${a}b${c}d${d}", scope);
+        assertEquals("ab${c}d${d}", result2);
+
+        scope.declare("c", "c");
+
+        String result3 = resolver.resolve("${a}b${c}d${d}", scope);
+        assertEquals("abcd${d}", result3);
+
+        scope.declare("d", "d");
+
+        String result4 = resolver.resolve("${a}b${c}d${d}", scope);
+        assertEquals("abcdd", result4);
     }
 
     @Test
@@ -312,6 +349,244 @@ public class VariableReferenceResolverTest {
             assertTrue(msg.contains("{"));
             assertTrue(msg.contains("in variable reference"));
         }
+    }
+
+    @Test
+    public void resolve_null() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.resolve(null, scope);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null string"));
+        }
+    }
+
+    @Test
+    public void resolve_InvalidVariableReference_Edge1() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.resolve("something $", scope);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("empty variable reference"));
+        }
+    }
+
+    @Test
+    public void resolve_InvalidVariableReference_2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.resolve("a ${b something", scope);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("missing closing }"));
+        }
+    }
+
+    @Test
+    public void resolve_InvalidVariableReference_UnbalancedBrackets() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.resolve("blah${something", scope);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
+        }
+    }
+
+    @Test
+    public void resolve_SimpleReference_NaturalSeparator() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("b", "blah");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("$b/something", scope);
+        assertEquals("blah/something", result);
+    }
+
+    @Test
+    public void resolve_SimpleReference_NaturalSeparator2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("b", "blah");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("$b:something", scope);
+        assertEquals("blah:something", result);
+    }
+
+    @Test
+    public void resolve_SimpleReference_NaturalSeparator3() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("b", "blah");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("$b something", scope);
+        assertEquals("blah something", result);
+    }
+
+    @Test
+    public void resolve_2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("some$thing", scope);
+        assertEquals("some$thing", result);
+    }
+
+    @Test
+    public void resolve_3() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("thing", "body");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("some$thing", scope);
+        assertEquals("somebody", result);
+    }
+
+    @Test
+    public void resolve_4() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("some$thing", scope);
+        assertEquals("some$thing", result);
+    }
+
+    @Test
+    public void resolve_5() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("thing", "body");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("some$thing", scope);
+        assertEquals("somebody", result);
+    }
+
+    @Test
+    public void resolve_6() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("a ${b} c", scope);
+        assertEquals("a ${b} c", result);
+    }
+
+    @Test
+    public void resolve_7() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        scope.declare("b", "b");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("a ${b} c", scope);
+        assertEquals("a b c", result);
+    }
+
+    @Test
+    public void resolve_8() throws Exception {
+
+        Scope scope = new ScopeImpl();
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+        String result = resolver.resolve("a ${b} c ${d} ", scope);
+        assertEquals("a ${b} c ${d} ", result);
+    }
+
+    @Test
+    public void resolve_9() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        scope.declare("b", "b");
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("a ${b} c ${d} ", scope);
+        assertEquals("a b c ${d} ", result);
+
+        scope.declare("d", "d");
+
+        String result2 = resolver.resolve("a ${b} c ${d} ", scope);
+        assertEquals("a b c d ", result2);
+    }
+
+    @Test
+    public void resolve_OnlyVariable() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("${something}", scope);
+
+        assertEquals("${something}", result);
+    }
+
+    @Test
+    public void resolve_OnlyVariable_2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        scope.declare("something", "else");
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("${something}", scope);
+
+        assertEquals("else", result);
+    }
+
+    @Test
+    public void resolve_VariableAndConstant() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("blah${something}", scope);
+
+        assertEquals("blah${something}", result);
+    }
+
+    @Test
+    public void resolve_VariableAndConstant_2() throws Exception {
+
+        Scope scope = new ScopeImpl();
+
+        scope.declare("something", "s");
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String result = resolver.resolve("blah${something}", scope);
+
+        assertEquals("blahs", result);
     }
 
     // resolveVariable() -----------------------------------------------------------------------------------------------

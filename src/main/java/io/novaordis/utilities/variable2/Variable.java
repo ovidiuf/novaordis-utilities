@@ -32,7 +32,11 @@ public interface Variable<T> {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    String VARIABLE_NAME_PATTERN_STRING = "[a-zA-z][a-zA-z0-9_\\-]*";
+    //
+    // Important: modifications to this patter should be kept in sync with the implementation of validVariableNameChar()
+    //            below.
+    //
+    String VARIABLE_NAME_PATTERN_STRING = "[a-zA-z][a-zA-z0-9_\\-\\.]*";
 
     Pattern VARIABLE_NAME_PATTERN = Pattern.compile("^" + VARIABLE_NAME_PATTERN_STRING + "$");
 
@@ -71,6 +75,11 @@ public interface Variable<T> {
         return s;
     }
 
+    /**
+     * Important: modifications to this method should be kept in sync with the content of the VARIABLE_NAME_PATTERN_STRING, above.
+     *
+     * @see Variable#VARIABLE_NAME_PATTERN_STRING
+     */
     static boolean validVariableNameChar(char c) {
 
         return
@@ -78,17 +87,18 @@ public interface Variable<T> {
                         ((int)'A' <= c && c <= (int)'Z') ||
                         ((int)'0' <= c && c <= (int)'9') ||
                         c == '-' ||
-                        c == '_';
+                        c == '_' ||
+                        c == '.';
     }
 
     /**
      * A character that indicates the end (implicit or explicit) of a variable reference.
      *
-     * Example: '}', ' ', etc.
+     * Example: '}', ' ', '/', etc.
      */
     static boolean variableReferenceTerminator(char c) {
 
-        return '}' == c || ' ' == c;
+        return '}' == c || ' ' == c || '/' == c || ':' == c;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -108,6 +118,9 @@ public interface Variable<T> {
 
     T get();
 
-    void set(T value);
+    /**
+     * @return the previous value associated with the variable or null if there wasn't any.
+     */
+    T set(T value);
 
 }

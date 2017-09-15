@@ -84,20 +84,13 @@ public abstract class VariableTest {
     }
 
     @Test
-    public void variableName_InvalidName_ContainsIllegalCharacter2() throws Exception {
+    public void variableName_ValidName_() throws Exception {
 
         Class type = getTypeToTest();
 
-        try {
+        Variable v = getVariableToTest("some.thing", type, null);
 
-            getVariableToTest("some.thing", type, null);
-            fail("should have thrown Exception");
-        }
-        catch(IllegalNameException e) {
-
-            String msg = e.getMessage();
-            assertEquals("some.thing", msg);
-        }
+        assertEquals("some.thing", v.name());
     }
 
     @Test
@@ -181,6 +174,7 @@ public abstract class VariableTest {
         assertTrue(Variable.validVariableNameChar('9'));
         assertTrue(Variable.validVariableNameChar('-'));
         assertTrue(Variable.validVariableNameChar('_'));
+        assertTrue(Variable.validVariableNameChar('.'));
     }
 
     // variableReferenceTerminator() -----------------------------------------------------------------------------------
@@ -190,6 +184,8 @@ public abstract class VariableTest {
 
         assertTrue(Variable.variableReferenceTerminator('}'));
         assertTrue(Variable.variableReferenceTerminator(' '));
+        assertTrue(Variable.variableReferenceTerminator('/'));
+        assertTrue(Variable.variableReferenceTerminator(':'));
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

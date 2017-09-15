@@ -17,8 +17,8 @@
 package io.novaordis.utilities.xml.editor;
 
 import io.novaordis.utilities.Util;
-import io.novaordis.utilities.variable.VariableProvider;
-import io.novaordis.utilities.variable.VariableProviderImpl;
+import io.novaordis.utilities.variable2.Scope;
+import io.novaordis.utilities.variable2.ScopeImpl;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +59,13 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        assertNull(editor.getVariableProvider());
+        assertNull(editor.getScope());
 
-        VariableProvider p = new VariableProviderImpl();
+        Scope s = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        editor.setScope(s);
 
-        assertEquals(p, editor.getVariableProvider());
+        assertEquals(s, editor.getScope());
     }
 
     // get -------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         // we don't install any VariableProvider
         //
 
-        assertNull(editor.getVariableProvider());
+        assertNull(editor.getScope());
 
         String s = editor.get("/root/blue");
         assertEquals("${something}", s);
@@ -94,7 +94,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        assertNull(editor.getVariableProvider());
+        assertNull(editor.getScope());
 
         try {
             editor.get("/root/red");
@@ -114,10 +114,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
-        assertNull(p.getVariableValue("something"));
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        assertNull(sc.getVariable("something"));
+
+        editor.setScope(sc);
 
         String s = editor.get("/root/blue");
         assertEquals("${something}", s);
@@ -130,9 +131,9 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        editor.setScope(sc);
 
         try {
             editor.get("/root/red");
@@ -152,10 +153,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
-        p.setVariableValue("something", "bright");
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        sc.declare("something", "bright");
+
+        editor.setScope(sc);
 
         String s = editor.get("/root/blue");
         assertEquals("bright", s);
@@ -174,7 +176,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         // we don't install any VariableProvider
         //
 
-        assertNull(editor.getVariableProvider());
+        assertNull(editor.getScope());
 
         List<String> s = editor.getList("/root/list/element");
 
@@ -191,7 +193,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        assertNull(editor.getVariableProvider());
+        assertNull(editor.getScope());
 
         try {
             editor.getList("/root/list2/element2");
@@ -213,10 +215,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
-        assertNull(p.getVariableValue("element.variable"));
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        assertNull(sc.getVariable("element.variable"));
+
+        editor.setScope(sc);
 
         List<String> s = editor.getList("/root/list/element");
 
@@ -233,9 +236,9 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        editor.setScope(sc);
 
         try {
             editor.getList("/root/list2/element2");
@@ -257,10 +260,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        VariableProviderImpl p = new VariableProviderImpl();
-        p.setVariableValue("element.variable", "B");
+        Scope sc = new ScopeImpl();
 
-        editor.setVariableProvider(p);
+        sc.declare("element.variable", "B");
+
+        editor.setScope(sc);
 
         List<String> s = editor.getList("/root/list/element");
 

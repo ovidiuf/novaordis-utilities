@@ -183,6 +183,12 @@ public class ScopeImpl implements Scope {
     }
 
     @Override
+    public Scope getEnclosing() {
+
+        return parent;
+    }
+
+    @Override
     public String evaluate(String stringWithVariableReferences) {
 
         return variableReferenceResolver.resolve(stringWithVariableReferences, this);

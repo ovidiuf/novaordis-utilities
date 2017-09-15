@@ -16,10 +16,7 @@
 
 package io.novaordis.utilities.xml.editor;
 
-import io.novaordis.utilities.variable.StringWithVariables;
-import io.novaordis.utilities.variable.VariableFormatException;
-import io.novaordis.utilities.variable.VariableNotDefinedException;
-import io.novaordis.utilities.variable.VariableProvider;
+import io.novaordis.utilities.variable2.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +26,8 @@ import java.util.List;
 
 /**
  * An InLineXMLEditor implementation that is capable of handling variables in the XML content. It does that by querying
- * and possibly modifying the contents of a VariableProvider. If no variable provider is installed, then the editor
- * will fall back to the functionality of a basic editor and won't interact with variables in any way, leaving them
- * unresolved.
+ * and possibly modifying the contents of a Scope. If no variable scope is installed, then the editor will fall back to
+ * the functionality of a basic editor and won't interact with variables in any way, leaving them unresolved.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
@@ -47,13 +43,15 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private BasicInLineXMLEditor delegateEditor;
-    private VariableProvider variableProvider;
+    private Scope variables;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
     public VariableAwareInLineXMLEditor(File xmlFile) throws IOException {
 
         this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
+
+        log.debug(this + " constructed");
     }
 
     // InLineXMLEditor implementation ----------------------------------------------------------------------------------
@@ -99,16 +97,12 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         String s = delegateEditor.get(path);
 
-        //
-        // optimization
-        //
+        if (variables == null) {
 
-        if (!StringWithVariables.containsVariableReferences(s)) {
-
-            return s;
+            return path;
         }
 
-        return resolveVariables(s, path);
+        return variables.evaluate(s);
     }
 
     @Override
@@ -123,16 +117,16 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         for(int i = 0; i < elements.size(); i ++) {
 
-            String e = elements.get(i);
+            String element = elements.get(i);
 
-            //
-            // optimization
-            //
+            if (variables != null) {
 
-            if (StringWithVariables.containsVariableReferences(e)) {
+                String element2 = variables.evaluate(element);
 
-                e = resolveVariables(e, path);
-                elements.set(i, e);
+                if (!element2.equals(element)) {
+
+                    elements.set(i, element2);
+                }
             }
         }
 
@@ -144,7 +138,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         String current = delegateEditor.get(path);
 
-        if (StringWithVariables.containsVariableReferences(current)) {
+        if (variables != null && !variables.evaluate(current).equals(current)) {
 
             throw new RuntimeException("NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
         }
@@ -169,52 +163,41 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     /**
      * @return may return null
      */
-    public VariableProvider getVariableProvider() {
+    public Scope getScope() {
 
-        return variableProvider;
+        return variables;
     }
 
-    public void setVariableProvider(VariableProvider variableProvider) {
+    public void setScope(Scope variables) {
 
-        this.variableProvider = variableProvider;
+        this.variables = variables;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
-
-    String resolveVariables(String rawContent, String path) throws IllegalStateException {
-
-        StringWithVariables sv;
-
-        try {
-
-            sv = new StringWithVariables(rawContent);
-
-            return sv.resolve(variableProvider);
-        }
-        catch (VariableFormatException e) {
-
-            //
-            // incorrectly specified variable
-            //
-
-            log.debug("invalid variable reference '" + rawContent + "'", e);
-            throw new IllegalStateException("path " + path + " contains an invalid variable reference '" + rawContent + "'");
-        }
-        catch (VariableNotDefinedException e) {
-
-            //
-            // the underlying tokens have been configured to fail on attempts to resolve missing variables
-            //
-
-            throw new IllegalStateException(
-                    "path " + path + " contains a variable reference whose definition is missing", e);
-        }
-    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------
+
+//    catch (VariableFormatException e) {
+//
+//        //
+//        // incorrectly specified variable
+//        //
+//
+//        log.debug("invalid variable reference '" + rawContent + "'", e);
+//        throw new IllegalStateException("path " + path + " contains an invalid variable reference '" + rawContent + "'");
+//    }
+//    catch (VariableNotDefinedException e) {
+//
+//        //
+//        // the underlying tokens have been configured to fail on attempts to resolve missing variables
+//        //
+//
+//        throw new IllegalStateException(
+//                "path " + path + " contains a variable reference whose definition is missing", e);
+//    }
 
 }

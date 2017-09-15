@@ -59,9 +59,13 @@ abstract class VariableBase<T> implements Variable<T> {
     }
 
     @Override
-    public void set(T value) {
+    public T set(T value) {
+
+        T old = this.value;
 
         this.value = value;
+
+        return old;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

@@ -92,15 +92,20 @@ public class VariableReferenceResolver {
         return s;
     }
 
-
     /**
      * Resolves variable references, if the corresponding variables are declared, or leaves the references unchanged
      * if the corresponding variables are not declared.
      *
      * @exception IllegalNameException
      * @exception IllegalReferenceException
+     * @exception IllegalArgumentException on null arguments
      */
     public String resolve(String stringWithVariableReferences, Scope scope) {
+
+        if (stringWithVariableReferences == null) {
+
+            throw new IllegalArgumentException("null string");
+        }
 
         StringBuilder sb = new StringBuilder();
 
@@ -124,7 +129,6 @@ public class VariableReferenceResolver {
                 if ('{' == c) {
 
                     optionalLeftBraceFound = true;
-
                     continue;
                 }
             }
@@ -149,6 +153,14 @@ public class VariableReferenceResolver {
                         }
 
                         from = to + 1;
+                    }
+                    else if (optionalLeftBraceFound) {
+
+                        //
+                        // got a terminator, but not '}', this is illegal
+                        //
+
+                        throw new IllegalReferenceException("missing closing }");
                     }
                     else {
 
@@ -188,6 +200,10 @@ public class VariableReferenceResolver {
             //
 
             sb.append(resolveVariable(variableName, scope, false));
+        }
+        else if (expectingOptionalLeftBrace) {
+
+            throw new IllegalReferenceException("empty variable reference");
         }
         else {
 

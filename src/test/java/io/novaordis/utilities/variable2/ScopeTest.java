@@ -167,6 +167,25 @@ public abstract class ScopeTest {
         }
     }
 
+    @Test
+    public void declare_Twice() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        s.declare("A", "something");
+
+        try {
+
+            s.declare("A", "something");
+            fail("should have thrown exception");
+        }
+        catch(DuplicateDeclarationException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("?"));
+        }
+    }
+
     // undeclare() -----------------------------------------------------------------------------------------------------
 
     @Test
@@ -779,6 +798,84 @@ public abstract class ScopeTest {
         assertEquals("color", v.name());
         assertEquals("blue", v.get());
     }
+
+    // legacy tests inherited from the previous implementation ---------------------------------------------------------
+
+    @Test
+    public void legacy() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        assertNull(s.getVariable("something"));
+
+        assertNull(s.declare("something", "A"));
+
+        assertEquals("A", s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertEquals("A", s.getVariable("something").set("B"));
+
+        assertEquals("B", s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertEquals("B", s.getVariable("something").set(null));
+
+        assertNull(s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertNull(s.getVariable("something").set("C"));
+    }
+
+    @Test
+    public void legacy2() throws Exception {
+
+        Scope parent = getScopeToTest();
+
+        assertNull(parent.getEnclosing());
+
+        Scope childOne = getScopeToTest();
+
+        assertNull(childOne.getEnclosing());
+
+        Scope childTwo = getScopeToTest();
+
+        assertNull(childTwo.getEnclosing());
+
+        childOne.enclose(parent);
+        assertEquals(parent, childOne.getEnclosing());
+
+        childTwo.enclose(parent);
+        assertEquals(parent, childTwo.getEnclosing());
+
+        //
+        // verify hierarchical resolution
+        //
+
+        parent.declare("variableA", "valueA");
+
+        assertEquals("valueA", parent.getVariable("variableA").get());
+        assertEquals("valueA", childOne.getVariable("variableA").get());
+        assertEquals("valueA", childTwo.getVariable("variableA").get());
+
+        //
+        // local values supersede the values above them in the hierarchy
+        //
+
+        //noinspection unchecked
+        childOne.getVariable("variableA").set("valueB");
+
+        assertEquals("valueA", parent.getVariable("variableA").get());
+        assertEquals("valueB", childOne.getVariable("variableA").get());
+        assertEquals("valueA", childTwo.getVariable("variableA").get());
+
+        //noinspection unchecked
+        childTwo.getVariable("variableA").set("valueC");
+
+        assertEquals("valueA", parent.getVariable("variableA").get());
+        assertEquals("valueB", childOne.getVariable("variableA").get());
+        assertEquals("valueC", childTwo.getVariable("variableA").get());
+    }
+
 
     // Package protected -----------------------------------------------------------------------------------------------
 

@@ -92,6 +92,11 @@ public interface Scope {
     void enclose(Scope scope);
 
     /**
+     * @return the closest enclosing scope May return null if this scope is not enclosed in any other scope.
+     */
+    Scope getEnclosing();
+
+    /**
      * Resolves variable references and evaluates expressions.
      *
      * @exception IllegalNameException if the variable name references are not valid variable names.
