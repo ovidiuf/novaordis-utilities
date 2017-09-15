@@ -81,6 +81,16 @@ public interface Variable<T> {
                         c == '_';
     }
 
+    /**
+     * A character that indicates the end (implicit or explicit) of a variable reference.
+     *
+     * Example: '}', ' ', etc.
+     */
+    static boolean variableReferenceTerminator(char c) {
+
+        return '}' == c || ' ' == c;
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**

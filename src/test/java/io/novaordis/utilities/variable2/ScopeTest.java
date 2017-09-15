@@ -451,6 +451,44 @@ public abstract class ScopeTest {
         assertEquals("gobbledygook", result);
     }
 
+    @Test
+    public void evaluate_InvalidVariableReference() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate("${{something}");
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("misplaced"));
+            assertTrue(msg.contains("{"));
+            assertTrue(msg.contains("in variable reference"));
+        }
+    }
+
+    @Test
+    public void evaluate_InvalidVariableReference2() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate("${s");
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced"));
+            assertTrue(msg.contains("{"));
+            assertTrue(msg.contains("in variable reference"));
+        }
+    }
+
     // getVariablesDeclaredInScope() -----------------------------------------------------------------------------------
 
     @Test

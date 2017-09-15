@@ -186,6 +186,15 @@ public abstract class VariableTest {
         assertTrue(Variable.validVariableNameChar('_'));
     }
 
+    // variableReferenceTerminator() -----------------------------------------------------------------------------------
+
+    @Test
+    public void variableReferenceSeparator() throws Exception {
+
+        assertTrue(Variable.variableReferenceTerminator('}'));
+        assertTrue(Variable.variableReferenceTerminator(' '));
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

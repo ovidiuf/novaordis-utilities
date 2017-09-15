@@ -178,7 +178,7 @@ public class ScopeImpl implements Scope {
 
                     variableName += c;
                 }
-                else {
+                else if (Variable.variableReferenceTerminator(c)){
 
                     //
                     // end of variable name
@@ -203,6 +203,10 @@ public class ScopeImpl implements Scope {
                     sb.append(s);
                     variableName = null;
                 }
+                else {
+
+                    throw new IllegalReferenceException("misplaced '" + c + "' in variable reference");
+                }
             }
             else if ('$' == c) {
 
@@ -217,11 +221,16 @@ public class ScopeImpl implements Scope {
 
         if (variableName != null) {
 
+            if (optionalLeftBraceFound) {
+
+                throw new IllegalReferenceException("unbalanced '{' in variable reference");
+            }
+
             //
             // the string ends with a variable name declared with simplified notation
             //
 
-            sb.append(toStringValue(variableName, optionalLeftBraceFound));
+            sb.append(toStringValue(variableName, false));
         }
         else {
 
