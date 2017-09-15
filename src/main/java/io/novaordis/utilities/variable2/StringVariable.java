@@ -57,11 +57,6 @@ public class StringVariable extends VariableBase {
 
     // Protected -------------------------------------------------------------------------------------------------------
 
-    protected StringVariable copy() {
-
-        return (StringVariable) super.copy();
-    }
-
     // VariableBase implementation -------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------

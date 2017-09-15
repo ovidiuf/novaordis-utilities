@@ -47,44 +47,6 @@ public abstract class ScopeTest {
 
     // variable exposure -----------------------------------------------------------------------------------------------
 
-    // @Test
-    public void insureAllExposedVariablesAreCopies() throws Exception {
-
-        Scope s = getScopeToTest();
-
-        Variable<String> v = s.declare("a", String.class);
-
-        assertNull(v.get());
-        v.set("something");
-
-        Variable v2 = s.getVariable("a");
-        assertNull(v2.get());
-
-        Variable<String> v3 = s.declare("b", String.class, "something");
-
-        assertEquals("something", v3.get());
-        v3.set("something else");
-
-        Variable v4 = s.getVariable("b");
-        assertEquals("something", v4.get());
-
-        Variable<String> v5 = s.declare("c", "something");
-
-        assertEquals("something", v5.get());
-        v5.set("something else");
-
-        Variable v6 = s.getVariable("c");
-        assertEquals("something", v6.get());
-
-        List<Variable> vs = s.getVariablesDeclaredInScope();
-
-        assertEquals(3, vs.size());
-
-        //
-        // TODO continue here ...
-        //
-    }
-
     // declare() -------------------------------------------------------------------------------------------------------
 
     @Test
@@ -205,7 +167,38 @@ public abstract class ScopeTest {
         }
     }
 
-    // scope visibility rules ------------------------------------------------------------------------------------------
+    // undeclare() -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void undeclare_NoSuchVariable() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        Variable v = s.undeclare("i-am-pretty-sure-this-variable-does-not-exist");
+        assertNull(v);
+    }
+
+    @Test
+    public void undeclare() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        s.declare("test", "something");
+
+        assertEquals("something", s.getVariable("test").get());
+
+        Variable v2 = s.undeclare("test");
+
+        assertEquals("something", v2.get());
+
+        assertNull(s.getVariable("test"));
+
+        Variable v3 = s.undeclare("test");
+
+        assertNull(v3);
+    }
+
+    // scope visibility and value rules --------------------------------------------------------------------------------
 
     @Test
     public void visibility() throws Exception {
@@ -268,6 +261,90 @@ public abstract class ScopeTest {
         assertNull(upper.getVariable("color"));
         assertEquals("blue", intermediate.getVariable("color").get());
         assertEquals("blue", lower.getVariable("color").get());
+    }
+
+    @Test
+    public void valueRelativeToScope() throws Exception {
+
+        Scope upper = new ScopeImpl();
+
+        Scope inter = new ScopeImpl();
+
+        Scope lower = new ScopeImpl();
+
+        upper.enclose(inter);
+
+        inter.enclose(lower);
+
+        upper.declare("color", "red");
+        inter.declare("color", "yellow");
+        lower.declare("color", "blue");
+
+        assertEquals("red", upper.getVariable("color").get());
+        assertEquals("yellow", inter.getVariable("color").get());
+        assertEquals("blue", lower.getVariable("color").get());
+
+        lower.undeclare("color");
+
+        assertEquals("red", upper.getVariable("color").get());
+        assertEquals("yellow", inter.getVariable("color").get());
+        assertEquals("yellow", lower.getVariable("color").get());
+
+        inter.undeclare("color");
+
+        assertEquals("red", upper.getVariable("color").get());
+        assertEquals("red", inter.getVariable("color").get());
+        assertEquals("red", lower.getVariable("color").get());
+    }
+
+    @Test
+    public void valueRelativeToScope_set() throws Exception {
+
+        Scope upper = new ScopeImpl();
+
+        Scope inter = new ScopeImpl();
+
+        Scope lower = new ScopeImpl();
+
+        upper.enclose(inter);
+
+        inter.enclose(lower);
+
+        upper.declare("color", "red");
+        inter.declare("color", "yellow");
+        lower.declare("color", "blue");
+
+        assertEquals("red", upper.getVariable("color").get());
+        assertEquals("yellow", inter.getVariable("color").get());
+        assertEquals("blue", lower.getVariable("color").get());
+
+        //noinspection unchecked
+        upper.getVariable("color").set("dark red");
+
+        assertEquals("dark red", upper.getVariable("color").get());
+        assertEquals("yellow", inter.getVariable("color").get());
+        assertEquals("blue", lower.getVariable("color").get());
+
+        //noinspection unchecked
+        inter.getVariable("color").set("dark yellow");
+
+        assertEquals("dark red", upper.getVariable("color").get());
+        assertEquals("dark yellow", inter.getVariable("color").get());
+        assertEquals("blue", lower.getVariable("color").get());
+
+        //noinspection unchecked
+        lower.getVariable("color").set("dark blue");
+
+        assertEquals("dark red", upper.getVariable("color").get());
+        assertEquals("dark yellow", inter.getVariable("color").get());
+        assertEquals("dark blue", lower.getVariable("color").get());
+
+        upper.undeclare("color");
+
+        assertNull(upper.getVariable("color"));
+        assertEquals("dark yellow", inter.getVariable("color").get());
+        assertEquals("dark blue", lower.getVariable("color").get());
+
     }
 
     // getVariable() ---------------------------------------------------------------------------------------------------
@@ -624,10 +701,6 @@ public abstract class ScopeTest {
         assertEquals("z", v.name());
         assertNull(v.get());
 
-        //
-        // make sure a copy was returned, not the variable itself
-        //
-
         //noinspection unchecked
         v.set("dirty");
         assertEquals("dirty", v.get());
@@ -637,7 +710,7 @@ public abstract class ScopeTest {
         Variable v2 = declaredInScope2.get(0);
 
         assertEquals("z", v2.name());
-        assertNull(v2.get());
+        assertEquals("dirty", v2.get());
 
         //
         // declare another variable
@@ -651,7 +724,7 @@ public abstract class ScopeTest {
 
         Variable v3 = declaredInScope3.get(0);
         assertEquals("z", v3.name());
-        assertNull(v3.get());
+        assertEquals("dirty", v3.get());
 
         Variable v4 = declaredInScope3.get(1);
         assertEquals("a", v4.name());
@@ -675,11 +748,11 @@ public abstract class ScopeTest {
 
         Variable v5 = declaredInScope4.get(0);
         assertEquals("z", v5.name());
-        assertNull(v5.get());
+        assertEquals("dirty", v5.get());
 
         Variable v6 = declaredInScope4.get(1);
         assertEquals("a", v6.name());
-        assertNull(v6.get());
+        assertEquals("dirty", v6.get());
     }
 
     @Test

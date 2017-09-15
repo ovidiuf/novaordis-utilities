@@ -68,6 +68,12 @@ public interface Scope {
     <T> Variable<T> declare(String name, T value);
 
     /**
+     * Undeclare a variable in a scope. Noop if the variable does not exist.
+     * @return the declared variable, if exists, or null.
+     */
+    Variable undeclare(String name);
+
+    /**
      * @return the list of variables declared in <b>this</b> scope, in the order in which they were declared. Note that
      * variables declared in enclosing scopes are not returned by this method, even if they are visible in scope.
      */

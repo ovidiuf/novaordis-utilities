@@ -18,6 +18,7 @@ package io.novaordis.utilities.variable2;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -114,6 +115,23 @@ public class ScopeImpl implements Scope {
     }
 
     @Override
+    public Variable undeclare(String name) {
+
+        for(Iterator<Variable> i = declarations.iterator(); i.hasNext(); ) {
+
+            Variable v = i.next();
+
+            if (v.name().equals(name)) {
+
+                i.remove();
+                return v;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public List<Variable> getVariablesDeclaredInScope() {
 
         if (declarations.isEmpty()) {
@@ -126,7 +144,7 @@ public class ScopeImpl implements Scope {
         //noinspection Convert2streamapi
         for(Variable d: declarations) {
 
-            result.add(((VariableBase)d).copy());
+            result.add(d);
         }
 
         return result;
@@ -139,7 +157,7 @@ public class ScopeImpl implements Scope {
 
             if (d.name().equals(name)) {
 
-                return ((VariableBase)d).copy();
+                return d;
             }
         }
 

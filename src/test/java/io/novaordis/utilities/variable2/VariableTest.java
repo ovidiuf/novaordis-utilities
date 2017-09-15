@@ -47,9 +47,6 @@ public abstract class VariableTest {
     @Test
     public abstract void declarationWithoutAssignment() throws Exception;
 
-    @Test
-    public abstract void copy() throws Exception;
-
     // variable names --------------------------------------------------------------------------------------------------
 
     @Test

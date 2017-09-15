@@ -63,25 +63,6 @@ public class StringVariableTest extends VariableTest {
         assertNull(v.get());
     }
 
-    @Override
-    public void copy() throws Exception {
-
-        Scope s = new ScopeImpl();
-
-        Variable<String> v = s.declare("something", String.class, "blah");
-
-        StringVariable sv = (StringVariable)v;
-
-        StringVariable sv2 = sv.copy();
-
-        assertFalse(sv.equals(sv2));
-        assertFalse(sv2.equals(sv));
-
-        assertEquals("something", sv2.name());
-        assertEquals("blah", sv2.get());
-        assertEquals(String.class, sv2.type());
-    }
-
     // Tests -----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

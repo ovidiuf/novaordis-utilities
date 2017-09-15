@@ -22,7 +22,7 @@ package io.novaordis.utilities.variable2;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-abstract class VariableBase<T> implements Variable<T>, Cloneable {
+abstract class VariableBase<T> implements Variable<T> {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ abstract class VariableBase<T> implements Variable<T>, Cloneable {
      */
     VariableBase(String name) {
 
-        setName(Variable.validateVariableName(name));
+        this.name = Variable.validateVariableName(name);
     }
 
     // Variable implementation -----------------------------------------------------------------------------------------
@@ -67,24 +67,6 @@ abstract class VariableBase<T> implements Variable<T>, Cloneable {
     // Public ----------------------------------------------------------------------------------------------------------
 
     @Override
-    public Object clone() {
-
-        try {
-
-            Object o = super.clone();
-
-            ((VariableBase)o).name = this.name;
-            ((VariableBase)o).value = this.value;
-
-            return o;
-        }
-        catch(CloneNotSupportedException e) {
-
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @Override
     public String toString() {
 
         return name + "=" + value;
@@ -93,16 +75,6 @@ abstract class VariableBase<T> implements Variable<T>, Cloneable {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    protected void setName(String name) {
-
-        this.name = name;
-    }
-
-    protected VariableBase copy() {
-
-        return (VariableBase) this.clone();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 
