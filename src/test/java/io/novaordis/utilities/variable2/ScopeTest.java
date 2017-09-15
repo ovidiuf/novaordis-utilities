@@ -19,6 +19,7 @@ package io.novaordis.utilities.variable2;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -114,6 +115,53 @@ public abstract class ScopeTest {
             String msg = e.getMessage();
             assertEquals("test", msg);
 
+        }
+    }
+
+    @Test
+    public void declare_TypeInferenceBasedOnValue_Null() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        try {
+
+            s.declare("test", null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalTypeException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("variable type cannot be inferred"));
+        }
+    }
+
+    @Test
+    public void declare_TypeInferenceBasedOnValue_String() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        Variable<String> v = s.declare("test", "something");
+
+        assertEquals("test", v.name());
+        assertEquals("something", v.get());
+        assertEquals(String.class, v.type());
+        assertTrue(v instanceof StringVariable);
+    }
+
+    @Test
+    public void declare_TypeInferenceBasedOnValue_UnsupportedType() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        try {
+
+            s.declare("test", new AtomicBoolean(true));
+            fail("should have thrown exception");
+        }
+        catch(IllegalTypeException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains(AtomicBoolean.class.getName()));
         }
     }
 
@@ -488,7 +536,6 @@ public abstract class ScopeTest {
             assertTrue(msg.contains("in variable reference"));
         }
     }
-
 
     @Test
     public void evaluate_InvalidVariableReference3() throws Exception {

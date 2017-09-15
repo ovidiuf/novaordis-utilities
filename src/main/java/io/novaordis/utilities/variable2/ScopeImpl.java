@@ -56,6 +56,11 @@ public class ScopeImpl implements Scope {
     @Override
     public <T> Variable<T> declare(String name, Class<? extends T> type) {
 
+        if (type == null) {
+
+            throw new IllegalTypeException("variable type cannot be inferred");
+        }
+
         return declare(name, type, null);
     }
 
@@ -92,6 +97,20 @@ public class ScopeImpl implements Scope {
 
         //noinspection unchecked
         return v;
+    }
+
+    @Override
+    public <T> Variable<T> declare(String name, T value) {
+
+        if (value == null) {
+
+            throw new IllegalTypeException("variable type cannot be inferred");
+        }
+
+        Class type  = value.getClass();
+
+        //noinspection unchecked
+        return declare(name, type, value);
     }
 
     @Override

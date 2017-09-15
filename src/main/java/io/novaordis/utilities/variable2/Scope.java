@@ -56,6 +56,18 @@ public interface Scope {
     <T> Variable<T> declare(String name, Class<? extends T> type, T value);
 
     /**
+     * @param value is used for type inference. If the type cannot be inferred or it is not supported, throws
+     *              IllegalTypeException.
+     *
+     * A variable declaration with assignment. A declaration in a scope is the only way to create variable instances.
+     *
+     * @return the variable <b>declared</b> in this scope.
+     *
+     * @exception IllegalTypeException if variable of the specified type are not supported.
+     */
+    <T> Variable<T> declare(String name, T value);
+
+    /**
      * @return the list of variables declared in <b>this</b> scope, in the order in which they were declared. Note that
      * variables declared in enclosing scopes are not returned by this method, even if they are visible in scope.
      */
