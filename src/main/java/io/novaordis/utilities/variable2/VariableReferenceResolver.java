@@ -16,6 +16,9 @@
 
 package io.novaordis.utilities.variable2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A variable reference resolver.
  *
@@ -92,25 +95,18 @@ public class VariableReferenceResolver {
         return s;
     }
 
-    /**
-     * Resolves variable references, if the corresponding variables are declared, or leaves the references unchanged
-     * if the corresponding variables are not declared.
-     *
-     * @exception IllegalNameException
-     * @exception IllegalReferenceException
-     * @exception IllegalArgumentException on null arguments
-     */
-    public String resolve(String stringWithVariableReferences, Scope scope) {
+    public List<VariableReference> getVariableReferences(String stringWithVariableReferences) {
 
         if (stringWithVariableReferences == null) {
 
             throw new IllegalArgumentException("null string");
         }
 
-        StringBuilder sb = new StringBuilder();
+        List<VariableReference> references = new ArrayList<>();
 
         int from = 0;
         int to = 0;
+        int startIndex = -1;
 
         boolean expectingOptionalLeftBrace = false;
         boolean optionalLeftBraceFound = false;
@@ -149,7 +145,7 @@ public class VariableReferenceResolver {
 
                         if (!optionalLeftBraceFound) {
 
-                            throw new IllegalReferenceException("unbalanced closing }");
+                            throw new IllegalReferenceException(variableName, "unbalanced closing }");
                         }
 
                         from = to + 1;
@@ -160,21 +156,20 @@ public class VariableReferenceResolver {
                         // got a terminator, but not '}', this is illegal
                         //
 
-                        throw new IllegalReferenceException("missing closing }");
+                        throw new IllegalReferenceException(variableName, "missing closing }");
                     }
                     else {
 
                         from = to;
                     }
 
-                    variableName = Variable.validateVariableName(variableName);
-                    String s = resolveVariable(variableName, scope, optionalLeftBraceFound);
-                    sb.append(s);
+                    VariableReference r = new VariableReference(variableName, startIndex, to, optionalLeftBraceFound);
+                    references.add(r);
                     variableName = null;
                 }
                 else {
 
-                    throw new IllegalReferenceException("misplaced '" + c + "' in variable reference");
+                    throw new IllegalReferenceException(variableName, "misplaced '" + c + "' in variable reference");
                 }
             }
             else if ('$' == c) {
@@ -183,8 +178,8 @@ public class VariableReferenceResolver {
                 // variable detected
                 //
 
-                sb.append(stringWithVariableReferences.substring(from, to));
                 expectingOptionalLeftBrace = true;
+                startIndex = to;
             }
         }
 
@@ -192,22 +187,64 @@ public class VariableReferenceResolver {
 
             if (optionalLeftBraceFound) {
 
-                throw new IllegalReferenceException("unbalanced '{' in variable reference");
+                throw new IllegalReferenceException(variableName, "unbalanced '{' in variable reference");
             }
 
             //
             // the string ends with a variable name declared with simplified notation
             //
 
-            sb.append(resolveVariable(variableName, scope, false));
+            VariableReference r = new VariableReference(variableName, startIndex, to - 1, false);
+            references.add(r);
         }
         else if (expectingOptionalLeftBrace) {
 
-            throw new IllegalReferenceException("empty variable reference");
+            throw new IllegalReferenceException("", "empty variable reference");
         }
-        else {
 
-            sb.append(stringWithVariableReferences.substring(from, to));
+        return references;
+    }
+
+    /**
+     * Resolves variable references, if the corresponding variables are declared, or leaves the references unchanged
+     * if the corresponding variables are not declared.
+     *
+     * @exception IllegalNameException
+     * @exception IllegalReferenceException
+     * @exception IllegalArgumentException on null arguments
+     *
+     *
+     * TODO - refactor this to use getVariableReference
+     *
+     */
+    public String resolve(String stringWithVariableReferences, Scope scope) {
+
+        if (stringWithVariableReferences == null) {
+
+            throw new IllegalArgumentException("null string");
+        }
+
+        List<VariableReference> references = getVariableReferences(stringWithVariableReferences);
+
+        if (references.isEmpty()) {
+
+            return stringWithVariableReferences;
+        }
+
+        //
+        // replace
+        //
+
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+
+        for(VariableReference r: references) {
+
+            sb.append(stringWithVariableReferences.substring(i, r.getStartIndex()));
+            String s = resolveVariable(r.getName(), scope, r.hasBraces());
+            sb.append(s);
+            i = r.getEndIndex();
         }
 
         return sb.toString();

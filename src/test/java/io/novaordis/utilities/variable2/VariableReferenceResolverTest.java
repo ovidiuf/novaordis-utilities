@@ -18,7 +18,10 @@ package io.novaordis.utilities.variable2;
 
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -28,6 +31,7 @@ import static org.junit.Assert.fail;
  * @since 9/15/17
  */
 public class VariableReferenceResolverTest {
+
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -40,6 +44,270 @@ public class VariableReferenceResolverTest {
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // getVariableReferences() -----------------------------------------------------------------------------------------
+
+    @Test
+    public void getVariableReferences_NoVariableReferences() throws Exception {
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String s = "gobbledygook";
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertTrue(vrs.isEmpty());
+    }
+
+    @Test
+    public void getVariableReferences_NoVariableReferences2() throws Exception {
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        String s = "";
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertTrue(vrs.isEmpty());
+    }
+
+    @Test
+    public void getVariableReferences() throws Exception {
+
+        String s = "a${b}c";
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(1, r.getStartIndex());
+        assertEquals(4, r.getEndIndex());
+        assertTrue(r.hasBraces());
+    }
+
+    @Test
+    public void getVariableReferences2() throws Exception {
+
+        String s = "a$b";
+
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(1, r.getStartIndex());
+        assertEquals(2, r.getEndIndex());
+        assertFalse(r.hasBraces());
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference() throws Exception {
+
+        String s = "$b}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference2() throws Exception {
+
+        String s = "$b}c";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences3() throws Exception {
+
+        String s = "gobble${dy}gook";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences4() throws Exception {
+
+        String s = "gobble${dy}go${ok}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences5() throws Exception {
+
+        String s = "gobbledy${a}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences6() throws Exception {
+
+        String s = "${a}dygook";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences7() throws Exception {
+
+        String s = "${a}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences8() throws Exception {
+
+        String s = "go${a}ok";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences9() throws Exception {
+
+        String s = "${g}${o}${b}${b}${l}${e}${d}${y}${g}${o}${o}${k}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences10() throws Exception {
+
+        String s = "${a}b${c}d${d}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference3() throws Exception {
+
+        String s = "${{something}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference4() throws Exception {
+
+        String s = "${some${thing}}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference5() throws Exception {
+
+        String s = "${s";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_null() throws Exception {
+
+        String s = null;
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference6() throws Exception {
+
+        String s = "something $";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference7() throws Exception {
+
+        String s = "a ${b something";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences_IllegalReference8() throws Exception {
+
+        String s = "blah${something";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences11() throws Exception {
+
+        String s = "$b/something";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences12() throws Exception {
+
+        String s = "$b:something";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences13() throws Exception {
+
+        String s = "$b something";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences14() throws Exception {
+
+        String s = "some$thing";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences15() throws Exception {
+
+        String s = "a ${b} c";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences16() throws Exception {
+
+        String s = "a ${b} c ${d} ";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences17() throws Exception {
+
+        String s = "${something}";
+
+        fail("return here");
+    }
+
+    @Test
+    public void getVariableReferences18() throws Exception {
+
+        String s = "blah${something}";
+
+        fail("return here");
+    }
 
     // resolve() -------------------------------------------------------------------------------------------------------
 
@@ -666,6 +934,26 @@ public class VariableReferenceResolverTest {
         String result2 = resolver.resolveVariable("a", s, false);
 
         assertEquals("b", result2);
+    }
+
+    // variableReferenceResolver() -------------------------------------------------------------------------------------
+
+    @Test
+    public void variableReferenceResolver_Null() throws Exception  {
+
+        VariableReferenceResolver r = getVariableReferenceResolverToTest();
+
+        try {
+
+            r.getVariableReferences(null);
+            fail("should have thrown exceptions");
+
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null string"));
+        }
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

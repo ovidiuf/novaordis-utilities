@@ -17,13 +17,10 @@
 package io.novaordis.utilities.variable2;
 
 /**
- * The IllegalReferenceException exception carries the variable name - or what it is thought to be the variable name -
- * extracted from the variable reference literal that caused it, in addition to the general message.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/16/17
  */
-public class IllegalReferenceException extends VariableException {
+public class VariableReference {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -31,30 +28,59 @@ public class IllegalReferenceException extends VariableException {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    //
-    // the variable reference, including the ${} that caused the exception, even if it's invalid (in this case, is the
-    // string that is thought to be the variable reference
-    //
-    private String variableName;
+    private String name;
+
+    private boolean hasBraces;
+
+    private int startIndex;
+    private int endIndex;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public IllegalReferenceException(String variableName, String msg) {
+    /**
+     *
+     * @param name
+     * @param startIndex in the enclosing string.
+     * @param endIndex in the enclosing string - is the index of last character of the reference (which may be '}' or
+     *                 the last character of the name).
+     * @param hasBraces
+     *
+     * @exception IllegalNameException if the name is illegal.
+     */
+    public VariableReference(String name, int startIndex, int endIndex, boolean hasBraces) {
 
-        super(msg);
-
-        this.variableName = variableName;
+        this.name = Variable.validateVariableName(name);
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.hasBraces = hasBraces;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * The variable name - or what it is thought to be the variable name - extracted from the variable reference literal
-     * that caused the exception.
-     */
-    public String getVariableName() {
+    public String getName() {
 
-        return variableName;
+        return name;
+    }
+
+    public int getStartIndex() {
+
+        return startIndex;
+    }
+
+    public int getEndIndex() {
+
+        return endIndex;
+    }
+
+    public boolean hasBraces() {
+
+        return hasBraces;
+    }
+
+    @Override
+    public String toString() {
+
+        return startIndex + ":$" + (hasBraces ? "{" : "") + name + (hasBraces ? "}:" : ":") + endIndex;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

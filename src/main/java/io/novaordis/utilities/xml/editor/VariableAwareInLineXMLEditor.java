@@ -16,7 +16,11 @@
 
 package io.novaordis.utilities.xml.editor;
 
+import io.novaordis.utilities.variable2.IllegalReferenceException;
 import io.novaordis.utilities.variable2.Scope;
+import io.novaordis.utilities.variable2.ScopeImpl;
+import io.novaordis.utilities.variable2.VariableReference;
+import io.novaordis.utilities.variable2.VariableReferenceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +47,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private BasicInLineXMLEditor delegateEditor;
+
     private Scope variables;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -50,6 +55,11 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     public VariableAwareInLineXMLEditor(File xmlFile) throws IOException {
 
         this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
+
+        //
+        // we start with an empty scope, we need a non-null scope here to detect variable reference syntax errors
+        //
+        this.variables = new ScopeImpl();
 
         log.debug(this + " constructed");
     }
@@ -90,19 +100,28 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     }
 
     /**
-     * @exception IllegalStateException if an incorrectly specified variable is identified.
+     * @exception IllegalStateException if encountering problems with the variable references.
      */
     @Override
     public String get(String path) {
 
         String s = delegateEditor.get(path);
 
-        if (variables == null) {
+        try {
 
-            return path;
+            //
+            // 'variables' is never null
+            //
+
+            return variables.evaluate(s);
         }
+        catch(IllegalReferenceException e) {
 
-        return variables.evaluate(s);
+            String msg = e.getMessage();
+            String variableName = e.getVariableName();
+            msg = "path " + path + " contains an invalid variable reference '" + variableName + "': " + msg;
+            throw new IllegalStateException(msg);
+        }
     }
 
     @Override
@@ -119,14 +138,27 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
             String element = elements.get(i);
 
-            if (variables != null) {
+            String element2;
 
-                String element2 = variables.evaluate(element);
+            try {
 
-                if (!element2.equals(element)) {
+                //
+                // 'variables' is never null
+                //
 
-                    elements.set(i, element2);
-                }
+                element2 = variables.evaluate(element);
+            }
+            catch(IllegalReferenceException e) {
+
+                String msg = e.getMessage();
+                String variableName = e.getVariableName();
+                msg = "path " + path + " contains an invalid variable reference '" + variableName + "': " + msg;
+                throw new IllegalStateException(msg);
+            }
+
+            if (!element2.equals(element)) {
+
+                elements.set(i, element2);
             }
         }
 
@@ -138,9 +170,16 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         String current = delegateEditor.get(path);
 
-        if (variables != null && !variables.evaluate(current).equals(current)) {
+        List<VariableReference> references = new VariableReferenceResolver().getVariableReferences(current);
 
-            throw new RuntimeException("NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
+        //
+        // if the path value contains variable references ...
+        //
+
+        if (!references.isEmpty()) {
+
+            throw new RuntimeException(
+                    "NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
         }
 
         return delegateEditor.set(path, newValue);
@@ -168,9 +207,18 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
         return variables;
     }
 
-    public void setScope(Scope variables) {
+    public void setScope(Scope s) {
 
-        this.variables = variables;
+        //
+        // we cannot install a null scope
+        //
+
+        if (s == null) {
+
+            throw new IllegalArgumentException("null scope");
+        }
+
+        this.variables = s;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------
@@ -180,24 +228,5 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     // Private ---------------------------------------------------------------------------------------------------------
 
     // Inner classes ---------------------------------------------------------------------------------------------------
-
-//    catch (VariableFormatException e) {
-//
-//        //
-//        // incorrectly specified variable
-//        //
-//
-//        log.debug("invalid variable reference '" + rawContent + "'", e);
-//        throw new IllegalStateException("path " + path + " contains an invalid variable reference '" + rawContent + "'");
-//    }
-//    catch (VariableNotDefinedException e) {
-//
-//        //
-//        // the underlying tokens have been configured to fail on attempts to resolve missing variables
-//        //
-//
-//        throw new IllegalStateException(
-//                "path " + path + " contains a variable reference whose definition is missing", e);
-//    }
 
 }

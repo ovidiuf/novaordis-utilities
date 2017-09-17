@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -53,13 +54,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
     // variable provider accessor/mutator ------------------------------------------------------------------------------
 
     @Test
-    public void getVariableProvider_setVariableProvider() throws Exception {
+    public void getScope_setScope() throws Exception {
 
         File f = Util.cp("xml/simple.xml", scratchDirectory);
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
-
-        assertNull(editor.getScope());
 
         Scope s = new ScopeImpl();
 
@@ -68,39 +67,52 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         assertEquals(s, editor.getScope());
     }
 
+    @Test
+    public void setScope_Null() throws Exception {
+
+        File f = Util.cp("xml/simple.xml", scratchDirectory);
+
+        VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
+
+        try {
+
+            editor.setScope(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null scope"));
+        }
+    }
+
     // get -------------------------------------------------------------------------------------------------------------
 
     @Test
-    public void get_UnresolvedVariable_NoVariableProvider() throws Exception {
+    public void get_UnresolvedVariable() throws Exception {
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
-
-        //
-        // we don't install any VariableProvider
-        //
-
-        assertNull(editor.getScope());
 
         String s = editor.get("/root/blue");
         assertEquals("${something}", s);
     }
 
     @Test
-    public void get_BrokenVariable_NoVariableProvider() throws Exception {
+    public void get_BrokenVariable() throws Exception {
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        assertNull(editor.getScope());
-
         try {
+
             editor.get("/root/red");
             fail("should throw exception");
         }
         catch(Exception e) {
+
             String msg = e.getMessage();
             log.info(msg);
             assertEquals("path /root/red contains an invalid variable reference '${broken.variable'", msg);
@@ -136,13 +148,16 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         editor.setScope(sc);
 
         try {
+
             editor.get("/root/red");
             fail("should throw exception");
         }
-        catch(Exception e) {
+        catch(IllegalStateException e) {
+
             String msg = e.getMessage();
-            log.info(msg);
-            assertEquals("path /root/red contains an invalid variable reference '${broken.variable'", msg);
+            assertTrue(msg.contains("path /root/red contains an invalid variable reference"));
+            assertTrue(msg.contains("broken.variable"));
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
         }
     }
 
@@ -166,17 +181,11 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
     // getList ---------------------------------------------------------------------------------------------------------
 
     @Test
-    public void getList_UnresolvedVariable_NoVariableProvider() throws Exception {
+    public void getList_UnresolvedVariable() throws Exception {
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
-
-        //
-        // we don't install any VariableProvider
-        //
-
-        assertNull(editor.getScope());
 
         List<String> s = editor.getList("/root/list/element");
 
@@ -187,24 +196,23 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
     }
 
     @Test
-    public void getList_BrokenVariable_NoVariableProvider() throws Exception {
+    public void getList_BrokenVariable() throws Exception {
 
         File f = Util.cp("xml/variables/xml-with-custom-variables.xml", scratchDirectory);
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        assertNull(editor.getScope());
-
         try {
+
             editor.getList("/root/list2/element2");
             fail("should throw exception");
         }
         catch(Exception e) {
+
             String msg = e.getMessage();
-            log.info(msg);
-            assertEquals(
-                    "path /root/list2/element2 contains an invalid variable reference '${broken.element.variable'",
-                    msg);
+            assertTrue(msg.contains("path /root/list2/element2 contains an invalid variable reference"));
+            assertTrue(msg.contains("broken.element.variable"));
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
         }
     }
 

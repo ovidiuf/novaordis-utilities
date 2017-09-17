@@ -16,14 +16,15 @@
 
 package io.novaordis.utilities.variable2;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 /**
- * The IllegalReferenceException exception carries the variable name - or what it is thought to be the variable name -
- * extracted from the variable reference literal that caused it, in addition to the general message.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/15/17
  */
-public class IllegalReferenceException extends VariableException {
+public class IllegalReferenceExceptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -31,30 +32,21 @@ public class IllegalReferenceException extends VariableException {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    //
-    // the variable reference, including the ${} that caused the exception, even if it's invalid (in this case, is the
-    // string that is thought to be the variable reference
-    //
-    private String variableName;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    public IllegalReferenceException(String variableName, String msg) {
-
-        super(msg);
-
-        this.variableName = variableName;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    /**
-     * The variable name - or what it is thought to be the variable name - extracted from the variable reference literal
-     * that caused the exception.
-     */
-    public String getVariableName() {
+    // Tests -----------------------------------------------------------------------------------------------------------
 
-        return variableName;
+    // variable name ---------------------------------------------------------------------------------------------------
+
+    @Test
+    public void getVariableName() throws Exception {
+
+        IllegalReferenceException e = new IllegalReferenceException("something", "something else");
+
+        assertEquals("something", e.getVariableName());
+        assertEquals("something else", e.getMessage());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

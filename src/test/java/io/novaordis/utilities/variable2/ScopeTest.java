@@ -182,7 +182,7 @@ public abstract class ScopeTest {
         catch(DuplicateDeclarationException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("?"));
+            assertTrue(msg.contains("A"));
         }
     }
 
@@ -808,7 +808,9 @@ public abstract class ScopeTest {
 
         assertNull(s.getVariable("something"));
 
-        assertNull(s.declare("something", "A"));
+        Variable v = s.declare("something", "A");
+        assertEquals("something", v.name());
+        assertEquals("A", v.get());
 
         assertEquals("A", s.getVariable("something").get());
 
@@ -841,10 +843,10 @@ public abstract class ScopeTest {
 
         assertNull(childTwo.getEnclosing());
 
-        childOne.enclose(parent);
+        parent.enclose(childOne);
         assertEquals(parent, childOne.getEnclosing());
 
-        childTwo.enclose(parent);
+        parent.enclose(childTwo);
         assertEquals(parent, childTwo.getEnclosing());
 
         //
@@ -858,24 +860,52 @@ public abstract class ScopeTest {
         assertEquals("valueA", childTwo.getVariable("variableA").get());
 
         //
-        // local values supersede the values above them in the hierarchy
+        // local values supersede the values above them in the hierarchy, but only if the values were declared locally
         //
 
+        //
+        // 'variableA' was declared in parent, so changing the value in children changes its value in parent
+        //
         //noinspection unchecked
         childOne.getVariable("variableA").set("valueB");
 
-        assertEquals("valueA", parent.getVariable("variableA").get());
+        assertEquals("valueB", parent.getVariable("variableA").get());
         assertEquals("valueB", childOne.getVariable("variableA").get());
-        assertEquals("valueA", childTwo.getVariable("variableA").get());
+        assertEquals("valueB", childTwo.getVariable("variableA").get());
+
+        //
+        // 'variableA' was declared in parent, so changing the value in children changes its value in parent
+        //
 
         //noinspection unchecked
         childTwo.getVariable("variableA").set("valueC");
 
-        assertEquals("valueA", parent.getVariable("variableA").get());
-        assertEquals("valueB", childOne.getVariable("variableA").get());
+        assertEquals("valueC", parent.getVariable("variableA").get());
+        assertEquals("valueC", childOne.getVariable("variableA").get());
         assertEquals("valueC", childTwo.getVariable("variableA").get());
-    }
 
+        //
+        // if I declare the same variable in an enclosed scope, the modifications do not propagate
+        //
+
+        childOne.declare("variableA", "valueD");
+
+        assertEquals("valueC", parent.getVariable("variableA").get());
+        assertEquals("valueD", childOne.getVariable("variableA").get());
+        assertEquals("valueC", childTwo.getVariable("variableA").get());
+
+        //
+        // changing a scoped variable does not affect the value outside the scope and enclosed scopes
+        //
+
+        //noinspection unchecked
+        childOne.getVariable("variableA").set("valueE");
+
+        assertEquals("valueC", parent.getVariable("variableA").get());
+        assertEquals("valueE", childOne.getVariable("variableA").get());
+        assertEquals("valueC", childTwo.getVariable("variableA").get());
+
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
