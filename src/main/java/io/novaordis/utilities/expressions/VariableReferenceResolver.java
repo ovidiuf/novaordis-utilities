@@ -45,9 +45,22 @@ public class VariableReferenceResolver {
      *
      * @param  useBraces if the variable is not declared in scope, the string representation is the variable reference
      *                   which is rendered surrounded by braces or not, depending the value of this flag.
+     *
+     * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
+     *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
+     *                              resolved in scope, the method will maintain the variable reference unchanged in
+     *                              the result string.
+     *
      * @return the string value of a variable whose name was specified.
+     *
+     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an at least one undeclared variable
+     * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
+     * identified undeclared variable.
+
      */
-    public String resolveVariable(String variableName, Scope scope, boolean useBraces) {
+    public String resolveVariable(
+            String variableName, Scope scope, boolean useBraces, boolean failOnUndeclaredVariable)
+            throws UndeclaredVariableException {
 
         if (scope == null) {
 
@@ -59,6 +72,11 @@ public class VariableReferenceResolver {
         Variable v = scope.getVariable(variableName);
 
         if (v == null) {
+
+            if (failOnUndeclaredVariable) {
+
+                throw new UndeclaredVariableException(variableName, null);
+            }
 
             if (useBraces) {
 
@@ -209,15 +227,21 @@ public class VariableReferenceResolver {
      * Resolves variable references, if the corresponding variables are declared, or leaves the references unchanged
      * if the corresponding variables are not declared.
      *
+     * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
+     *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
+     *                              resolved in scope, the method will maintain the variable reference unchanged in
+     *                              the result string.
+     *
+     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an at least one undeclared variable
+     * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
+     * identified undeclared variable.
+     *
      * @exception IllegalNameException
      * @exception IllegalReferenceException
      * @exception IllegalArgumentException on null arguments
-     *
-     *
-     * TODO - refactor this to use getVariableReference
-     *
      */
-    public String resolve(String stringWithVariableReferences, Scope scope) {
+    public String resolve(String stringWithVariableReferences, Scope scope, boolean failOnUndeclaredVariable)
+            throws UndeclaredVariableException {
 
         if (stringWithVariableReferences == null) {
 
@@ -242,7 +266,7 @@ public class VariableReferenceResolver {
         for(VariableReference r: references) {
 
             sb.append(stringWithVariableReferences.substring(i, r.getStartIndex()));
-            String s = resolveVariable(r.getName(), scope, r.hasBraces());
+            String s = resolveVariable(r.getName(), scope, r.hasBraces(), failOnUndeclaredVariable);
             sb.append(s);
             i = r.getEndIndex() + 1;
         }

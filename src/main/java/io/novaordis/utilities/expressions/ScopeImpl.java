@@ -191,7 +191,26 @@ public class ScopeImpl implements Scope {
     @Override
     public String evaluate(String stringWithVariableReferences) {
 
-        return variableReferenceResolver.resolve(stringWithVariableReferences, this);
+        try {
+
+            return evaluate(stringWithVariableReferences, false);
+        }
+        catch(UndeclaredVariableException e) {
+
+            //
+            // this is abnormal, we cannot throw UndeclaredVariableException if we requested the method not to fail
+            // on undeclared references
+            //
+
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public String evaluate(String stringWithVariableReferences, boolean failOnUndeclaredVariable)
+            throws UndeclaredVariableException {
+
+        return variableReferenceResolver.resolve(stringWithVariableReferences, this, failOnUndeclaredVariable);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

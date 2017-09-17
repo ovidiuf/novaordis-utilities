@@ -97,11 +97,40 @@ public interface Scope {
     Scope getEnclosing();
 
     /**
-     * Resolves variable references and evaluates expressions.
+     * Resolves variable references and evaluates expressions. If a variable cannot be resolved because it was not
+     * declared in scope, the reference is returned unchanged. If a more nuanced reaction to this situation is needed
+     * use evaluate(String, boolean)
      *
      * @exception IllegalArgumentException on null string.
+     *
      * @exception IllegalNameException if the variable name references are not valid variable names.
+     *
+     * @see Scope#evaluate(String, boolean)
      */
     String evaluate(String stringWithVariableReferences);
+
+    /**
+     * Resolves variable references and evaluates expressions. If a variable cannot be resolved because it was not
+     * declared in scope, the method will either keep the variable reference unchanged, or it will throw exception,
+     * depending on the value of "failOnMissingVariable" flag.
+     *
+     * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
+     *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
+     *                              resolved in scope, the method will maintain the variable reference unchanged in
+     *                              the result string.
+     *
+     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an at least one undeclared variable
+     * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
+     * identified undeclared variable.
+     *
+     * @exception IllegalArgumentException on null string.
+     *
+     * @exception IllegalNameException if the variable name references are not valid variable names.
+     *
+     * @see Scope#evaluate(String, boolean)
+     */
+    String evaluate(String stringWithVariableReferences, boolean failOnUndeclaredVariable)
+            throws UndeclaredVariableException;
+
 
 }

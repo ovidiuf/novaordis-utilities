@@ -709,6 +709,59 @@ public abstract class ScopeTest {
         }
     }
 
+    @Test
+    public void evaluate_FailOnUndeclaredVariable_NoUndeclaredVariable() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        scope.declare("a", "A");
+
+        String result = scope.evaluate("test ${a}", true);
+
+        assertEquals("test A", result);
+    }
+
+    @Test
+    public void evaluate_FailOnUndeclaredVariable_UndeclaredVariablePresent() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        assertNull(scope.getVariable("a"));
+
+        try {
+
+            scope.evaluate("test ${a}", true);
+            fail("should have thrown exception");
+        }
+        catch(UndeclaredVariableException e) {
+
+            String n = e.getUndeclaredVariableName();
+            assertEquals("a", n);
+        }
+    }
+
+    @Test
+    public void evaluate_FailOnUndeclaredVariable_UndeclaredVariablePresent_MultipleUndeclaredVariables()
+            throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        assertNull(scope.getVariable("a"));
+        assertNull(scope.getVariable("m"));
+        assertNull(scope.getVariable("z"));
+
+        try {
+
+            scope.evaluate("test ${z}, ${m}, ${a}", true);
+            fail("should have thrown exception");
+        }
+        catch(UndeclaredVariableException e) {
+
+            String n = e.getUndeclaredVariableName();
+            assertEquals("z", n);
+        }
+    }
+
     // getVariablesDeclaredInScope() -----------------------------------------------------------------------------------
 
     @Test
