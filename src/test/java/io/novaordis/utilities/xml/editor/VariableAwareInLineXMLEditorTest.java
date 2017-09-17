@@ -17,8 +17,8 @@
 package io.novaordis.utilities.xml.editor;
 
 import io.novaordis.utilities.Util;
-import io.novaordis.utilities.variable2.Scope;
-import io.novaordis.utilities.variable2.ScopeImpl;
+import io.novaordis.utilities.expressions.Scope;
+import io.novaordis.utilities.expressions.ScopeImpl;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

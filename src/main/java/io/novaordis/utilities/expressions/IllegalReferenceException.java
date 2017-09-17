@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
- * Basic variable implementation. It keeps track of the scopes it was declared in.
+ * The IllegalReferenceException exception carries the variable name - or what it is thought to be the variable name -
+ * extracted from the variable reference literal that caused it, in addition to the general message.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-abstract class VariableBase<T> implements Variable<T> {
+public class IllegalReferenceException extends VariableException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,50 +31,30 @@ abstract class VariableBase<T> implements Variable<T> {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private String name;
-
-    private T value;
+    //
+    // the variable reference, including the ${} that caused the exception, even if it's invalid (in this case, is the
+    // string that is thought to be the variable reference
+    //
+    private String variableName;
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    /**
-     * @exception IllegalNameException
-     */
-    VariableBase(String name) {
+    public IllegalReferenceException(String variableName, String msg) {
 
-        this.name = Variable.validateVariableName(name);
-    }
+        super(msg);
 
-    // Variable implementation -----------------------------------------------------------------------------------------
-
-    @Override
-    public String name() {
-
-        return name;
-    }
-
-    @Override
-    public T get() {
-
-        return value;
-    }
-
-    @Override
-    public T set(T value) {
-
-        T old = this.value;
-
-        this.value = value;
-
-        return old;
+        this.variableName = variableName;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    @Override
-    public String toString() {
+    /**
+     * The variable name - or what it is thought to be the variable name - extracted from the variable reference literal
+     * that caused the exception.
+     */
+    public String getVariableName() {
 
-        return name + "=" + value;
+        return variableName;
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

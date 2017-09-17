@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
- * Indicates an illegal variable name.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-public class IllegalNameException extends VariableException {
+public class StringVariable extends VariableBase {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,9 +30,25 @@ public class IllegalNameException extends VariableException {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public IllegalNameException(String msg) {
+    /**
+     * Variables can only be created by declaring them in scopes.
+     *
+     * All constructors must be at most protected.
+     *
+     * @exception IllegalNameException
+     */
+    protected StringVariable(String name) {
 
-        super(msg);
+        super(name);
+    }
+
+    // Variable implementation -----------------------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class type() {
+
+        return String.class;
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
@@ -42,6 +56,8 @@ public class IllegalNameException extends VariableException {
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    // VariableBase implementation -------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
 

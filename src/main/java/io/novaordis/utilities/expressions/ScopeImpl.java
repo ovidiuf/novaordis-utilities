@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 import java.util.ArrayList;
 import java.util.Collections;

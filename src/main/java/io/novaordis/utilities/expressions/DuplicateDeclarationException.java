@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
+ * Must carry the name of the duplicate variable as message.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-public class VariableException extends RuntimeException {
+public class DuplicateDeclarationException extends VariableException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,9 +32,12 @@ public class VariableException extends RuntimeException {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public VariableException(String msg) {
+    /**
+     * @param duplicateVariableName - the name of the duplicate variable.
+     */
+    public DuplicateDeclarationException(String duplicateVariableName) {
 
-        super(msg);
+        super(duplicateVariableName);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

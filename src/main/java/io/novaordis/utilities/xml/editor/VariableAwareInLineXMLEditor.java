@@ -16,11 +16,11 @@
 
 package io.novaordis.utilities.xml.editor;
 
-import io.novaordis.utilities.variable2.IllegalReferenceException;
-import io.novaordis.utilities.variable2.Scope;
-import io.novaordis.utilities.variable2.ScopeImpl;
-import io.novaordis.utilities.variable2.VariableReference;
-import io.novaordis.utilities.variable2.VariableReferenceResolver;
+import io.novaordis.utilities.expressions.IllegalReferenceException;
+import io.novaordis.utilities.expressions.Scope;
+import io.novaordis.utilities.expressions.ScopeImpl;
+import io.novaordis.utilities.expressions.VariableReference;
+import io.novaordis.utilities.expressions.VariableReferenceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

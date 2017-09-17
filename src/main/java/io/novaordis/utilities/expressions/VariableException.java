@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
- * Indicates an illegal variable type.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-public class IllegalTypeException extends VariableException {
+public class VariableException extends RuntimeException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,7 +30,7 @@ public class IllegalTypeException extends VariableException {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public IllegalTypeException(String msg) {
+    public VariableException(String msg) {
 
         super(msg);
     }

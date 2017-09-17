@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/16/17
  */
-public class ScopeImplTest extends ScopeTest {
+public class VariableReference {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,21 +28,64 @@ public class ScopeImplTest extends ScopeTest {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private String name;
+
+    private boolean hasBraces;
+
+    private int startIndex;
+    private int endIndex;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    /**
+     *
+     * @param name
+     * @param startIndex in the enclosing string.
+     * @param endIndex in the enclosing string - is the index of last character of the reference (which may be '}' or
+     *                 the last character of the name).
+     * @param hasBraces
+     *
+     * @exception IllegalNameException if the name is illegal.
+     */
+    public VariableReference(String name, int startIndex, int endIndex, boolean hasBraces) {
+
+        this.name = Variable.validateVariableName(name);
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.hasBraces = hasBraces;
+    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Tests -----------------------------------------------------------------------------------------------------------
+    public String getName() {
+
+        return name;
+    }
+
+    public int getStartIndex() {
+
+        return startIndex;
+    }
+
+    public int getEndIndex() {
+
+        return endIndex;
+    }
+
+    public boolean hasBraces() {
+
+        return hasBraces;
+    }
+
+    @Override
+    public String toString() {
+
+        return startIndex + ":$" + (hasBraces ? "{" : "") + name + (hasBraces ? "}:" : ":") + endIndex;
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected Scope getScopeToTest() throws Exception {
-
-        return new ScopeImpl();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

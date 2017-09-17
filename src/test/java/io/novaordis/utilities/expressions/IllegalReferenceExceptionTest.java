@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/16/17
+ * @since 9/15/17
  */
-public class VariableReference {
+public class IllegalReferenceExceptionTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,59 +32,21 @@ public class VariableReference {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private String name;
-
-    private boolean hasBraces;
-
-    private int startIndex;
-    private int endIndex;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    /**
-     *
-     * @param name
-     * @param startIndex in the enclosing string.
-     * @param endIndex in the enclosing string - is the index of last character of the reference (which may be '}' or
-     *                 the last character of the name).
-     * @param hasBraces
-     *
-     * @exception IllegalNameException if the name is illegal.
-     */
-    public VariableReference(String name, int startIndex, int endIndex, boolean hasBraces) {
-
-        this.name = Variable.validateVariableName(name);
-        this.startIndex = startIndex;
-        this.endIndex = endIndex;
-        this.hasBraces = hasBraces;
-    }
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    public String getName() {
+    // Tests -----------------------------------------------------------------------------------------------------------
 
-        return name;
-    }
+    // variable name ---------------------------------------------------------------------------------------------------
 
-    public int getStartIndex() {
+    @Test
+    public void getVariableName() throws Exception {
 
-        return startIndex;
-    }
+        IllegalReferenceException e = new IllegalReferenceException("something", "something else");
 
-    public int getEndIndex() {
-
-        return endIndex;
-    }
-
-    public boolean hasBraces() {
-
-        return hasBraces;
-    }
-
-    @Override
-    public String toString() {
-
-        return startIndex + ":$" + (hasBraces ? "{" : "") + name + (hasBraces ? "}:" : ":") + endIndex;
+        assertEquals("something", e.getVariableName());
+        assertEquals("something else", e.getMessage());
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

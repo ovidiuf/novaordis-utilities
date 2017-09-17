@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+package io.novaordis.utilities.expressions;
 
 /**
+ * Indicates an illegal variable name.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/15/17
+ * @since 9/13/17
  */
-public class IllegalReferenceExceptionTest {
+public class IllegalNameException extends VariableException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -34,20 +32,12 @@ public class IllegalReferenceExceptionTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Public ----------------------------------------------------------------------------------------------------------
+    public IllegalNameException(String msg) {
 
-    // Tests -----------------------------------------------------------------------------------------------------------
-
-    // variable name ---------------------------------------------------------------------------------------------------
-
-    @Test
-    public void getVariableName() throws Exception {
-
-        IllegalReferenceException e = new IllegalReferenceException("something", "something else");
-
-        assertEquals("something", e.getVariableName());
-        assertEquals("something else", e.getMessage());
+        super(msg);
     }
+
+    // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 

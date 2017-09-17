@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.variable2;
+package io.novaordis.utilities.expressions;
 
 /**
- * Must carry the name of the duplicate variable as message.
- *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-public class DuplicateDeclarationException extends VariableException {
+public class ScopeImplTest extends ScopeTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,19 +30,19 @@ public class DuplicateDeclarationException extends VariableException {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    /**
-     * @param duplicateVariableName - the name of the duplicate variable.
-     */
-    public DuplicateDeclarationException(String duplicateVariableName) {
-
-        super(duplicateVariableName);
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
+
+    // Tests -----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
+
+    @Override
+    protected Scope getScopeToTest() throws Exception {
+
+        return new ScopeImpl();
+    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 
