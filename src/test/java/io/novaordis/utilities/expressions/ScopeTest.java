@@ -440,7 +440,24 @@ public abstract class ScopeTest {
         assertEquals("test", v.name());
     }
 
-    // resolve() ------------------------------------------------------------------------------------------------------
+    // evaluate() ------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void evaluate_Null() throws Exception {
+
+        Scope scope = getScopeToTest();
+
+        try {
+
+            scope.evaluate(null);
+            fail("should throw exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.equals("null string"));
+        }
+    }
 
     @Test
     public void evaluate_NoVariables() throws Exception {

@@ -99,6 +99,7 @@ public interface Scope {
     /**
      * Resolves variable references and evaluates expressions.
      *
+     * @exception IllegalArgumentException on null string.
      * @exception IllegalNameException if the variable name references are not valid variable names.
      */
     String evaluate(String stringWithVariableReferences);
