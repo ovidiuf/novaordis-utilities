@@ -529,7 +529,7 @@ public abstract class ScopeTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 
@@ -546,7 +546,7 @@ public abstract class ScopeTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 
@@ -563,7 +563,7 @@ public abstract class ScopeTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 

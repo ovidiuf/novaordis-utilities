@@ -104,21 +104,19 @@ public class VariableReferenceResolver {
 
         List<VariableReference> references = new ArrayList<>();
 
-        int from = 0;
-        int to = 0;
+        int i = 0;
         int startIndex = -1;
 
         boolean expectingOptionalLeftBrace = false;
         boolean optionalLeftBraceFound = false;
         String variableName = null;
 
-        for(; to < stringWithVariableReferences.length(); to ++) {
+        for(; i < stringWithVariableReferences.length(); i++) {
 
-            char c = stringWithVariableReferences.charAt(to);
+            char c = stringWithVariableReferences.charAt(i);
 
             if (expectingOptionalLeftBrace) {
 
-                from = to;
                 variableName = "";
                 expectingOptionalLeftBrace = false;
 
@@ -141,14 +139,14 @@ public class VariableReferenceResolver {
                     // end of variable name
                     //
 
+                    int endIndex = i;
+
                     if (c == '}') {
 
                         if (!optionalLeftBraceFound) {
 
-                            throw new IllegalReferenceException(variableName, "unbalanced closing }");
+                            throw new IllegalReferenceException(variableName, "unbalanced closing '}'");
                         }
-
-                        from = to + 1;
                     }
                     else if (optionalLeftBraceFound) {
 
@@ -156,14 +154,16 @@ public class VariableReferenceResolver {
                         // got a terminator, but not '}', this is illegal
                         //
 
-                        throw new IllegalReferenceException(variableName, "missing closing }");
+                        throw new IllegalReferenceException(variableName, "missing closing '}'");
                     }
                     else {
 
-                        from = to;
+                        endIndex --;
                     }
 
-                    VariableReference r = new VariableReference(variableName, startIndex, to, optionalLeftBraceFound);
+                    VariableReference r =
+                            new VariableReference(variableName, startIndex, endIndex, optionalLeftBraceFound);
+
                     references.add(r);
                     variableName = null;
                 }
@@ -179,7 +179,7 @@ public class VariableReferenceResolver {
                 //
 
                 expectingOptionalLeftBrace = true;
-                startIndex = to;
+                startIndex = i;
             }
         }
 
@@ -194,7 +194,7 @@ public class VariableReferenceResolver {
             // the string ends with a variable name declared with simplified notation
             //
 
-            VariableReference r = new VariableReference(variableName, startIndex, to - 1, false);
+            VariableReference r = new VariableReference(variableName, startIndex, i - 1, false);
             references.add(r);
         }
         else if (expectingOptionalLeftBrace) {
@@ -244,7 +244,12 @@ public class VariableReferenceResolver {
             sb.append(stringWithVariableReferences.substring(i, r.getStartIndex()));
             String s = resolveVariable(r.getName(), scope, r.hasBraces());
             sb.append(s);
-            i = r.getEndIndex();
+            i = r.getEndIndex() + 1;
+        }
+
+        if (i <= stringWithVariableReferences.length()) {
+
+            sb.append(stringWithVariableReferences.substring(i));
         }
 
         return sb.toString();

@@ -114,7 +114,18 @@ public class VariableReferenceResolverTest {
 
         String s = "$b}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced closing '}'"));
+        }
     }
 
     @Test
@@ -122,7 +133,18 @@ public class VariableReferenceResolverTest {
 
         String s = "$b}c";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced closing '}'"));
+        }
     }
 
     @Test
@@ -130,7 +152,18 @@ public class VariableReferenceResolverTest {
 
         String s = "gobble${dy}gook";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("dy", r.getName());
+        assertEquals(6, r.getStartIndex());
+        assertEquals(10, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -138,7 +171,26 @@ public class VariableReferenceResolverTest {
 
         String s = "gobble${dy}go${ok}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(2, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("dy", r.getName());
+        assertEquals(6, r.getStartIndex());
+        assertEquals(10, r.getEndIndex());
+        assertTrue(r.hasBraces());
+
+        VariableReference r2 = vrs.get(1);
+
+        assertEquals("ok", r2.getName());
+        assertEquals(13, r2.getStartIndex());
+        assertEquals(17, r2.getEndIndex());
+        assertTrue(r2.hasBraces());
+
     }
 
     @Test
@@ -146,7 +198,18 @@ public class VariableReferenceResolverTest {
 
         String s = "gobbledy${a}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("a", r.getName());
+        assertEquals(8, r.getStartIndex());
+        assertEquals(11, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -154,7 +217,18 @@ public class VariableReferenceResolverTest {
 
         String s = "${a}dygook";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("a", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(3, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -162,7 +236,18 @@ public class VariableReferenceResolverTest {
 
         String s = "${a}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("a", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(3, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -170,7 +255,18 @@ public class VariableReferenceResolverTest {
 
         String s = "go${a}ok";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("a", r.getName());
+        assertEquals(2, r.getStartIndex());
+        assertEquals(5, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -178,7 +274,95 @@ public class VariableReferenceResolverTest {
 
         String s = "${g}${o}${b}${b}${l}${e}${d}${y}${g}${o}${o}${k}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(12, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("g", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(3, r.getEndIndex());
+        assertTrue(r.hasBraces());
+
+        VariableReference r2 = vrs.get(1);
+
+        assertEquals("o", r2.getName());
+        assertEquals(4, r2.getStartIndex());
+        assertEquals(7, r2.getEndIndex());
+        assertTrue(r2.hasBraces());
+
+        VariableReference r3 = vrs.get(2);
+
+        assertEquals("b", r3.getName());
+        assertEquals(8, r3.getStartIndex());
+        assertEquals(11, r3.getEndIndex());
+        assertTrue(r3.hasBraces());
+
+        VariableReference r4 = vrs.get(3);
+
+        assertEquals("b", r4.getName());
+        assertEquals(12, r4.getStartIndex());
+        assertEquals(15, r4.getEndIndex());
+        assertTrue(r4.hasBraces());
+
+        VariableReference r5 = vrs.get(4);
+
+        assertEquals("l", r5.getName());
+        assertEquals(16, r5.getStartIndex());
+        assertEquals(19, r5.getEndIndex());
+        assertTrue(r5.hasBraces());
+
+        VariableReference r6 = vrs.get(5);
+
+        assertEquals("e", r6.getName());
+        assertEquals(20, r6.getStartIndex());
+        assertEquals(23, r6.getEndIndex());
+        assertTrue(r6.hasBraces());
+
+        VariableReference r7 = vrs.get(6);
+
+        assertEquals("d", r7.getName());
+        assertEquals(24, r7.getStartIndex());
+        assertEquals(27, r7.getEndIndex());
+        assertTrue(r7.hasBraces());
+
+        VariableReference r8 = vrs.get(7);
+
+        assertEquals("y", r8.getName());
+        assertEquals(28, r8.getStartIndex());
+        assertEquals(31, r8.getEndIndex());
+        assertTrue(r8.hasBraces());
+
+        VariableReference r9 = vrs.get(8);
+
+        assertEquals("g", r9.getName());
+        assertEquals(32, r9.getStartIndex());
+        assertEquals(35, r9.getEndIndex());
+        assertTrue(r9.hasBraces());
+
+        VariableReference r10 = vrs.get(9);
+
+        assertEquals("o", r10.getName());
+        assertEquals(36, r10.getStartIndex());
+        assertEquals(39, r10.getEndIndex());
+        assertTrue(r10.hasBraces());
+
+        VariableReference r11 = vrs.get(10);
+
+        assertEquals("o", r11.getName());
+        assertEquals(40, r11.getStartIndex());
+        assertEquals(43, r11.getEndIndex());
+        assertTrue(r11.hasBraces());
+
+        VariableReference r12 = vrs.get(11);
+
+        assertEquals("k", r12.getName());
+        assertEquals(44, r12.getStartIndex());
+        assertEquals(47, r12.getEndIndex());
+        assertTrue(r12.hasBraces());
     }
 
     @Test
@@ -186,7 +370,33 @@ public class VariableReferenceResolverTest {
 
         String s = "${a}b${c}d${d}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(3, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("a", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(3, r.getEndIndex());
+        assertTrue(r.hasBraces());
+
+        VariableReference r2 = vrs.get(1);
+
+        assertEquals("c", r2.getName());
+        assertEquals(5, r2.getStartIndex());
+        assertEquals(8, r2.getEndIndex());
+        assertTrue(r2.hasBraces());
+
+        VariableReference r3 = vrs.get(2);
+
+        assertEquals("d", r3.getName());
+        assertEquals(10, r3.getStartIndex());
+        assertEquals(13, r3.getEndIndex());
+        assertTrue(r3.hasBraces());
+
     }
 
     @Test
@@ -194,7 +404,18 @@ public class VariableReferenceResolverTest {
 
         String s = "${{something}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("misplaced '{' in variable reference"));
+        }
     }
 
     @Test
@@ -202,7 +423,18 @@ public class VariableReferenceResolverTest {
 
         String s = "${some${thing}}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("misplaced '$' in variable reference"));
+        }
     }
 
     @Test
@@ -210,15 +442,35 @@ public class VariableReferenceResolverTest {
 
         String s = "${s";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
+        }
     }
 
     @Test
     public void getVariableReferences_null() throws Exception {
 
-        String s = null;
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
 
-        fail("return here");
+        try {
+
+            resolver.getVariableReferences(null);
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null string"));
+        }
     }
 
     @Test
@@ -226,7 +478,18 @@ public class VariableReferenceResolverTest {
 
         String s = "something $";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("empty variable reference"));
+        }
     }
 
     @Test
@@ -234,7 +497,18 @@ public class VariableReferenceResolverTest {
 
         String s = "a ${b something";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("missing closing '}'"));
+        }
     }
 
     @Test
@@ -242,7 +516,18 @@ public class VariableReferenceResolverTest {
 
         String s = "blah${something";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        try {
+
+            resolver.getVariableReferences(s);
+            fail("should have thrown exception");
+        }
+        catch(IllegalReferenceException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
+        }
     }
 
     @Test
@@ -250,7 +535,18 @@ public class VariableReferenceResolverTest {
 
         String s = "$b/something";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(1, r.getEndIndex());
+        assertFalse(r.hasBraces());
     }
 
     @Test
@@ -258,7 +554,18 @@ public class VariableReferenceResolverTest {
 
         String s = "$b:something";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(1, r.getEndIndex());
+        assertFalse(r.hasBraces());
     }
 
     @Test
@@ -266,7 +573,18 @@ public class VariableReferenceResolverTest {
 
         String s = "$b something";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(1, r.getEndIndex());
+        assertFalse(r.hasBraces());
     }
 
     @Test
@@ -274,7 +592,18 @@ public class VariableReferenceResolverTest {
 
         String s = "some$thing";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("thing", r.getName());
+        assertEquals(4, r.getStartIndex());
+        assertEquals(9, r.getEndIndex());
+        assertFalse(r.hasBraces());
     }
 
     @Test
@@ -282,7 +611,18 @@ public class VariableReferenceResolverTest {
 
         String s = "a ${b} c";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(2, r.getStartIndex());
+        assertEquals(5, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -290,7 +630,25 @@ public class VariableReferenceResolverTest {
 
         String s = "a ${b} c ${d} ";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(2, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("b", r.getName());
+        assertEquals(2, r.getStartIndex());
+        assertEquals(5, r.getEndIndex());
+        assertTrue(r.hasBraces());
+
+        VariableReference r2 = vrs.get(1);
+
+        assertEquals("d", r2.getName());
+        assertEquals(9, r2.getStartIndex());
+        assertEquals(12, r2.getEndIndex());
+        assertTrue(r2.hasBraces());
     }
 
     @Test
@@ -298,7 +656,18 @@ public class VariableReferenceResolverTest {
 
         String s = "${something}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("something", r.getName());
+        assertEquals(0, r.getStartIndex());
+        assertEquals(11, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     @Test
@@ -306,7 +675,18 @@ public class VariableReferenceResolverTest {
 
         String s = "blah${something}";
 
-        fail("return here");
+        VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
+
+        List<VariableReference> vrs = resolver.getVariableReferences(s);
+
+        assertEquals(1, vrs.size());
+
+        VariableReference r = vrs.get(0);
+
+        assertEquals("something", r.getName());
+        assertEquals(4, r.getStartIndex());
+        assertEquals(15, r.getEndIndex());
+        assertTrue(r.hasBraces());
     }
 
     // resolve() -------------------------------------------------------------------------------------------------------
@@ -417,7 +797,7 @@ public class VariableReferenceResolverTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 
@@ -435,7 +815,7 @@ public class VariableReferenceResolverTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 
@@ -453,7 +833,7 @@ public class VariableReferenceResolverTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("unbalanced closing }"));
+            assertTrue(msg.contains("unbalanced closing '}'"));
         }
     }
 
@@ -669,7 +1049,7 @@ public class VariableReferenceResolverTest {
         catch(IllegalReferenceException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("missing closing }"));
+            assertTrue(msg.contains("missing closing '}'"));
         }
     }
 

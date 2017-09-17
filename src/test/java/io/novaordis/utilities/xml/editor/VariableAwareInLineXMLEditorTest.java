@@ -114,8 +114,8 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         catch(Exception e) {
 
             String msg = e.getMessage();
-            log.info(msg);
-            assertEquals("path /root/red contains an invalid variable reference '${broken.variable'", msg);
+            assertTrue(msg.contains("path /root/red contains an invalid variable reference 'broken.variable'"));
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
         }
     }
 
@@ -249,15 +249,16 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
         editor.setScope(sc);
 
         try {
+
             editor.getList("/root/list2/element2");
             fail("should throw exception");
         }
         catch(Exception e) {
+
             String msg = e.getMessage();
-            log.info(msg);
-            assertEquals(
-                    "path /root/list2/element2 contains an invalid variable reference '${broken.element.variable'",
-                    msg);
+            assertTrue(msg.contains(
+                    "path /root/list2/element2 contains an invalid variable reference 'broken.element.variable'"));
+            assertTrue(msg.contains("unbalanced '{' in variable reference"));
         }
     }
 

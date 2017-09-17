@@ -107,6 +107,11 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         String s = delegateEditor.get(path);
 
+        if (s == null) {
+
+            return null;
+        }
+
         try {
 
             //
@@ -170,16 +175,19 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
         String current = delegateEditor.get(path);
 
-        List<VariableReference> references = new VariableReferenceResolver().getVariableReferences(current);
+        if (current != null) {
 
-        //
-        // if the path value contains variable references ...
-        //
+            List<VariableReference> references = new VariableReferenceResolver().getVariableReferences(current);
 
-        if (!references.isEmpty()) {
+            //
+            // if the path value contains variable references ...
+            //
 
-            throw new RuntimeException(
-                    "NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
+            if (!references.isEmpty()) {
+
+                throw new RuntimeException(
+                        "NOT YET IMPLEMENTED: we don't support yet writing content that references variables");
+            }
         }
 
         return delegateEditor.set(path, newValue);

@@ -303,10 +303,12 @@ public abstract class InLineXMLEditorTest {
         InLineXMLEditor editor = getInLineXmlEditorToTest(xmlFile);
 
         try {
+
             assertTrue(editor.set("/c", "y"));
             fail("should throw NYE");
         }
         catch(RuntimeException e) {
+
             String msg = e.getMessage();
             log.info(msg);
             assertTrue(msg.startsWith("NOT YET IMPLEMENTED: we did not find element and we don't know how to add"));
