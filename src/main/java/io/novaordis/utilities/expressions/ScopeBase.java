@@ -186,6 +186,11 @@ public class ScopeBase implements Scope {
             //noinspection unchecked
             v = new StringVariable(name);
         }
+        else if (Boolean.class.equals(type)) {
+
+            //noinspection unchecked
+            v = new BooleanVariable(name);
+        }
         else {
 
             throw new IllegalTypeException(type.toString());

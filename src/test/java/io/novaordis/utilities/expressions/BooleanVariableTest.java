@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
-public class StringVariableTest extends VariableTest {
+public class BooleanVariableTest extends VariableTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -43,13 +43,13 @@ public class StringVariableTest extends VariableTest {
 
         Scope s = new ScopeBase();
 
-        Variable<String> v = s.declare("something", "blah");
+        Variable<Boolean> v = s.declare("something", true);
 
-        assertTrue(v instanceof StringVariable);
+        assertTrue(v instanceof BooleanVariable);
 
         assertEquals("something", v.name());
-        assertEquals(String.class, v.type());
-        assertEquals("blah", v.get());
+        assertEquals(Boolean.class, v.type());
+        assertEquals(true, v.get());
 
     }
 
@@ -58,12 +58,12 @@ public class StringVariableTest extends VariableTest {
 
         Scope s = new ScopeBase();
 
-        Variable<String> v = s.declare("something", String.class);
+        Variable<Boolean> v = s.declare("something", Boolean.class);
 
-        assertTrue(v instanceof StringVariable);
+        assertTrue(v instanceof BooleanVariable);
 
         assertEquals("something", v.name());
-        assertEquals(String.class, v.type());
+        assertEquals(Boolean.class, v.type());
         assertNull(v.get());
     }
 
@@ -76,9 +76,9 @@ public class StringVariableTest extends VariableTest {
     @Override
     protected <T> Variable<T> getVariableToTest(String name, T optionalValue) throws Exception {
 
-        if (optionalValue != null && !(optionalValue instanceof String)) {
+        if (optionalValue != null && !(optionalValue instanceof Boolean)) {
 
-            throw new IllegalArgumentException("optional value must be null or String");
+            throw new IllegalArgumentException("optional value must be null or Boolean");
         }
 
         Scope defaultScope = new ScopeBase();
@@ -89,7 +89,7 @@ public class StringVariableTest extends VariableTest {
     @Override
     protected Object getValueToTest() {
 
-        return "some string";
+        return true;
     }
 
     // Private ---------------------------------------------------------------------------------------------------------

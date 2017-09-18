@@ -17,6 +17,8 @@
 package io.novaordis.utilities.expressions;
 
 /**
+ * A variable whose value is a String.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
  */
