@@ -16,7 +16,6 @@
 
 package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.NotSupportedException;
 import io.novaordis.utilities.expressions.Scope;
 import io.novaordis.utilities.expressions.ScopeTest;
 import io.novaordis.utilities.expressions.StringVariable;
@@ -66,7 +65,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));
@@ -100,7 +99,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertNotNull(msg);
@@ -125,7 +124,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertNotNull(msg);
@@ -148,7 +147,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertNotNull(msg);
@@ -173,7 +172,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));
@@ -207,7 +206,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));
@@ -230,7 +229,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
             fail("should have thrown exception");
         }
-        catch(NotSupportedException e) {
+        catch(UnsupportedOperationException e) {
 
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));

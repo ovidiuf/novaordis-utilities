@@ -16,7 +16,6 @@
 
 package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.NotSupportedException;
 import io.novaordis.utilities.expressions.DuplicateDeclarationException;
 import io.novaordis.utilities.expressions.ScopeBase;
 import io.novaordis.utilities.expressions.Variable;
@@ -168,7 +167,7 @@ public class OSProcessScope extends ScopeBase {
 
         if (value == null) {
 
-            throw new NotSupportedException("cannot declare undefined environment variables");
+            throw new UnsupportedOperationException("cannot declare undefined environment variables");
         }
 
         Class effectiveType;
@@ -184,7 +183,7 @@ public class OSProcessScope extends ScopeBase {
 
         if (!String.class.equals(effectiveType)) {
 
-            throw new NotSupportedException("cannot declare " + effectiveType + " variables");
+            throw new UnsupportedOperationException("cannot declare " + effectiveType + " variables");
         }
 
         if (declaredVariableNames.contains(name)) {

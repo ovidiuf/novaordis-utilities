@@ -16,8 +16,6 @@
 
 package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.NotSupportedException;
-
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/4/16
@@ -43,13 +41,13 @@ public class SystemEnvironmentVariableProvider implements EnvironmentVariablePro
     @Override
     public void export(String name, String value) {
 
-        throw new NotSupportedException(); // at least, not now ...
+        throw new UnsupportedOperationException(); // at least, not now ...
     }
 
     @Override
     public void unset(String name) {
 
-        throw new NotSupportedException(); // at least, not now ...
+        throw new UnsupportedOperationException(); // at least, not now ...
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

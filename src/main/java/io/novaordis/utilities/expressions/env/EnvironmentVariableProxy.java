@@ -16,7 +16,6 @@
 
 package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.NotSupportedException;
 import io.novaordis.utilities.expressions.StringVariable;
 
 /**
@@ -79,12 +78,12 @@ public class EnvironmentVariableProxy extends StringVariable {
 
         if (value == null) {
 
-            throw new NotSupportedException("cannot set null values for environment variables");
+            throw new UnsupportedOperationException("cannot set null values for environment variables");
         }
 
         if (!(value instanceof String)) {
 
-            throw new NotSupportedException("cannot set non-String values for environment variables");
+            throw new UnsupportedOperationException("cannot set non-String values for environment variables");
 
         }
 
