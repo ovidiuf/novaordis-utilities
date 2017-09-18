@@ -19,11 +19,15 @@ package io.novaordis.utilities.expressions.env;
 import io.novaordis.utilities.NotSupportedException;
 import io.novaordis.utilities.expressions.Scope;
 import io.novaordis.utilities.expressions.ScopeTest;
+import io.novaordis.utilities.expressions.StringVariable;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -45,25 +49,28 @@ public class OSProcessScopeTest extends ScopeTest {
 
     // Overrides -------------------------------------------------------------------------------------------------------
 
-    /**
-     * We cannot declare undefined environment variable, they must have a value, even if it is an empty string.
-     * @throws Exception
-     */
     @Test
     @Override
     public void declare_StringVariable_Undefined() throws Exception {
+
+        //
+        // We cannot declare undefined (null) environment variable, they must have a value, even if it is an empty
+        // string.
+        //
 
         Scope s = getScopeToTest();
 
         try {
 
             s.declare("test", String.class);
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
 
             String msg = e.getMessage();
             assertTrue(msg.contains("cannot"));
+            assertTrue(msg.contains("declare"));
             assertTrue(msg.contains("undefined"));
         }
     }
@@ -77,17 +84,20 @@ public class OSProcessScopeTest extends ScopeTest {
         //
     }
 
-    /**
-     * Throws a different exception.
-     */
     @Test
+    @Override
     public void declare_TypeInferenceBasedOnValue_Null() throws Exception {
 
         Scope s = getScopeToTest();
 
         try {
 
+            //
+            // Throws a different exception
+            //
+
             s.declare("test", null);
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -97,10 +107,8 @@ public class OSProcessScopeTest extends ScopeTest {
         }
     }
 
-    /**
-     * Throws a different exception.
-     */
     @Test
+    @Override
     public void declare_UnsupportedType() throws Exception {
 
         Class type = Void.class;
@@ -109,7 +117,13 @@ public class OSProcessScopeTest extends ScopeTest {
 
         try {
 
+            //
+            // Throws a different exception
+            //
+
             s.declare("something", type);
+
+            fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
 
@@ -118,17 +132,20 @@ public class OSProcessScopeTest extends ScopeTest {
         }
     }
 
-    /**
-     * Throws a different exception.
-     */
     @Test
+    @Override
     public void declare_TypeInferenceBasedOnValue_UnsupportedType() throws Exception {
 
         Scope s = getScopeToTest();
 
         try {
 
+            //
+            // Throws a different exception
+            //
+
             s.declare("test", new AtomicBoolean(true));
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -140,20 +157,20 @@ public class OSProcessScopeTest extends ScopeTest {
 
     // getVariable() test overrides ------------------------------------------------------------------------------------
 
-
-    /**
-     * We cannot declare undefined environment variable, they must have a value, even if it is an empty string.
-     * @throws Exception
-     */
     @Test
     @Override
     public void getVariable_NullValue() throws Exception {
+
+        //
+        // We cannot declare undefined environment variable, they must have a value, even if it is an empty string.
+        //
 
         Scope s = getScopeToTest();
 
         try {
 
             s.declare("test", String.class);
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -187,6 +204,7 @@ public class OSProcessScopeTest extends ScopeTest {
         try {
 
             s.declare("test", null);
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -209,6 +227,7 @@ public class OSProcessScopeTest extends ScopeTest {
         try {
 
             s.declare("test", 1);
+
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -221,15 +240,12 @@ public class OSProcessScopeTest extends ScopeTest {
 
     // evaluate() ------------------------------------------------------------------------------------------------------
 
-    /**
-     * We cannot have "defined but null" with environment variables.
-     */
     @Test
     @Override
     public void evaluate_VariableNameParsing_SimpleDeclaration_VariableDefinedButNull() throws Exception {
 
         //
-        // noop
+        // noop - we cannot have "defined but null" with environment variables.
         //
     }
 
@@ -244,61 +260,69 @@ public class OSProcessScopeTest extends ScopeTest {
         //
     }
 
-
     // Tests -----------------------------------------------------------------------------------------------------------
 
-//    @Test
-//    public void environmentVariableProvider() {
-//
-//        NortVariableProvider p = new NortVariableProvider();
-//
-//        EnvironmentVariableProvider original = p.getEnvironmentVariableProvider();
-//
-//        assertNotNull(original);
-//
-//        MockEnvironmentVariableProvider p2 = new MockEnvironmentVariableProvider();
-//
-//        p.setEnvironmentVariableProvider(p2);
-//
-//        EnvironmentVariableProvider p3 = p.getEnvironmentVariableProvider();
-//
-//        assertEquals(p3, p2);
-//        assertNotEquals(p3, original);
-//
-//        //
-//        // we don't have a parent
-//        //
-//        assertNull(p.getVariableProviderParent());
-//
-//        try {
-//
-//            p.setVariableProviderParent(new MockVariableProvider());
-//            fail("should have thrown exception");
-//        }
-//        catch(UnsupportedOperationException e) {
-//
-//            log.info("" + e);
-//        }
-//    }
-//
-//    @Test
-//    public void resolveAnEnvironmentVariable() {
-//
-//        MockEnvironmentVariableProvider mp = new MockEnvironmentVariableProvider();
-//
-//        NortVariableProvider p = new NortVariableProvider();
-//        p.setEnvironmentVariableProvider(mp);
-//
-//        assertNull(p.getVariableValue("NO_SUCH_VARIABLE"));
-//
-//        String value = "some value";
-//        String variableName = "SOME_VARIABLE";
-//        mp.installEnvironmentVariable(variableName, value);
-//
-//        String s = p.getVariableValue(variableName);
-//        assertEquals("some value", s);
-//    }
+    @Test
+    public void environmentVariableProvider() throws Exception {
 
+        OSProcessScope p = getScopeToTest();
+
+        EnvironmentVariableProvider original = p.getEnvironmentVariableProvider();
+
+        assertNotNull(original);
+
+        MockEnvironmentVariableProvider p2 = new MockEnvironmentVariableProvider();
+
+        p.setEnvironmentVariableProvider(p2);
+
+        EnvironmentVariableProvider p3 = p.getEnvironmentVariableProvider();
+
+        assertEquals(p3, p2);
+        assertNotEquals(p3, original);
+
+        //
+        // because we are not encloseable, we don't have a parent
+        //
+    }
+
+    @Test
+    public void resolveAnEnvironmentVariable_MockEnvironment() throws Exception {
+
+        OSProcessScope p = getScopeToTest();
+
+        MockEnvironmentVariableProvider mp = new MockEnvironmentVariableProvider();
+
+        p.setEnvironmentVariableProvider(mp);
+
+        assertNull(p.getVariable("NO_SUCH_VARIABLE"));
+
+        String value = "some value";
+        String variableName = "SOME_VARIABLE";
+
+        mp.installEnvironmentVariable(variableName, value);
+
+        StringVariable v = p.getVariable(variableName);
+        assertEquals("some value", v.get());
+    }
+
+    @Test
+    public void resolveAnEnvironmentVariable_RealEnvironment() throws Exception {
+
+        OSProcessScope p = getScopeToTest();
+
+        //
+        // install the real environment variable provider
+        //
+
+        p.setEnvironmentVariableProvider(new SystemEnvironmentVariableProvider());
+
+        StringVariable v = p.getVariable("USER");
+
+        assertNotNull(v);
+
+        String s = v.get();
+        assertNotNull(s);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

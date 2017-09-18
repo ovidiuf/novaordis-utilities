@@ -42,20 +42,6 @@ public class StringVariable extends VariableBase {
         super(name);
     }
 
-    /**
-     * Variables can only be created by declaring them in scopes.
-     *
-     * All constructors must be at most protected.
-     *
-     * @exception IllegalNameException
-     */
-    protected StringVariable(String name, String value) {
-
-        super(name);
-        //noinspection unchecked
-        set(value);
-    }
-
     // Variable implementation -----------------------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
@@ -63,6 +49,12 @@ public class StringVariable extends VariableBase {
     public Class type() {
 
         return String.class;
+    }
+
+    @Override
+    public String get() {
+
+        return (String)super.get();
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

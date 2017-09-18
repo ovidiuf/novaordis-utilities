@@ -16,7 +16,8 @@
 
 package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.expressions.env.EnvironmentVariableProvider;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
@@ -30,13 +31,26 @@ public class MockEnvironmentVariableProvider implements EnvironmentVariableProvi
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Map<String, String> environment;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    public MockEnvironmentVariableProvider() {
+
+        this.environment = new HashMap<>();
+    }
 
     // EnvironmentVariableProvider implementation ----------------------------------------------------------------------
 
     @Override
     public String getenv(String name) {
-        throw new RuntimeException("getenv() NOT YET IMPLEMENTED");
+
+        if (name == null) {
+
+            throw new NullPointerException();
+        }
+
+        return environment.get(name);
     }
 
     @Override
@@ -50,6 +64,11 @@ public class MockEnvironmentVariableProvider implements EnvironmentVariableProvi
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
+
+    public void installEnvironmentVariable(String name, String value) {
+
+        environment.put(name, value);
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 

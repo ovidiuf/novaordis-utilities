@@ -1370,40 +1370,6 @@ public class FilesTest {
         assertNull(Files.getExtension("a/b.c/d"));
     }
 
-
-    // alternative implementation of relativePath() --------------------------------------------------------------------
-
-//    @Test
-//    public void testRelativePathExperimental() throws Exception
-//    {
-//        File ancestor = new File("C:\\a");
-//        File descendent = new File("C:\\a\\b");
-//
-//        String path = Files.relativePathExperimental(ancestor, descendent);
-//        assertEquals("b", path);
-//    }
-
-    // this fails on Mac
-//    @Test
-//    public void testRelativePathExperimental_2() throws Exception
-//    {
-//        File ancestor = new File("C:\\a");
-//        File descendent = new File("C:\\a\\b\\c");
-//
-//        String path = Files.relativePathExperimental(ancestor, descendent);
-//        assertEquals("b/c", path);
-//    }
-
-//    @Test
-//    public void testRelativePathExperimental_3() throws Exception
-//    {
-//        File ancestor = new File("C:\\");
-//        File descendent = new File("C:\\a\\b\\c");
-//
-//        String path = Files.relativePathExperimental(ancestor, descendent);
-//        assertEquals("a/b/c", path);
-//    }
-
     @Test
     public void testRelativePathExperimental_NoRelationshipWhatsoever() throws Exception {
         File ancestor = new File("B:\\");

@@ -20,6 +20,8 @@ import io.novaordis.utilities.NotSupportedException;
 import io.novaordis.utilities.expressions.StringVariable;
 
 /**
+ * A variable instance that represents an environment variable.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/17/17
  */
@@ -32,6 +34,7 @@ public class EnvironmentVariableProxy extends StringVariable {
     // Attributes ------------------------------------------------------------------------------------------------------
 
     private OSProcessScope ownerProcessScope;
+
     private String valueBeforeUndeclaration;
 
     // Constructors ----------------------------------------------------------------------------------------------------
@@ -50,6 +53,10 @@ public class EnvironmentVariableProxy extends StringVariable {
 
         if (valueBeforeUndeclaration != null) {
 
+            //
+            // the variable has been undeclared in scope and it will carry the last value until it will be GCed
+            //
+
             return valueBeforeUndeclaration;
         }
 
@@ -61,7 +68,7 @@ public class EnvironmentVariableProxy extends StringVariable {
 
         if (value == null) {
 
-            throw new RuntimeException("NOT YET IMPLEMENTED");
+            throw new IllegalStateException("instance that is not backed by an actual environment variable");
         }
 
         return value;
@@ -121,7 +128,7 @@ public class EnvironmentVariableProxy extends StringVariable {
      * Invoking this method lets the proxy know that the corresponding variable was undeclared and does not exist
      * in the environment anymore.
      */
-    void setUndeclared() {
+    void undeclare() {
 
         this.valueBeforeUndeclaration = get();
     }

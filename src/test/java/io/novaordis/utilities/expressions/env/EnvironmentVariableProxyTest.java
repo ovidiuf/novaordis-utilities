@@ -43,6 +43,7 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
     //
 
     @Test
+    @Override
     public void variableName_Null() throws Exception {
 
         //
@@ -76,7 +77,7 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
 
         EnvironmentVariableProxy v = getVariableToTest("A", "some value");
 
-        v.setUndeclared();
+        v.undeclare();
 
         //
         // from this moment on, the variable does not take its value from the environment

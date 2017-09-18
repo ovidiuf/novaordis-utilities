@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * The common behavior shared among scope implementations.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17

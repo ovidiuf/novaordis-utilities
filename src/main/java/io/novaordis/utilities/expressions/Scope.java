@@ -37,8 +37,7 @@ public interface Scope {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * A variable declaration without assignment. A declaration in a scople is the only way to create variable
-     * instances.
+     * A variable declaration without assignment. A declaration in a scope is the only way to create variable instances.
      *
      * @return the variable <b>declared</b> in this scope.
      *

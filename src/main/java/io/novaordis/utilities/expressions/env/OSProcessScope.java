@@ -90,7 +90,7 @@ public class OSProcessScope extends ScopeBase {
             return null;
         }
 
-        v.setUndeclared();
+        v.undeclare();
 
         environmentVariableProvider.unset(name);
         declaredVariableNames.remove(name);
@@ -99,20 +99,20 @@ public class OSProcessScope extends ScopeBase {
     }
 
     /**
-     * Overrides superclass, relies on whatever it finds in the environment.
-     * @param name
-     * @return
+     * Overrides superclass, because EnvironmentVariableProxy do not carry the value with them, but query the
+     * environment every time get() is invoked.
      */
     @Override
     public EnvironmentVariableProxy getVariable(String name) {
 
-        //
-        // there's never an enclosing scope, we cannot control that from the JVM
-        //
-
         String value = environmentVariableProvider.getenv(name);
 
         if (value == null) {
+
+            //
+            // there's never an enclosing scope, we cannot control that from the JVM, so we don't delegate to the
+            // enclosing scope, as it is the case generally
+            //
 
             return null;
         }
@@ -130,6 +130,7 @@ public class OSProcessScope extends ScopeBase {
 
         List<Variable> result = new ArrayList<>();
 
+        //noinspection Convert2streamapi
         for(String name: declaredVariableNames) {
 
             result.add(getVariable(name));

@@ -17,7 +17,7 @@
 package io.novaordis.utilities.expressions;
 
 /**
- * A simple, general purpose, encloseable scope.
+ * A simple, general purpose, encloseable scope. Can be used "as is".
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/18/17

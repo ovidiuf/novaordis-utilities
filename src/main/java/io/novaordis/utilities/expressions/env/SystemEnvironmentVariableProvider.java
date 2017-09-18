@@ -43,13 +43,13 @@ public class SystemEnvironmentVariableProvider implements EnvironmentVariablePro
     @Override
     public void export(String name, String value) {
 
-        throw new NotSupportedException();
+        throw new NotSupportedException(); // at least, not now ...
     }
 
     @Override
     public void unset(String name) {
 
-        throw new NotSupportedException();
+        throw new NotSupportedException(); // at least, not now ...
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

@@ -38,12 +38,14 @@ public class VariableReference {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     /**
+     * @param name the variable name.
      *
-     * @param name
      * @param startIndex in the enclosing string.
+     *
      * @param endIndex in the enclosing string - is the index of last character of the reference (which may be '}' or
      *                 the last character of the name).
-     * @param hasBraces
+     *
+     * @param hasBraces whether the variable reference is specified using the long format ${var} or short format $var.
      *
      * @exception IllegalNameException if the name is illegal.
      */

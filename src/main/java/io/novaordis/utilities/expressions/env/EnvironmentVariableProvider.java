@@ -45,6 +45,7 @@ public interface EnvironmentVariableProvider {
         synchronized (EnvironmentVariableProvider.class) {
 
             if (INSTANCE[0] != null) {
+
                 return INSTANCE[0];
             }
 
@@ -107,6 +108,5 @@ public interface EnvironmentVariableProvider {
      * NotSupportedException.
      */
     void unset(String name);
-
 
 }

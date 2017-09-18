@@ -17,7 +17,7 @@
 package io.novaordis.utilities.expressions;
 
 /**
- * Basic variable implementation. It keeps track of the scopes it was declared in.
+ * The common behavior shared among variable implementations.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/13/17
