@@ -19,7 +19,6 @@ package io.novaordis.utilities.expressions;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -53,10 +52,11 @@ public abstract class VariableTest {
     public void variableName_InvalidName_StartsWithDigit() throws Exception {
 
         Class type = getTypeToTest();
+        Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("2something", type, null);
+            getVariableToTest("2something", type, value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -70,10 +70,11 @@ public abstract class VariableTest {
     public void variableName_InvalidName_ContainsIllegalCharacter() throws Exception {
 
         Class type = getTypeToTest();
+        Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("some@thing", type, null);
+            getVariableToTest("some@thing", type, value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -84,11 +85,12 @@ public abstract class VariableTest {
     }
 
     @Test
-    public void variableName_ValidName_() throws Exception {
+    public void variableName_ValidName() throws Exception {
 
         Class type = getTypeToTest();
+        Object value = getValueToTest();
 
-        Variable v = getVariableToTest("some.thing", type, null);
+        Variable v = getVariableToTest("some.thing", type, value);
 
         assertEquals("some.thing", v.name());
     }
@@ -114,10 +116,11 @@ public abstract class VariableTest {
     public void variableName_LiteralNull() throws Exception {
 
         Class type = getTypeToTest();
+        Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("null", type, null);
+            getVariableToTest("null", type, value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -132,12 +135,13 @@ public abstract class VariableTest {
     public void variableName() throws Exception {
 
         Class type = getTypeToTest();
+        Object value = getValueToTest();
 
-        Variable v = getVariableToTest("som2et_h-i-ng", type, null);
+        Variable v = getVariableToTest("som2et_h-i-ng", type, value);
 
         String name = v.name();
         assertEquals("som2et_h-i-ng", name);
-        assertNull(v.get());
+        assertEquals(value, v.get());
         assertEquals(type, v.type());
     }
 

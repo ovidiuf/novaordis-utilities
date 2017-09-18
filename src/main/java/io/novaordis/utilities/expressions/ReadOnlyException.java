@@ -18,9 +18,9 @@ package io.novaordis.utilities.expressions;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/17/17
  */
-public class ScopeImplTest extends EncloseableScopeTest {
+public class ReadOnlyException extends RuntimeException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,17 +32,9 @@ public class ScopeImplTest extends EncloseableScopeTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Tests -----------------------------------------------------------------------------------------------------------
-
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected ScopeImpl getScopeToTest() throws Exception {
-
-        return new ScopeImpl();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

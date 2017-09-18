@@ -17,35 +17,25 @@
 package io.novaordis.utilities.expressions;
 
 /**
+ * A scope that can be enclosed in other scopes.
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/18/17
  */
-public class ScopeImplTest extends EncloseableScopeTest {
+public interface EncloseableScope extends Scope {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
     // Static ----------------------------------------------------------------------------------------------------------
 
-    // Attributes ------------------------------------------------------------------------------------------------------
-
-    // Constructors ----------------------------------------------------------------------------------------------------
-
     // Public ----------------------------------------------------------------------------------------------------------
 
-    // Tests -----------------------------------------------------------------------------------------------------------
+    /**
+     * @return the closest enclosing scope May return null if this scope is not enclosed in any other scope.
+     */
+    Scope getEnclosing();
 
-    // Package protected -----------------------------------------------------------------------------------------------
+    void setParent(Scope parent);
 
-    // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected ScopeImpl getScopeToTest() throws Exception {
-
-        return new ScopeImpl();
-    }
-
-    // Private ---------------------------------------------------------------------------------------------------------
-
-    // Inner classes ---------------------------------------------------------------------------------------------------
 
 }

@@ -4,9 +4,11 @@
       <w>appenders</w>
       <w>cbuffer</w>
       <w>crtl</w>
+      <w>encloseable</w>
       <w>localos</w>
       <w>stax</w>
       <w>testhost</w>
+      <w>undeclare</w>
     </words>
   </dictionary>
 </component>

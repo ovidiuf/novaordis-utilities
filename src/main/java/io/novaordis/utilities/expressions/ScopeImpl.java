@@ -16,17 +16,13 @@
 
 package io.novaordis.utilities.expressions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 /**
+ * A simple, general purpose, encloseable scope.
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/18/17
  */
-public class ScopeImpl implements Scope {
+public class ScopeImpl extends ScopeBase implements EncloseableScope {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -34,134 +30,42 @@ public class ScopeImpl implements Scope {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    // variable declarations in this scope - these instances are never exposes, only copies; they are maintain in the
-    // order of the declaration
-    private List<Variable> declarations;
-
     //
     // the parent of this scope - is the directly enclosing scope. If the parent is null, this scope is not
     // enclosed within anything
     //
     private Scope parent;
 
-    private VariableReferenceResolver variableReferenceResolver;
-
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public ScopeImpl() {
-
-        this.variableReferenceResolver = new VariableReferenceResolver();
-        this.declarations = new ArrayList<>();
-        this.parent = null;
-    }
-
-    // Scope implementation --------------------------------------------------------------------------------------------
+    // EncloseableScope implementation ---------------------------------------------------------------------------------
 
     @Override
-    public <T> Variable<T> declare(String name, Class<? extends T> type) {
+    public Scope getEnclosing() {
 
-        if (type == null) {
-
-            throw new IllegalTypeException("variable type cannot be inferred");
-        }
-
-        return declare(name, type, null);
+        return parent;
     }
 
     @Override
-    public <T> Variable<T> declare(String name, Class<? extends T> type, T value) {
+    public void setParent(Scope parent) {
 
-        //
-        // we cannot have two variables with the same name declared in scope
-        //
-
-        for(Variable d: declarations) {
-
-            if (name.equals(d.name())) {
-
-                throw new DuplicateDeclarationException(name);
-            }
-        }
-
-        Variable<T> v;
-
-        if (String.class.equals(type)) {
-
-            //noinspection unchecked
-            v = new StringVariable(name);
-        }
-        else {
-
-            throw new IllegalTypeException(type.toString());
-        }
-
-        v.set(value);
-
-        declarations.add(v);
-
-        //noinspection unchecked
-        return v;
+        this.parent = parent;
     }
 
-    @Override
-    public <T> Variable<T> declare(String name, T value) {
-
-        if (value == null) {
-
-            throw new IllegalTypeException("variable type cannot be inferred");
-        }
-
-        Class type  = value.getClass();
-
-        //noinspection unchecked
-        return declare(name, type, value);
-    }
-
-    @Override
-    public Variable undeclare(String name) {
-
-        for(Iterator<Variable> i = declarations.iterator(); i.hasNext(); ) {
-
-            Variable v = i.next();
-
-            if (v.name().equals(name)) {
-
-                i.remove();
-                return v;
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<Variable> getVariablesDeclaredInScope() {
-
-        if (declarations.isEmpty()) {
-
-            return Collections.emptyList();
-        }
-
-        List<Variable> result = new ArrayList<>();
-
-        //noinspection Convert2streamapi
-        for(Variable d: declarations) {
-
-            result.add(d);
-        }
-
-        return result;
-    }
+    // Scope overrides -------------------------------------------------------------------------------------------------
 
     @Override
     public Variable getVariable(String name) {
 
-        for(Variable d: declarations) {
+        //
+        // first search in scope, if not found, search up
+        //
 
-            if (d.name().equals(name)) {
+        Variable v = super.getVariable(name);
 
-                return d;
-            }
+        if (v != null) {
+
+            return v;
         }
 
         //
@@ -176,53 +80,11 @@ public class ScopeImpl implements Scope {
         return parent.getVariable(name);
     }
 
-    @Override
-    public void enclose(Scope scope) {
-
-        ((ScopeImpl)scope).setParent(this);
-    }
-
-    @Override
-    public Scope getEnclosing() {
-
-        return parent;
-    }
-
-    @Override
-    public String evaluate(String stringWithVariableReferences) {
-
-        try {
-
-            return evaluate(stringWithVariableReferences, false);
-        }
-        catch(UndeclaredVariableException e) {
-
-            //
-            // this is abnormal, we cannot throw UndeclaredVariableException if we requested the method not to fail
-            // on undeclared references
-            //
-
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @Override
-    public String evaluate(String stringWithVariableReferences, boolean failOnUndeclaredVariable)
-            throws UndeclaredVariableException {
-
-        return variableReferenceResolver.resolve(stringWithVariableReferences, this, failOnUndeclaredVariable);
-    }
-
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    void setParent(Scope parent) {
-
-        this.parent = parent;
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/17/17
  */
-public class ScopeImplTest extends EncloseableScopeTest {
+public class NotSupportedException extends RuntimeException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,19 +30,22 @@ public class ScopeImplTest extends EncloseableScopeTest {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    // Public ----------------------------------------------------------------------------------------------------------
+    public NotSupportedException() {
 
-    // Tests -----------------------------------------------------------------------------------------------------------
+        super();
+    }
+
+    public NotSupportedException(String msg) {
+
+        super(msg);
+    }
+
+
+    // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    @Override
-    protected ScopeImpl getScopeToTest() throws Exception {
-
-        return new ScopeImpl();
-    }
 
     // Private ---------------------------------------------------------------------------------------------------------
 

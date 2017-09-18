@@ -18,7 +18,7 @@ package io.novaordis.utilities.xml.editor;
 
 import io.novaordis.utilities.Util;
 import io.novaordis.utilities.expressions.Scope;
-import io.novaordis.utilities.expressions.ScopeImpl;
+import io.novaordis.utilities.expressions.ScopeBase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope s = new ScopeImpl();
+        Scope s = new ScopeBase();
 
         editor.setScope(s);
 
@@ -126,7 +126,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         assertNull(sc.getVariable("something"));
 
@@ -143,7 +143,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         editor.setScope(sc);
 
@@ -168,7 +168,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         sc.declare("something", "bright");
 
@@ -223,7 +223,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         assertNull(sc.getVariable("element.variable"));
 
@@ -244,7 +244,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         editor.setScope(sc);
 
@@ -269,7 +269,7 @@ public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
 
         VariableAwareInLineXMLEditor editor = getInLineXmlEditorToTest(f);
 
-        Scope sc = new ScopeImpl();
+        Scope sc = new ScopeBase();
 
         sc.declare("element.variable", "B");
 

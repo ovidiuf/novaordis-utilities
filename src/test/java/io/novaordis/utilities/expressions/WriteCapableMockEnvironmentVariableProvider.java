@@ -16,11 +16,16 @@
 
 package io.novaordis.utilities.expressions;
 
+import io.novaordis.utilities.env.EnvironmentVariableProvider;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/17/17
  */
-public class StringVariable extends VariableBase {
+public class WriteCapableMockEnvironmentVariableProvider implements EnvironmentVariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,50 +33,55 @@ public class StringVariable extends VariableBase {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Map<String, String> mockEnvironment;
+
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    /**
-     * Variables can only be created by declaring them in scopes.
-     *
-     * All constructors must be at most protected.
-     *
-     * @exception IllegalNameException
-     */
-    protected StringVariable(String name) {
+    public WriteCapableMockEnvironmentVariableProvider() {
 
-        super(name);
+        this.mockEnvironment = new HashMap<>();
     }
 
-    /**
-     * Variables can only be created by declaring them in scopes.
-     *
-     * All constructors must be at most protected.
-     *
-     * @exception IllegalNameException
-     */
-    protected StringVariable(String name, String value) {
+    // EnvironmentVariableProvider implementation ----------------------------------------------------------------------
 
-        super(name);
-        //noinspection unchecked
-        set(value);
-    }
-
-    // Variable implementation -----------------------------------------------------------------------------------------
-
-    @SuppressWarnings("unchecked")
     @Override
-    public Class type() {
+    public String getenv(String name) {
 
-        return String.class;
+        if (name == null) {
+
+            //
+            // as per interface description
+            //
+            throw new NullPointerException("name");
+        }
+
+        //
+        // must return null if the environment variable is not declared
+        //
+
+        //noinspection UnnecessaryLocalVariable
+        String s = mockEnvironment.get(name);
+        return s;
     }
+
+    @Override
+    public void export(String name, String value) {
+
+        mockEnvironment.put(name, value);
+    }
+
+    @Override
+    public void unset(String name) {
+
+        mockEnvironment.remove(name);
+    }
+
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
-
-    // VariableBase implementation -------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
 

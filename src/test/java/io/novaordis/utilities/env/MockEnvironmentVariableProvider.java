@@ -37,6 +37,16 @@ public class MockEnvironmentVariableProvider implements EnvironmentVariableProvi
         throw new RuntimeException("getenv() NOT YET IMPLEMENTED");
     }
 
+    @Override
+    public void export(String name, String value) {
+        throw new RuntimeException("export() NOT YET IMPLEMENTED");
+    }
+
+    @Override
+    public void unset(String name) {
+        throw new RuntimeException("unset() NOT YET IMPLEMENTED");
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------

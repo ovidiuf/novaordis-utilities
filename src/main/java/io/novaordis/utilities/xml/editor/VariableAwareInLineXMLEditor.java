@@ -18,7 +18,7 @@ package io.novaordis.utilities.xml.editor;
 
 import io.novaordis.utilities.expressions.IllegalReferenceException;
 import io.novaordis.utilities.expressions.Scope;
-import io.novaordis.utilities.expressions.ScopeImpl;
+import io.novaordis.utilities.expressions.ScopeBase;
 import io.novaordis.utilities.expressions.VariableReference;
 import io.novaordis.utilities.expressions.VariableReferenceResolver;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
         //
         // we start with an empty scope, we need a non-null scope here to detect variable reference syntax errors
         //
-        this.variables = new ScopeImpl();
+        this.variables = new ScopeBase();
 
         log.debug(this + " constructed");
     }

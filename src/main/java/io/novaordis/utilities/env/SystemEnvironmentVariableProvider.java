@@ -16,6 +16,8 @@
 
 package io.novaordis.utilities.env;
 
+import io.novaordis.utilities.NotSupportedException;
+
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/4/16
@@ -36,6 +38,18 @@ public class SystemEnvironmentVariableProvider implements EnvironmentVariablePro
     public String getenv(String name) {
 
         return System.getenv(name);
+    }
+
+    @Override
+    public void export(String name, String value) {
+
+        throw new NotSupportedException();
+    }
+
+    @Override
+    public void unset(String name) {
+
+        throw new NotSupportedException();
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

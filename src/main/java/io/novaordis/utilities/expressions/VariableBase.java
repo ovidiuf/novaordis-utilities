@@ -73,7 +73,7 @@ abstract class VariableBase<T> implements Variable<T> {
     @Override
     public String toString() {
 
-        return name + "=" + value;
+        return name + "=" + get();
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

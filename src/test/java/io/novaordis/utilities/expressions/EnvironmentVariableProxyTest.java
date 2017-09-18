@@ -16,14 +16,17 @@
 
 package io.novaordis.utilities.expressions;
 
+import io.novaordis.utilities.env.EnvironmentVariableProvider;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/13/17
+ * @since 9/17/17
  */
-public class StringVariableTest extends VariableTest {
+public class EnvironmentVariableProxyTest extends StringVariableTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -35,47 +38,73 @@ public class StringVariableTest extends VariableTest {
 
     // Public ----------------------------------------------------------------------------------------------------------
 
+    //
     // Overrides -------------------------------------------------------------------------------------------------------
+    //
 
-    @Override
-    public void declarationWithAssignment() throws Exception {
+    @Test
+    public void variableName_Null() throws Exception {
 
-        Scope s = new ScopeBase();
-
-        Variable<String> v = s.declare("something", String.class, "blah");
-
-        assertEquals("something", v.name());
-        assertEquals(String.class, v.type());
-        assertEquals("blah", v.get());
-
-    }
-
-    @Override
-    public void declarationWithoutAssignment() throws Exception {
-
-        Scope s = new ScopeBase();
-
-        Variable<String> v = s.declare("something", String.class);
-
-        assertEquals("something", v.name());
-        assertEquals(String.class, v.type());
-        assertNull(v.get());
+        //
+        // we cannot declare environment variable with a null value, noop
+        //
     }
 
     // Tests -----------------------------------------------------------------------------------------------------------
+
+    // set() -----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void set_Proxy() throws Exception {
+
+        EnvironmentVariableProxy v = getVariableToTest("A", String.class, "some value");
+
+        OSProcessScope s = v.getOSProcessScope();
+
+        EnvironmentVariableProvider p = s.getEnvironmentVariableProvider();
+
+        v.set("some other value");
+
+        String value = p.getenv("A");
+        assertEquals("some other value", value);
+    }
+
+    // undeclared() ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void undeclared() throws Exception {
+
+        EnvironmentVariableProxy v = getVariableToTest("A", String.class, "some value");
+
+        v.setUndeclared();
+
+        //
+        // from this moment on, the variable does not take its value from the environment
+        //
+
+        v.getOSProcessScope().getEnvironmentVariableProvider().unset("A");
+        assertNull(v.getOSProcessScope().getEnvironmentVariableProvider().getenv("A"));
+
+        assertEquals("some value", v.get());
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected <T> Variable<T> getVariableToTest(String name, Class<? extends T> type, T optionalValue)
+    protected <T> EnvironmentVariableProxy getVariableToTest(String name, Class<? extends T> type, T optionalValue)
             throws Exception {
 
-        Scope defaultScope = new ScopeBase();
+        OSProcessScope defaultOSProcessScope = new OSProcessScope();
+
+        WriteCapableMockEnvironmentVariableProvider mp = new WriteCapableMockEnvironmentVariableProvider();
+
+        defaultOSProcessScope.setEnvironmentVariableProvider(mp);
 
         //noinspection UnnecessaryLocalVariable
-        Variable v = defaultScope.declare(name, String.class, (String)optionalValue);
+        EnvironmentVariableProxy v = (EnvironmentVariableProxy)
+                defaultOSProcessScope.declare(name, String.class, (String)optionalValue);
 
         //noinspection unchecked
         return v;

@@ -45,12 +45,10 @@ public abstract class ScopeTest {
 
     // Tests -----------------------------------------------------------------------------------------------------------
 
-    // variable exposure -----------------------------------------------------------------------------------------------
-
     // declare() -------------------------------------------------------------------------------------------------------
 
     @Test
-    public void declare_StringVariable() throws Exception {
+    public void declare_StringVariable_Undefined() throws Exception {
 
         Scope s = getScopeToTest();
 
@@ -63,6 +61,32 @@ public abstract class ScopeTest {
     }
 
     @Test
+    public void declare_StringVariable_Defined() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        Variable<String> v = s.declare("test", String.class, "some-value");
+
+        assertNotNull(v);
+        assertEquals("test", v.name());
+        assertEquals("some-value", v.get());
+        assertEquals(String.class, v.type());
+    }
+
+    @Test
+    public void declare_StringVariable_Defined2() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        Variable<String> v = s.declare("test", "some-value");
+
+        assertNotNull(v);
+        assertEquals("test", v.name());
+        assertEquals("some-value", v.get());
+        assertEquals(String.class, v.type());
+    }
+
+    @Test
     public void declare_UnsupportedType() throws Exception {
 
         Class type = Void.class;
@@ -70,8 +94,8 @@ public abstract class ScopeTest {
         Scope s = getScopeToTest();
 
         try {
-            s.declare("something", type);
 
+            s.declare("something", type);
         }
         catch(IllegalTypeException e) {
 
@@ -85,11 +109,11 @@ public abstract class ScopeTest {
 
         Scope s = getScopeToTest();
 
-        assertNotNull(s.declare("test", String.class));
+        assertNotNull(s.declare("test", String.class, "test value"));
 
         try {
 
-            s.declare("test", String.class);
+            s.declare("test", String.class, "some other test value");
             fail("should have thrown exception");
         }
         catch(DuplicateDeclarationException e) {
@@ -217,155 +241,6 @@ public abstract class ScopeTest {
         assertNull(v3);
     }
 
-    // scope visibility and value rules --------------------------------------------------------------------------------
-
-    @Test
-    public void visibility() throws Exception {
-
-        //
-        // Once a variable is declared in a scope, it becomes visible to all enclosed scopes (scopes that have this
-        // scope as parent) but it is not visible to this scope's enclosing scopes.
-        //
-
-        Scope topMost = getScopeToTest();
-
-        Scope intermediate = getScopeToTest();
-
-        topMost.enclose(intermediate);
-
-        Scope bottomMost = getScopeToTest();
-
-        intermediate.enclose(bottomMost);
-
-        Variable<String> v = intermediate.declare("test", String.class, "something");
-
-        assertEquals("something", v.get());
-
-        //
-        // variable is not visible in the enclosing scope
-        //
-
-        Variable variableInTopMost = topMost.getVariable("test");
-        assertNull(variableInTopMost);
-
-        //
-        // variable is visible (obviously) in the declaring scope
-        //
-
-        Variable variableInIntermediate = intermediate.getVariable("test");
-        assertNotNull(variableInIntermediate);
-        assertEquals("something", variableInIntermediate.get());
-
-        //
-        // variable is visible in the enclosed scope
-        //
-
-        Variable variableInBottomMost = bottomMost.getVariable("test");
-        assertNotNull(variableInBottomMost);
-        assertEquals("something", variableInBottomMost.get());
-    }
-
-    @Test
-    public void visibility2() throws Exception {
-
-        Scope upper = new ScopeImpl();
-        Scope intermediate = new ScopeImpl();
-        Scope lower = new ScopeImpl();
-
-        upper.enclose(intermediate);
-        intermediate.enclose(lower);
-
-        intermediate.declare("color", String.class, "blue");
-
-        assertNull(upper.getVariable("color"));
-        assertEquals("blue", intermediate.getVariable("color").get());
-        assertEquals("blue", lower.getVariable("color").get());
-    }
-
-    @Test
-    public void valueRelativeToScope() throws Exception {
-
-        Scope upper = new ScopeImpl();
-
-        Scope inter = new ScopeImpl();
-
-        Scope lower = new ScopeImpl();
-
-        upper.enclose(inter);
-
-        inter.enclose(lower);
-
-        upper.declare("color", "red");
-        inter.declare("color", "yellow");
-        lower.declare("color", "blue");
-
-        assertEquals("red", upper.getVariable("color").get());
-        assertEquals("yellow", inter.getVariable("color").get());
-        assertEquals("blue", lower.getVariable("color").get());
-
-        lower.undeclare("color");
-
-        assertEquals("red", upper.getVariable("color").get());
-        assertEquals("yellow", inter.getVariable("color").get());
-        assertEquals("yellow", lower.getVariable("color").get());
-
-        inter.undeclare("color");
-
-        assertEquals("red", upper.getVariable("color").get());
-        assertEquals("red", inter.getVariable("color").get());
-        assertEquals("red", lower.getVariable("color").get());
-    }
-
-    @Test
-    public void valueRelativeToScope_set() throws Exception {
-
-        Scope upper = new ScopeImpl();
-
-        Scope inter = new ScopeImpl();
-
-        Scope lower = new ScopeImpl();
-
-        upper.enclose(inter);
-
-        inter.enclose(lower);
-
-        upper.declare("color", "red");
-        inter.declare("color", "yellow");
-        lower.declare("color", "blue");
-
-        assertEquals("red", upper.getVariable("color").get());
-        assertEquals("yellow", inter.getVariable("color").get());
-        assertEquals("blue", lower.getVariable("color").get());
-
-        //noinspection unchecked
-        upper.getVariable("color").set("dark red");
-
-        assertEquals("dark red", upper.getVariable("color").get());
-        assertEquals("yellow", inter.getVariable("color").get());
-        assertEquals("blue", lower.getVariable("color").get());
-
-        //noinspection unchecked
-        inter.getVariable("color").set("dark yellow");
-
-        assertEquals("dark red", upper.getVariable("color").get());
-        assertEquals("dark yellow", inter.getVariable("color").get());
-        assertEquals("blue", lower.getVariable("color").get());
-
-        //noinspection unchecked
-        lower.getVariable("color").set("dark blue");
-
-        assertEquals("dark red", upper.getVariable("color").get());
-        assertEquals("dark yellow", inter.getVariable("color").get());
-        assertEquals("dark blue", lower.getVariable("color").get());
-
-        upper.undeclare("color");
-
-        assertNull(upper.getVariable("color"));
-        assertEquals("dark yellow", inter.getVariable("color").get());
-        assertEquals("dark blue", lower.getVariable("color").get());
-
-    }
-
     // getVariable() ---------------------------------------------------------------------------------------------------
 
     @Test
@@ -391,37 +266,18 @@ public abstract class ScopeTest {
     }
 
     @Test
-    public void getVariable_VariableDeclaredOneLevelUp() throws Exception {
+    public void getVariable_FromEnclosedScope() throws Exception {
 
         Scope top = getScopeToTest();
-        Scope bottom = getScopeToTest();
+
+        //
+        // we explicitely use a generic ScopeImpl, because some scopes, like the OSProcessScope, cannot be enclosed
+        //
+        ScopeImpl bottom = new ScopeImpl();
 
         top.enclose(bottom);
 
         top.declare("test", String.class, "something");
-
-        Variable v = bottom.getVariable("test");
-
-        assertNotNull(v);
-
-        assertEquals("something", v.get());
-    }
-
-    @Test
-    public void getVariable_VariableDeclaredTwoLevelsUp() throws Exception {
-
-        Scope top = getScopeToTest();
-        Scope intermediate = getScopeToTest();
-        Scope bottom = getScopeToTest();
-
-        top.enclose(intermediate);
-        intermediate.enclose(bottom);
-
-        top.declare("test", String.class, "something");
-
-        Variable v = intermediate.getVariable("test");
-        assertNotNull(v);
-        assertEquals("something", v.get());
 
         Variable v2 = bottom.getVariable("test");
         assertNotNull(v2);
@@ -779,7 +635,7 @@ public abstract class ScopeTest {
 
         Scope scope = getScopeToTest();
 
-        scope.declare("z", String.class);
+        scope.declare("z", String.class, "something");
 
         List<Variable> declaredInScope = scope.getVariablesDeclaredInScope();
 
@@ -788,7 +644,7 @@ public abstract class ScopeTest {
         Variable v = declaredInScope.get(0);
 
         assertEquals("z", v.name());
-        assertNull(v.get());
+        assertEquals("something", v.get());
 
         //noinspection unchecked
         v.set("dirty");
@@ -805,7 +661,7 @@ public abstract class ScopeTest {
         // declare another variable
         //
 
-        scope.declare("a", String.class);
+        scope.declare("a", String.class, "something else");
 
         List<Variable> declaredInScope3 = scope.getVariablesDeclaredInScope();
 
@@ -817,7 +673,7 @@ public abstract class ScopeTest {
 
         Variable v4 = declaredInScope3.get(1);
         assertEquals("a", v4.name());
-        assertNull(v4.get());
+        assertEquals("something else", v4.get());
 
         //
         // make sure a copy was returned, not the variable itself
@@ -844,35 +700,37 @@ public abstract class ScopeTest {
         assertEquals("dirty", v6.get());
     }
 
-    @Test
-    public void getVariablesDeclaredInScope_EnclosingScopesAreNotVisibleToThisMethod() throws Exception {
-
-        Scope scope = getScopeToTest();
-
-        Scope enclosing = getScopeToTest();
-
-        enclosing.enclose(scope);
-
-        enclosing.declare("color", String.class, "blue");
-
-        assertTrue(scope.getVariablesDeclaredInScope().isEmpty());
-
-        assertEquals("blue", scope.getVariable("color").get());
-
-        List<Variable> declaredInScope = enclosing.getVariablesDeclaredInScope();
-
-        assertEquals(1, declaredInScope.size());
-
-        Variable v = declaredInScope.get(0);
-
-        assertEquals("color", v.name());
-        assertEquals("blue", v.get());
-    }
-
     // legacy tests inherited from the previous implementation ---------------------------------------------------------
 
     @Test
-    public void legacy() throws Exception {
+    public void legacy_DoesNotSetValueToNull() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        assertNull(s.getVariable("something"));
+
+        Variable v = s.declare("something", "A");
+        assertEquals("something", v.name());
+        assertEquals("A", v.get());
+
+        assertEquals("A", s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertEquals("A", s.getVariable("something").set("B"));
+
+        assertEquals("B", s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertEquals("B", s.getVariable("something").set("C"));
+
+        assertEquals("C", s.getVariable("something").get());
+
+        //noinspection unchecked
+        assertEquals("C", s.getVariable("something").set("D"));
+    }
+
+    @Test
+    public void legacy_SetsValueToNull() throws Exception {
 
         Scope s = getScopeToTest();
 
@@ -896,85 +754,6 @@ public abstract class ScopeTest {
 
         //noinspection unchecked
         assertNull(s.getVariable("something").set("C"));
-    }
-
-    @Test
-    public void legacy2() throws Exception {
-
-        Scope parent = getScopeToTest();
-
-        assertNull(parent.getEnclosing());
-
-        Scope childOne = getScopeToTest();
-
-        assertNull(childOne.getEnclosing());
-
-        Scope childTwo = getScopeToTest();
-
-        assertNull(childTwo.getEnclosing());
-
-        parent.enclose(childOne);
-        assertEquals(parent, childOne.getEnclosing());
-
-        parent.enclose(childTwo);
-        assertEquals(parent, childTwo.getEnclosing());
-
-        //
-        // verify hierarchical resolution
-        //
-
-        parent.declare("variableA", "valueA");
-
-        assertEquals("valueA", parent.getVariable("variableA").get());
-        assertEquals("valueA", childOne.getVariable("variableA").get());
-        assertEquals("valueA", childTwo.getVariable("variableA").get());
-
-        //
-        // local values supersede the values above them in the hierarchy, but only if the values were declared locally
-        //
-
-        //
-        // 'variableA' was declared in parent, so changing the value in children changes its value in parent
-        //
-        //noinspection unchecked
-        childOne.getVariable("variableA").set("valueB");
-
-        assertEquals("valueB", parent.getVariable("variableA").get());
-        assertEquals("valueB", childOne.getVariable("variableA").get());
-        assertEquals("valueB", childTwo.getVariable("variableA").get());
-
-        //
-        // 'variableA' was declared in parent, so changing the value in children changes its value in parent
-        //
-
-        //noinspection unchecked
-        childTwo.getVariable("variableA").set("valueC");
-
-        assertEquals("valueC", parent.getVariable("variableA").get());
-        assertEquals("valueC", childOne.getVariable("variableA").get());
-        assertEquals("valueC", childTwo.getVariable("variableA").get());
-
-        //
-        // if I declare the same variable in an enclosed scope, the modifications do not propagate
-        //
-
-        childOne.declare("variableA", "valueD");
-
-        assertEquals("valueC", parent.getVariable("variableA").get());
-        assertEquals("valueD", childOne.getVariable("variableA").get());
-        assertEquals("valueC", childTwo.getVariable("variableA").get());
-
-        //
-        // changing a scoped variable does not affect the value outside the scope and enclosed scopes
-        //
-
-        //noinspection unchecked
-        childOne.getVariable("variableA").set("valueE");
-
-        assertEquals("valueC", parent.getVariable("variableA").get());
-        assertEquals("valueE", childOne.getVariable("variableA").get());
-        assertEquals("valueC", childTwo.getVariable("variableA").get());
-
     }
 
     // Package protected -----------------------------------------------------------------------------------------------

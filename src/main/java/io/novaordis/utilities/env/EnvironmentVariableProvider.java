@@ -88,13 +88,25 @@ public interface EnvironmentVariableProvider {
      * named value. On UNIX systems the alphabetic case of name is typically significant, while on Microsoft Windows
      * systems it is typically not.
      *
-     * @param  name the name of the environment variable
+     * @param name the name of the environment variable.
      *
      * @return the string value of the variable, or null if the variable is not defined in the system environment.
      *
      * @exception NullPointerException if name is null.
      */
     String getenv(String name);
+
+    /**
+     * This operation may not be possible. If the operation is not possible, the method will throw
+     * NotSupportedException.
+     */
+    void export(String name, String value);
+
+    /**
+     * This operation may not be possible. If the operation is not possible, the method will throw
+     * NotSupportedException.
+     */
+    void unset(String name);
 
 
 }

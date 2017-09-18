@@ -89,12 +89,7 @@ public interface Scope {
     /**
      * Declare an enclosed scope.
      */
-    void enclose(Scope scope);
-
-    /**
-     * @return the closest enclosing scope May return null if this scope is not enclosed in any other scope.
-     */
-    Scope getEnclosing();
+    void enclose(EncloseableScope scope);
 
     /**
      * Resolves variable references and evaluates expressions. If a variable cannot be resolved because it was not
