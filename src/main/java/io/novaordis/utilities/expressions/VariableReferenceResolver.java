@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A variable reference resolver.
+ * A variable reference resolver. It is capable of resolving variable references using the variable values pulled
+ * from a scope, or specified in-line.
  *
  * It is thread safe.
  *
@@ -38,80 +39,6 @@ public class VariableReferenceResolver {
     // Constructors ----------------------------------------------------------------------------------------------------
 
     // Public ----------------------------------------------------------------------------------------------------------
-
-    /**
-     * Given a variable name, the method returns the string representation of the variable value in scope, or the
-     * literal representation of the variable reference ("${var_name}") if the variable is not declared.
-     *
-     * @param  useBraces if the variable is not declared in scope, the string representation is the variable reference
-     *                   which is rendered surrounded by braces or not, depending the value of this flag.
-     *
-     * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
-     *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
-     *                              resolved in scope, the method will maintain the variable reference unchanged in
-     *                              the result string.
-     *
-     * @return the string value of a variable whose name was specified.
-     *
-     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an at least one undeclared variable
-     * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
-     * identified undeclared variable.
-
-     */
-    public String resolveVariable(
-            String variableName, Scope scope, boolean useBraces, boolean failOnUndeclaredVariable)
-            throws UndeclaredVariableException {
-
-        if (scope == null) {
-
-            throw new IllegalArgumentException("null scope");
-        }
-
-        String s;
-
-        Variable v = scope.getVariable(variableName);
-
-        if (v == null) {
-
-            if (failOnUndeclaredVariable) {
-
-                throw new UndeclaredVariableException(variableName, null);
-            }
-
-            if (useBraces) {
-
-                s = "${";
-            }
-            else {
-
-                s = "$";
-            }
-
-            s += variableName;
-
-            if (useBraces) {
-
-                s += "}";
-            }
-        }
-        else {
-
-            Object value = v.get();
-
-            //
-            // null value translates to empty space
-            //
-
-            if (value == null) {
-
-                value = "";
-            }
-
-            s = value.toString();
-        }
-
-        return s;
-    }
 
     public List<VariableReference> getVariableReferences(String stringWithVariableReferences) {
 
@@ -224,8 +151,101 @@ public class VariableReferenceResolver {
     }
 
     /**
+     * Given a variable name, the method returns the string representation of the variable value in scope, or the
+     * literal representation of the variable reference ("${var_name}") if the variable is not declared. If the variable
+     * is declared, but it has a null value, the value is interpreted automatically as the empty string.
+     *
+     * @param  useBraces if the variable is not declared in scope, the string representation is the variable reference
+     *                   which is rendered surrounded by braces or not, depending the value of this flag.
+     *
+     * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
+     *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
+     *                              resolved in scope, the method will maintain the variable reference unchanged in
+     *                              the result string.
+     *
+     * @return the string value of a variable whose name was specified.
+     *
+     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an dat least one undeclared variable
+     * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
+     * identified undeclared variable.
+     */
+    public String resolveVariableInScope(
+            String variableName, Scope scope, boolean failOnUndeclaredVariable, boolean useBraces)
+            throws UndeclaredVariableException {
+
+        if (scope == null) {
+
+            throw new IllegalArgumentException("null scope");
+        }
+
+        Variable v = scope.getVariable(variableName);
+
+        Object value;
+
+        if (v == null) {
+
+            if (failOnUndeclaredVariable) {
+
+                throw new UndeclaredVariableException(variableName, null);
+            }
+
+            value = null;
+        }
+        else {
+
+            value = v.get();
+
+            if (value == null) {
+
+                value = "";
+            }
+        }
+
+        return resolveVariableInLine(variableName, value, useBraces);
+    }
+
+    /**
+     * Given a variable name, and a value that may or may not be null, the method returns the string representation of
+     * the resolved variable reference, subject to settings such as "failOnNull" or "useBraces", as described below.
+     *
+     * @param longFormat if true, and the provided value is null, the method produces the variable reference
+     *                   representation in long format (${variableName}). If false, and the provided value is null,
+     *                   the method produces the variable reference representation in short format ($variableName)
+     *
+     * @return the value converted to string, or the variable representation if null.
+     */
+    public String resolveVariableInLine(String variableName, Object value, boolean longFormat) {
+
+        if (value != null) {
+
+            return value.toString();
+        }
+
+        String s;
+
+        if (longFormat) {
+
+            s = "${";
+        }
+        else {
+
+            s = "$";
+        }
+
+
+        s += variableName;
+
+        if (longFormat) {
+
+            s += "}";
+        }
+
+        return s;
+    }
+
+    /**
      * Resolves variable references, if the corresponding variables are declared, or leaves the references unchanged
-     * if the corresponding variables are not declared.
+     * if the corresponding variables are not declared (or fails, if failOnUndeclaredVariable is true).
      *
      * @param failOnUndeclaredVariable if true, and a variable reference cannot be resolved in scope, the method will
      *                              throw UndeclaredVariableException. If false, and a variable reference cannot be
@@ -240,7 +260,7 @@ public class VariableReferenceResolver {
      * @exception IllegalReferenceException
      * @exception IllegalArgumentException on null arguments
      */
-    public String resolve(String stringWithVariableReferences, Scope scope, boolean failOnUndeclaredVariable)
+    public String resolve(String stringWithVariableReferences, boolean failOnUndeclaredVariable, Scope scope)
             throws UndeclaredVariableException {
 
         if (stringWithVariableReferences == null) {
@@ -266,8 +286,111 @@ public class VariableReferenceResolver {
         for(VariableReference r: references) {
 
             sb.append(stringWithVariableReferences.substring(i, r.getStartIndex()));
-            String s = resolveVariable(r.getName(), scope, r.hasBraces(), failOnUndeclaredVariable);
+            String s = resolveVariableInScope(r.getName(), scope, failOnUndeclaredVariable, r.hasBraces());
             sb.append(s);
+            i = r.getEndIndex() + 1;
+        }
+
+        if (i <= stringWithVariableReferences.length()) {
+
+            sb.append(stringWithVariableReferences.substring(i));
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * In-line variable resolving.
+     *
+     * @param failOnUndeclaredVariable if true, and one of the variable names is not mentioned among arguments,
+     *                                 throws UndeclaredVariableException
+     *
+     * @throws UndeclaredVariableException if if true, and one of the variable names is not mentioned among arguments.
+     */
+    public String resolve(
+            String stringWithVariableReferences,
+            boolean failOnUndeclaredVariable,
+            String firstVariableName,
+            Object firstValue,
+            Object... theRestOfVariableNameAndValuePairsInOrder)
+            throws UndeclaredVariableException {
+
+        if (stringWithVariableReferences == null) {
+
+            throw new IllegalArgumentException("null string");
+        }
+
+        List<VariableReference> references = getVariableReferences(stringWithVariableReferences);
+
+        if (references.isEmpty()) {
+
+            return stringWithVariableReferences;
+        }
+
+        int optionalPairs =
+                theRestOfVariableNameAndValuePairsInOrder == null ? 0 :
+                        theRestOfVariableNameAndValuePairsInOrder.length / 2;
+
+        //
+        // replace
+        //
+
+        StringBuilder sb = new StringBuilder();
+
+        int i = 0;
+
+        for(VariableReference r: references) {
+
+            sb.append(stringWithVariableReferences.substring(i, r.getStartIndex()));
+
+            String variableName = r.getName();
+
+            Object value = null;
+
+            boolean variableNameFound = false;
+
+            //
+            // scan for the first occurrence of a variable name that matches
+            //
+
+            if (variableName.equals(firstVariableName)) {
+
+                variableNameFound = true;
+                value = firstValue;
+            }
+            else {
+
+                for(int j = 0; j < optionalPairs; j ++) {
+
+                    if (!(theRestOfVariableNameAndValuePairsInOrder[2 * j] instanceof String)) {
+
+                        throw new IllegalArgumentException(
+                                "argument " + theRestOfVariableNameAndValuePairsInOrder[2 * j] +
+                                        " is supposed to be a String variable name");
+                    }
+
+                    String optionalVariableName = (String)theRestOfVariableNameAndValuePairsInOrder[2 * j];
+
+                    if (variableName.equals(optionalVariableName)) {
+
+                        variableNameFound = true;
+                        value = theRestOfVariableNameAndValuePairsInOrder[2 * j + 1];
+                    }
+                }
+            }
+
+            if (!variableNameFound) {
+
+                if (failOnUndeclaredVariable) {
+
+                    throw new UndeclaredVariableException(variableName, null);
+                }
+            }
+
+            String s = resolveVariableInLine(variableName, value, r.hasBraces());
+
+            sb.append(s);
+
             i = r.getEndIndex() + 1;
         }
 

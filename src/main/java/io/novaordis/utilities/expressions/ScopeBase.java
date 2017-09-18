@@ -154,7 +154,7 @@ public class ScopeBase implements Scope {
     public String evaluate(String stringWithVariableReferences, boolean failOnUndeclaredVariable)
             throws UndeclaredVariableException {
 
-        return variableReferenceResolver.resolve(stringWithVariableReferences, this, failOnUndeclaredVariable);
+        return variableReferenceResolver.resolve(stringWithVariableReferences, failOnUndeclaredVariable, this);
     }
 
     // Public ----------------------------------------------------------------------------------------------------------
