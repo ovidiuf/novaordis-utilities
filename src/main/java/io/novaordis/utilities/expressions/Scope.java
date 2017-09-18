@@ -47,15 +47,6 @@ public interface Scope {
     <T> Variable<T> declare(String name, Class<? extends T> type);
 
     /**
-     * A variable declaration with assignment. A declaration in a scope is the only way to create variable instances.
-     *
-     * @return the variable <b>declared</b> in this scope.
-     *
-     * @exception IllegalTypeException if variable of the specified type are not supported.
-     */
-    <T> Variable<T> declare(String name, Class<? extends T> type, T value);
-
-    /**
      * @param value is used for type inference. If the type cannot be inferred or it is not supported, throws
      *              IllegalTypeException.
      *
@@ -68,8 +59,10 @@ public interface Scope {
     <T> Variable<T> declare(String name, T value);
 
     /**
-     * Undeclare a variable in a scope. Noop if the variable does not exist.
-     * @return the declared variable, if exists, or null.
+     * Undeclare a variable in a scope. Noop if the variable was not previously declared in scope. Variables declared
+     * in enclosing scopes cannot be undeclared from enclosed scopes.
+     *
+     * @return the declared variable, if the variable was previously declared, or null.
      */
     Variable undeclare(String name);
 

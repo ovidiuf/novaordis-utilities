@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities.expressions.env;
 
 import io.novaordis.utilities.NotSupportedException;
-import io.novaordis.utilities.env.EnvironmentVariableProvider;
+import io.novaordis.utilities.expressions.DuplicateDeclarationException;
+import io.novaordis.utilities.expressions.ScopeBase;
+import io.novaordis.utilities.expressions.Variable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,16 +64,6 @@ public class OSProcessScope extends ScopeBase {
     public <T> Variable<T> declare(String name, Class<? extends T> type) {
 
         return declareEnvironmentVariable(name, type, null);
-    }
-
-    /**
-     * Depending on the underlying EnvironmentVariableProvider implementation, declaring environment variables in the
-     * process' environment may not be possible, and this method may throw an exception.
-     */
-    @Override
-    public <T> Variable<T> declare(String name, Class<? extends T> type, T value) {
-
-        return declareEnvironmentVariable(name, type, value);
     }
 
     /**

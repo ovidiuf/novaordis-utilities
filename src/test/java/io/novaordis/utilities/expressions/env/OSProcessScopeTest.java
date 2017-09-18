@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities.expressions.env;
 
 import io.novaordis.utilities.NotSupportedException;
+import io.novaordis.utilities.expressions.Scope;
+import io.novaordis.utilities.expressions.ScopeTest;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -184,7 +186,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
         try {
 
-            s.declare("test", String.class, null);
+            s.declare("test", null);
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {
@@ -206,7 +208,7 @@ public class OSProcessScopeTest extends ScopeTest {
 
         try {
 
-            s.declare("test", Integer.class, 1);
+            s.declare("test", 1);
             fail("should have thrown exception");
         }
         catch(NotSupportedException e) {

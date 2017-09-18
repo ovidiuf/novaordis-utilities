@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.env.EnvironmentVariableProvider;
+import io.novaordis.utilities.expressions.StringVariableTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -57,7 +57,7 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
     @Test
     public void set_Proxy() throws Exception {
 
-        EnvironmentVariableProxy v = getVariableToTest("A", String.class, "some value");
+        EnvironmentVariableProxy v = getVariableToTest("A", "some value");
 
         OSProcessScope s = v.getOSProcessScope();
 
@@ -74,7 +74,7 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
     @Test
     public void undeclared() throws Exception {
 
-        EnvironmentVariableProxy v = getVariableToTest("A", String.class, "some value");
+        EnvironmentVariableProxy v = getVariableToTest("A", "some value");
 
         v.setUndeclared();
 
@@ -93,8 +93,8 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected <T> EnvironmentVariableProxy getVariableToTest(String name, Class<? extends T> type, T optionalValue)
-            throws Exception {
+    @SuppressWarnings("unchecked")
+    protected <T> EnvironmentVariableProxy getVariableToTest(String name, T optionalValue) throws Exception {
 
         OSProcessScope defaultOSProcessScope = new OSProcessScope();
 
@@ -102,18 +102,7 @@ public class EnvironmentVariableProxyTest extends StringVariableTest {
 
         defaultOSProcessScope.setEnvironmentVariableProvider(mp);
 
-        //noinspection UnnecessaryLocalVariable
-        EnvironmentVariableProxy v = (EnvironmentVariableProxy)
-                defaultOSProcessScope.declare(name, String.class, (String)optionalValue);
-
-        //noinspection unchecked
-        return v;
-    }
-
-    @Override
-    protected Class getTypeToTest() {
-
-        return String.class;
+        return (EnvironmentVariableProxy)defaultOSProcessScope.declare(name, (String)optionalValue);
     }
 
     @Override

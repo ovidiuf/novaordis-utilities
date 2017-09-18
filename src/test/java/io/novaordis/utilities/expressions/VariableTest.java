@@ -51,12 +51,11 @@ public abstract class VariableTest {
     @Test
     public void variableName_InvalidName_StartsWithDigit() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("2something", type, value);
+            getVariableToTest("2something", value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -69,12 +68,11 @@ public abstract class VariableTest {
     @Test
     public void variableName_InvalidName_ContainsIllegalCharacter() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("some@thing", type, value);
+            getVariableToTest("some@thing", value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -87,10 +85,9 @@ public abstract class VariableTest {
     @Test
     public void variableName_ValidName() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
-        Variable v = getVariableToTest("some.thing", type, value);
+        Variable v = getVariableToTest("some.thing", value);
 
         assertEquals("some.thing", v.name());
     }
@@ -98,11 +95,11 @@ public abstract class VariableTest {
     @Test
     public void variableName_Null() throws Exception {
 
-        Class type = getTypeToTest();
+        Object value = getValueToTest();
 
         try {
 
-            getVariableToTest(null, type, null);
+            getVariableToTest(null, value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -115,12 +112,11 @@ public abstract class VariableTest {
     @Test
     public void variableName_LiteralNull() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
         try {
 
-            getVariableToTest("null", type, value);
+            getVariableToTest("null", value);
             fail("should have thrown Exception");
         }
         catch(IllegalNameException e) {
@@ -134,15 +130,14 @@ public abstract class VariableTest {
     @Test
     public void variableName() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
-        Variable v = getVariableToTest("som2et_h-i-ng", type, value);
+        Variable v = getVariableToTest("som2et_h-i-ng", value);
 
         String name = v.name();
         assertEquals("som2et_h-i-ng", name);
         assertEquals(value, v.get());
-        assertEquals(type, v.type());
+        assertEquals(value.getClass(), v.type());
     }
 
     // identity --------------------------------------------------------------------------------------------------------
@@ -150,15 +145,14 @@ public abstract class VariableTest {
     @Test
     public void identity() throws Exception {
 
-        Class type = getTypeToTest();
         Object value = getValueToTest();
 
-        Variable v = getVariableToTest("test", type, value);
+        Variable v = getVariableToTest("test", value);
 
         String name = v.name();
         assertEquals("test", name);
         assertEquals(value, v.get());
-        assertEquals(type, v.type());
+        assertEquals(value.getClass(), v.type());
     }
 
     // validVariableNameChar() -----------------------------------------------------------------------------------------
@@ -201,10 +195,7 @@ public abstract class VariableTest {
      *
      * @param optionalValue may be null.
      */
-    protected abstract <T> Variable<T> getVariableToTest(String name, Class<? extends T> type, T optionalValue)
-            throws Exception;
-
-    protected abstract Class getTypeToTest();
+    protected abstract <T> Variable<T> getVariableToTest(String name, T optionalValue) throws Exception;
 
     protected abstract Object getValueToTest();
 

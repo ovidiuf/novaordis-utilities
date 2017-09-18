@@ -65,7 +65,7 @@ public abstract class ScopeTest {
 
         Scope s = getScopeToTest();
 
-        Variable<String> v = s.declare("test", String.class, "some-value");
+        Variable<String> v = s.declare("test", "some-value");
 
         assertNotNull(v);
         assertEquals("test", v.name());
@@ -109,11 +109,11 @@ public abstract class ScopeTest {
 
         Scope s = getScopeToTest();
 
-        assertNotNull(s.declare("test", String.class, "test value"));
+        assertNotNull(s.declare("test", "test value"));
 
         try {
 
-            s.declare("test", String.class, "some other test value");
+            s.declare("test", "some other test value");
             fail("should have thrown exception");
         }
         catch(DuplicateDeclarationException e) {
@@ -157,7 +157,7 @@ public abstract class ScopeTest {
         catch(IllegalTypeException e) {
 
             String msg = e.getMessage();
-            assertTrue(msg.contains("variable type cannot be inferred"));
+            assertTrue(msg.contains("null type"));
         }
     }
 
@@ -256,7 +256,7 @@ public abstract class ScopeTest {
 
         Scope s = getScopeToTest();
 
-        s.declare("test", String.class, "something");
+        s.declare("test", "something");
 
         Variable v = s.getVariable("test");
 
@@ -277,7 +277,7 @@ public abstract class ScopeTest {
 
         top.enclose(bottom);
 
-        top.declare("test", String.class, "something");
+        top.declare("test", "something");
 
         Variable v2 = bottom.getVariable("test");
         assertNotNull(v2);
@@ -327,7 +327,7 @@ public abstract class ScopeTest {
     public void evaluate_VariableNameParsing_CompleteDeclaration_VariableDefinedAndNonNull() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("b", String.class, "x");
+        scope.declare("b", "x");
 
         String result = scope.evaluate("a${b}c");
 
@@ -360,7 +360,7 @@ public abstract class ScopeTest {
     public void evaluate_VariableNameParsing_SimpleDeclaration_VariableDefinedAndNonNull() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("b", String.class, "x");
+        scope.declare("b", "x");
 
         String result = scope.evaluate("a$b");
 
@@ -460,7 +460,7 @@ public abstract class ScopeTest {
     public void evaluate_SimpleVariableReplacement() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("a", String.class, "gook");
+        scope.declare("a", "gook");
         String result = scope.evaluate("gobbledy${a}");
         assertEquals("gobbledygook", result);
     }
@@ -469,7 +469,7 @@ public abstract class ScopeTest {
     public void evaluate_SimpleVariableReplacement2() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("a", String.class, "gobble");
+        scope.declare("a", "gobble");
         String result = scope.evaluate("${a}dygook");
         assertEquals("gobbledygook", result);
     }
@@ -478,7 +478,7 @@ public abstract class ScopeTest {
     public void evaluate_SimpleVariableReplacement3() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("a", String.class, "gobbledygook");
+        scope.declare("a", "gobbledygook");
         String result = scope.evaluate("${a}");
         assertEquals("gobbledygook", result);
     }
@@ -487,7 +487,7 @@ public abstract class ScopeTest {
     public void evaluate_SimpleVariableReplacement4() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("a", String.class, "bbledygo");
+        scope.declare("a", "bbledygo");
         String result = scope.evaluate("go${a}ok");
         assertEquals("gobbledygook", result);
     }
@@ -496,14 +496,14 @@ public abstract class ScopeTest {
     public void evaluate_MultipleVariableReplacement() throws Exception {
 
         Scope scope = getScopeToTest();
-        scope.declare("b", String.class, "b");
-        scope.declare("d", String.class, "d");
-        scope.declare("e", String.class, "e");
-        scope.declare("g", String.class, "g");
-        scope.declare("k", String.class, "k");
-        scope.declare("l", String.class, "l");
-        scope.declare("o", String.class, "o");
-        scope.declare("y", String.class, "y");
+        scope.declare("b", "b");
+        scope.declare("d", "d");
+        scope.declare("e", "e");
+        scope.declare("g", "g");
+        scope.declare("k", "k");
+        scope.declare("l", "l");
+        scope.declare("o", "o");
+        scope.declare("y", "y");
         String result = scope.evaluate("${g}${o}${b}${b}${l}${e}${d}${y}${g}${o}${o}${k}");
         assertEquals("gobbledygook", result);
     }
@@ -635,7 +635,7 @@ public abstract class ScopeTest {
 
         Scope scope = getScopeToTest();
 
-        scope.declare("z", String.class, "something");
+        scope.declare("z", "something");
 
         List<Variable> declaredInScope = scope.getVariablesDeclaredInScope();
 
@@ -661,7 +661,7 @@ public abstract class ScopeTest {
         // declare another variable
         //
 
-        scope.declare("a", String.class, "something else");
+        scope.declare("a", "something else");
 
         List<Variable> declaredInScope3 = scope.getVariablesDeclaredInScope();
 

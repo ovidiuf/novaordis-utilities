@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.env;
+package io.novaordis.utilities.expressions.env;
+
+import io.novaordis.utilities.NotSupportedException;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/4/16
  */
-public class SystemEnvironmentVariableProviderTest extends EnvironmentVariableProviderTest {
+public class SystemEnvironmentVariableProvider implements EnvironmentVariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -30,15 +32,29 @@ public class SystemEnvironmentVariableProviderTest extends EnvironmentVariablePr
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
+    // EnvironmentVariableProvider implementation ----------------------------------------------------------------------
+
+    @Override
+    public String getenv(String name) {
+
+        return System.getenv(name);
+    }
+
+    @Override
+    public void export(String name, String value) {
+
+        throw new NotSupportedException();
+    }
+
+    @Override
+    public void unset(String name) {
+
+        throw new NotSupportedException();
+    }
+
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
-
-    @Override
-    protected EnvironmentVariableProvider getEnvironmentVariableProviderToTest() throws Exception {
-
-        return new SystemEnvironmentVariableProvider();
-    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

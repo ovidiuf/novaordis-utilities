@@ -42,7 +42,7 @@ public class StringVariableTest extends VariableTest {
 
         Scope s = new ScopeBase();
 
-        Variable<String> v = s.declare("something", String.class, "blah");
+        Variable<String> v = s.declare("something", "blah");
 
         assertEquals("something", v.name());
         assertEquals(String.class, v.type());
@@ -69,22 +69,16 @@ public class StringVariableTest extends VariableTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected <T> Variable<T> getVariableToTest(String name, Class<? extends T> type, T optionalValue)
-            throws Exception {
+    protected <T> Variable<T> getVariableToTest(String name, T optionalValue) throws Exception {
+
+        if (optionalValue != null && !(optionalValue instanceof String)) {
+
+            throw new IllegalArgumentException("optional value must be null or String");
+        }
 
         Scope defaultScope = new ScopeBase();
 
-        //noinspection UnnecessaryLocalVariable
-        Variable v = defaultScope.declare(name, String.class, (String)optionalValue);
-
-        //noinspection unchecked
-        return v;
-    }
-
-    @Override
-    protected Class getTypeToTest() {
-
-        return String.class;
+        return defaultScope.declare(name, optionalValue);
     }
 
     @Override

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities.expressions.env;
 
 import io.novaordis.utilities.NotSupportedException;
-import io.novaordis.utilities.env.EnvironmentVariableProvider;
+import io.novaordis.utilities.expressions.StringVariable;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>

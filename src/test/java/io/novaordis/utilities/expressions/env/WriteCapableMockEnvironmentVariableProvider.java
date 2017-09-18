@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
+package io.novaordis.utilities.expressions.env;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/17/17
  */
-public class ReadOnlyException extends RuntimeException {
+public class WriteCapableMockEnvironmentVariableProvider implements EnvironmentVariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -28,7 +31,49 @@ public class ReadOnlyException extends RuntimeException {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
+    private Map<String, String> mockEnvironment;
+
     // Constructors ----------------------------------------------------------------------------------------------------
+
+    public WriteCapableMockEnvironmentVariableProvider() {
+
+        this.mockEnvironment = new HashMap<>();
+    }
+
+    // EnvironmentVariableProvider implementation ----------------------------------------------------------------------
+
+    @Override
+    public String getenv(String name) {
+
+        if (name == null) {
+
+            //
+            // as per interface description
+            //
+            throw new NullPointerException("name");
+        }
+
+        //
+        // must return null if the environment variable is not declared
+        //
+
+        //noinspection UnnecessaryLocalVariable
+        String s = mockEnvironment.get(name);
+        return s;
+    }
+
+    @Override
+    public void export(String name, String value) {
+
+        mockEnvironment.put(name, value);
+    }
+
+    @Override
+    public void unset(String name) {
+
+        mockEnvironment.remove(name);
+    }
+
 
     // Public ----------------------------------------------------------------------------------------------------------
 

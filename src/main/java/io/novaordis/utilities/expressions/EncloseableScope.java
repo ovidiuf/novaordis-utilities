@@ -17,7 +17,10 @@
 package io.novaordis.utilities.expressions;
 
 /**
- * A scope that can be enclosed in other scopes.
+ * A scope that can be enclosed in other scopes. Once enclosed in a parent scope, the scope's variables become subject
+ * to the scoped visibility rules.
+ *
+ * https://kb.novaordis.com/index.php/Nova_Ordis_Variables#Scopes_and_Visibility
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/18/17

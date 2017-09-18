@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Nova Ordis LLC
+ * Copyright (c) 2016 Nova Ordis LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.expressions;
-
-import io.novaordis.utilities.env.EnvironmentVariableProvider;
-
-import java.util.HashMap;
-import java.util.Map;
+package io.novaordis.utilities.expressions.env;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
- * @since 9/17/17
+ * @since 12/4/16
  */
-public class WriteCapableMockEnvironmentVariableProvider implements EnvironmentVariableProvider {
+public class SystemEnvironmentVariableProviderTest extends EnvironmentVariableProviderTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -33,53 +28,17 @@ public class WriteCapableMockEnvironmentVariableProvider implements EnvironmentV
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private Map<String, String> mockEnvironment;
-
     // Constructors ----------------------------------------------------------------------------------------------------
-
-    public WriteCapableMockEnvironmentVariableProvider() {
-
-        this.mockEnvironment = new HashMap<>();
-    }
-
-    // EnvironmentVariableProvider implementation ----------------------------------------------------------------------
-
-    @Override
-    public String getenv(String name) {
-
-        if (name == null) {
-
-            //
-            // as per interface description
-            //
-            throw new NullPointerException("name");
-        }
-
-        //
-        // must return null if the environment variable is not declared
-        //
-
-        //noinspection UnnecessaryLocalVariable
-        String s = mockEnvironment.get(name);
-        return s;
-    }
-
-    @Override
-    public void export(String name, String value) {
-
-        mockEnvironment.put(name, value);
-    }
-
-    @Override
-    public void unset(String name) {
-
-        mockEnvironment.remove(name);
-    }
-
 
     // Public ----------------------------------------------------------------------------------------------------------
 
     // Package protected -----------------------------------------------------------------------------------------------
+
+    @Override
+    protected EnvironmentVariableProvider getEnvironmentVariableProviderToTest() throws Exception {
+
+        return new SystemEnvironmentVariableProvider();
+    }
 
     // Protected -------------------------------------------------------------------------------------------------------
 

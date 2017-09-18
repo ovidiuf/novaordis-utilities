@@ -736,7 +736,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("b", String.class, "x");
+        scope.declare("b", "x");
 
         String result = resolver.resolve("a${b}c", scope, false);
 
@@ -749,7 +749,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("b", String.class, "x");
+        scope.declare("b", "x");
 
         String result = resolver.resolve("a${b}c", scope, true);
 
@@ -818,7 +818,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("b", String.class, "x");
+        scope.declare("b", "x");
 
         String result = resolver.resolve("a$b", scope, false);
 
@@ -947,7 +947,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("a", String.class, "gook");
+        scope.declare("a", "gook");
         String result = resolver.resolve("gobbledy${a}", scope, false);
         assertEquals("gobbledygook", result);
     }
@@ -957,7 +957,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("a", String.class, "gobble");
+        scope.declare("a", "gobble");
         String result = resolver.resolve("${a}dygook", scope, false);
         assertEquals("gobbledygook", result);
     }
@@ -967,7 +967,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("a", String.class, "gobbledygook");
+        scope.declare("a", "gobbledygook");
         String result = resolver.resolve("${a}", scope, false);
         assertEquals("gobbledygook", result);
     }
@@ -977,7 +977,7 @@ public class VariableReferenceResolverTest {
 
         Scope scope = new ScopeBase();
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
-        scope.declare("a", String.class, "bbledygo");
+        scope.declare("a", "bbledygo");
         String result = resolver.resolve("go${a}ok", scope, false);
         assertEquals("gobbledygook", result);
     }
@@ -1482,7 +1482,7 @@ public class VariableReferenceResolverTest {
 
 
         ScopeBase s = new ScopeBase();
-        s.declare("a", String.class, "b");
+        s.declare("a", "b");
 
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
         
@@ -1500,7 +1500,7 @@ public class VariableReferenceResolverTest {
 
 
         ScopeBase s = new ScopeBase();
-        s.declare("a", String.class, "b");
+        s.declare("a", "b");
 
         VariableReferenceResolver resolver = getVariableReferenceResolverToTest();
 

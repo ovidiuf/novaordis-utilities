@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.env;
+package io.novaordis.utilities.expressions.env;
 
 import org.junit.Test;
 import org.slf4j.Logger;

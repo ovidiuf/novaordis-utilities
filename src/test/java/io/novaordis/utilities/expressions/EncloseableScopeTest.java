@@ -53,7 +53,7 @@ public abstract class EncloseableScopeTest extends ScopeTest {
 
         top.enclose(bottom);
 
-        top.declare("test", String.class, "something");
+        top.declare("test", "something");
 
         Variable v = bottom.getVariable("test");
 
@@ -72,7 +72,7 @@ public abstract class EncloseableScopeTest extends ScopeTest {
         top.enclose(intermediate);
         intermediate.enclose(bottom);
 
-        top.declare("test", String.class, "something");
+        top.declare("test", "something");
 
         Variable v = intermediate.getVariable("test");
         assertNotNull(v);
@@ -103,7 +103,7 @@ public abstract class EncloseableScopeTest extends ScopeTest {
 
         intermediate.enclose(bottomMost);
 
-        Variable<String> v = intermediate.declare("test", String.class, "something");
+        Variable<String> v = intermediate.declare("test", "something");
 
         assertEquals("something", v.get());
 
@@ -141,7 +141,7 @@ public abstract class EncloseableScopeTest extends ScopeTest {
         upper.enclose(intermediate);
         intermediate.enclose(lower);
 
-        intermediate.declare("color", String.class, "blue");
+        intermediate.declare("color", "blue");
 
         assertNull(upper.getVariable("color"));
         assertEquals("blue", intermediate.getVariable("color").get());
@@ -242,7 +242,7 @@ public abstract class EncloseableScopeTest extends ScopeTest {
 
         enclosing.enclose(scope);
 
-        enclosing.declare("color", String.class, "blue");
+        enclosing.declare("color", "blue");
 
         assertTrue(scope.getVariablesDeclaredInScope().isEmpty());
 
@@ -256,6 +256,46 @@ public abstract class EncloseableScopeTest extends ScopeTest {
 
         assertEquals("color", v.name());
         assertEquals("blue", v.get());
+    }
+
+    // undeclare() -----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void undeclare_FromEnclosedScope() throws Exception {
+
+        EncloseableScope enclosed = getScopeToTest();
+
+        Scope enclosing = new ScopeImpl();
+
+        enclosing.enclose(enclosed);
+
+        //
+        // declare a variable in the enclosing scope and attempt to undeclared it from the enclosed scope
+        //
+
+        enclosing.declare("A", "A value");
+
+        Variable v = enclosed.getVariable("A");
+        assertNotNull(v);
+        assertEquals("A value", v.get());
+
+        //
+        // attempt to undeclare the variable from the enclosed scope
+        //
+
+        Variable v2 = enclosed.undeclare("A");
+
+        //
+        // nothing to undeclare
+        //
+        assertNull(v2);
+
+        //
+        // variable is still there
+        //
+        Variable v3 = enclosed.getVariable("A");
+        assertNotNull(v3);
+        assertEquals("A value", v3.get());
     }
 
     // legacy ----------------------------------------------------------------------------------------------------------

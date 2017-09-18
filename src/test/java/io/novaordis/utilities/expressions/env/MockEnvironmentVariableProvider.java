@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.env;
+package io.novaordis.utilities.expressions.env;
 
-import io.novaordis.utilities.NotSupportedException;
+import io.novaordis.utilities.expressions.env.EnvironmentVariableProvider;
 
 /**
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 12/4/16
  */
-public class SystemEnvironmentVariableProvider implements EnvironmentVariableProvider {
+public class MockEnvironmentVariableProvider implements EnvironmentVariableProvider {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -36,20 +36,17 @@ public class SystemEnvironmentVariableProvider implements EnvironmentVariablePro
 
     @Override
     public String getenv(String name) {
-
-        return System.getenv(name);
+        throw new RuntimeException("getenv() NOT YET IMPLEMENTED");
     }
 
     @Override
     public void export(String name, String value) {
-
-        throw new NotSupportedException();
+        throw new RuntimeException("export() NOT YET IMPLEMENTED");
     }
 
     @Override
     public void unset(String name) {
-
-        throw new NotSupportedException();
+        throw new RuntimeException("unset() NOT YET IMPLEMENTED");
     }
 
     // Public ----------------------------------------------------------------------------------------------------------

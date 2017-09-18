@@ -55,45 +55,10 @@ public class ScopeBase implements Scope {
 
         if (type == null) {
 
-            throw new IllegalTypeException("variable type cannot be inferred");
+            throw new IllegalTypeException("null type");
         }
 
         return declare(name, type, null);
-    }
-
-    @Override
-    public <T> Variable<T> declare(String name, Class<? extends T> type, T value) {
-
-        //
-        // we cannot have two variables with the same name declared in scope
-        //
-
-        for(Variable d: declarations) {
-
-            if (name.equals(d.name())) {
-
-                throw new DuplicateDeclarationException(name);
-            }
-        }
-
-        Variable<T> v;
-
-        if (String.class.equals(type)) {
-
-            //noinspection unchecked
-            v = new StringVariable(name);
-        }
-        else {
-
-            throw new IllegalTypeException(type.toString());
-        }
-
-        v.set(value);
-
-        declarations.add(v);
-
-        //noinspection unchecked
-        return v;
     }
 
     @Override
@@ -101,7 +66,7 @@ public class ScopeBase implements Scope {
 
         if (value == null) {
 
-            throw new IllegalTypeException("variable type cannot be inferred");
+            throw new IllegalTypeException("the type of a variable cannot be inferred from a  null value");
         }
 
         Class type  = value.getClass();
@@ -198,6 +163,39 @@ public class ScopeBase implements Scope {
     // Protected -------------------------------------------------------------------------------------------------------
 
     // Private ---------------------------------------------------------------------------------------------------------
+
+    private <T> Variable<T> declare(String name, Class<? extends T> type, T value) {
+
+        //
+        // we cannot have two variables with the same name declared in scope
+        //
+
+        for(Variable d: declarations) {
+
+            if (name.equals(d.name())) {
+
+                throw new DuplicateDeclarationException(name);
+            }
+        }
+
+        Variable<T> v;
+
+        if (String.class.equals(type)) {
+
+            //noinspection unchecked
+            v = new StringVariable(name);
+        }
+        else {
+
+            throw new IllegalTypeException(type.toString());
+        }
+
+        v.set(value);
+
+        declarations.add(v);
+
+        return v;
+    }
 
     // Inner classes ---------------------------------------------------------------------------------------------------
 

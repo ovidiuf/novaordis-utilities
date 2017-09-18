@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.novaordis.utilities.env;
+package io.novaordis.utilities.expressions.env;
 
 /**
  * See https://kb.novaordis.com/index.php/Nova_Ordis_Utilities_Environment_Variable_Support
