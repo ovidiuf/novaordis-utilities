@@ -129,6 +129,11 @@ public class ScopeBase implements Scope {
     @Override
     public void enclose(EncloseableScope scope) {
 
+        if (scope == null) {
+
+            throw new IllegalArgumentException("null scope");
+        }
+
         scope.setParent(this);
     }
 

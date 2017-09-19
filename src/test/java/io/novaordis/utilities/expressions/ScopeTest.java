@@ -756,6 +756,43 @@ public abstract class ScopeTest {
         assertNull(s.getVariable("something").set("C"));
     }
 
+    // enclose() -------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void enclose_null() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        try {
+
+            s.enclose(null);
+
+            fail("should have thrown exception");
+        }
+        catch(IllegalArgumentException e) {
+
+            String msg = e.getMessage();
+            assertTrue(msg.contains("null scope"));
+        }
+    }
+
+    @Test
+    public void enclose() throws Exception {
+
+        Scope s = getScopeToTest();
+
+        EncloseableScope es = new ScopeImpl();
+
+        s.enclose(es);
+
+        assertNull(es.getVariable("something"));
+
+        s.declare("something", "blue");
+
+        Variable v = es.getVariable("something");
+        assertEquals("blue", v.get());
+    }
+
     // Package protected -----------------------------------------------------------------------------------------------
 
     // Protected -------------------------------------------------------------------------------------------------------

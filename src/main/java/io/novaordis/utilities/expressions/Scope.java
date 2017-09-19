@@ -80,6 +80,8 @@ public interface Scope {
 
     /**
      * Declare an enclosed scope.
+     *
+     * @exception IllegalArgumentException on null scope.
      */
     void enclose(EncloseableScope scope);
 
