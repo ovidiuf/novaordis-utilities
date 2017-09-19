@@ -189,6 +189,21 @@ public class OSProcessScopeTest extends ScopeTest {
         //
     }
 
+    // constructors ----------------------------------------------------------------------------------------------------
+
+    @Test
+    public void constructor() throws Exception {
+
+        OSProcessScope s = new OSProcessScope();
+
+        //
+        // make sure we have a default environment variable provider
+        //
+
+        EnvironmentVariableProvider p = s.getEnvironmentVariableProvider();
+        assertNotNull(p);
+    }
+
     // declare() -------------------------------------------------------------------------------------------------------
 
     /**

@@ -51,6 +51,7 @@ public class OSProcessScope extends ScopeBase {
     public OSProcessScope() {
 
         this.declaredVariableNames = new ArrayList<>();
+        this.environmentVariableProvider = new SystemEnvironmentVariableProvider();
     }
 
     // ScopeBase overrides ---------------------------------------------------------------------------------------------
