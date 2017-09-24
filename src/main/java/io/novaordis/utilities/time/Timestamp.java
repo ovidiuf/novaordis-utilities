@@ -38,8 +38,10 @@ public interface Timestamp {
     // Public ----------------------------------------------------------------------------------------------------------
 
     /**
-     * @return a UTC timestamp (a Universal Time timestamp, expressed in milliseconds from 01/01/1972 00:00:00 GMT and
-     * not accounting for daylight saving). Similar in semantics to Date.getTime()
+     * @return the POSIX time expressed in milliseconds. It is the UTC timestamp, expressed in milliseconds from
+     * 01/01/1972 00:00:00 GMT and not accounting for daylight saving). Similar in semantics to Date.getTime()
+     *
+     * See https://kb.novaordis.com/index.php/Time#POSIX_Time
      */
     long getTime();
 
