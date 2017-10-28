@@ -23,6 +23,8 @@ package io.novaordis.utilities.appspec;
  * In general, application-specific behavior, if present, takes precedence over corresponding, but more generic behavior
  * present in the generic runtime.
  *
+ * See https://kb.novaordis.com/index.php/Nova_Ordis_Application-Specific_Behavior_Pattern
+ *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 8/30/17
  */
