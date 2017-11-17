@@ -47,7 +47,25 @@ public enum Log4jLevel {
 
         for(Log4jLevel l: values()) {
 
-            if (l.toLiteral().equals(s)) {
+            if (l.name().equals(s)) {
+
+                return l;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return null if no Log4jLevel match.
+     */
+    public static Log4jLevel find(String s, int from) {
+
+        s = s.substring(from);
+
+        for(Log4jLevel l: values()) {
+
+            if (s.startsWith(l.name())) {
 
                 return l;
             }

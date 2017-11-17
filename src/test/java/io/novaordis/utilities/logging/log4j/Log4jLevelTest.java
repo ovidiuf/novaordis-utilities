@@ -103,9 +103,27 @@ public class Log4jLevelTest {
     }
 
     @Test
-    public void fromLiteral_InvalidVAlue() throws Exception {
+    public void fromLiteral2() throws Exception {
+
+        for(Log4jLevel l: Log4jLevel.values()) {
+
+            String s = l.name();
+
+            assertEquals(l, Log4jLevel.fromLiteral(s));
+        }
+    }
+
+    @Test
+    public void fromLiteral_InvalidValue() throws Exception {
 
         assertNull(Log4jLevel.fromLiteral("invalid value"));
+    }
+
+
+    @Test
+    public void fromLiteral_InvalidValue2() throws Exception {
+
+        assertNull(Log4jLevel.fromLiteral("nosuchvalue"));
     }
 
     // native ----------------------------------------------------------------------------------------------------------
@@ -240,6 +258,26 @@ public class Log4jLevelTest {
         assertTrue(Log4jLevel.OFF.compareTo(Log4jLevel.OFF) == 0);
     }
 
+    // find() ----------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void find() throws Exception {
+
+        for(Log4jLevel l: Log4jLevel.values()) {
+
+            String s = l.name();
+
+            s = "blah" + s + "blah";
+
+            assertEquals(l, Log4jLevel.find(s, 4));
+        }
+    }
+
+    @Test
+    public void find_InvalidValue() throws Exception {
+
+        assertNull(Log4jLevel.find("nosuchvalue", 1));
+    }
 
     // Package protected -----------------------------------------------------------------------------------------------
 
