@@ -10,7 +10,7 @@
     <artifactId>novaordis-utilities</artifactId>
     <packaging>jar</packaging>
 
-    <version>4.7.13-SNAPSHOT-3</version>
+    <version>4.7.13</version>
 
     <properties>
 
