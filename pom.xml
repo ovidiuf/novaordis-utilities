@@ -34,6 +34,7 @@
     <distributionManagement>
         <repository>
             <id>novaordis-nexus</id>
+            <url>https://maven.apps.openshift.novaordis.io/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
 
