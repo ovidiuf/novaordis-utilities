@@ -116,7 +116,7 @@ public interface Scope {
      *
      * @exception IllegalNameException if the variable name references are not valid variable names.
      *
-     * @see Scope#evaluate(String, boolean)
+     * @see Scope#evaluate(String)
      */
     String evaluate(String stringWithVariableReferences, boolean failOnUndeclaredVariable)
             throws UndeclaredVariableException;

@@ -165,7 +165,7 @@ public class VariableReferenceResolver {
      *
      * @return the string value of a variable whose name was specified.
      *
-     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an dat least one undeclared variable
+     * @exception UndeclaredVariableException if 'failOnUndeclaredVariable' is true an at least one undeclared variable
      * is identified. If multiple variables are present, UndeclaredVariableException will carry the name of the first
      * identified undeclared variable.
      */

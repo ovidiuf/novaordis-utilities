@@ -20,7 +20,7 @@ package io.novaordis.utilities.expressions;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 9/17/17
  */
-public class UndeclaredVariableException extends Exception {
+public class UndeclaredVariableException extends RuntimeException {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ public class UndeclaredVariableException extends Exception {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public UndeclaredVariableException(String undeclaredVariableName, String msg) {
+    UndeclaredVariableException(String undeclaredVariableName, String msg) {
 
         super(msg);
 
