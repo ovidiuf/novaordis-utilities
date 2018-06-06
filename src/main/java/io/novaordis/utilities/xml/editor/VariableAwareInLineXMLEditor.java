@@ -36,7 +36,7 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
+public class VariableAwareInLineXMLEditor implements InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
     // Attributes ------------------------------------------------------------------------------------------------------
 
-    private BasicInLineXMLEditor delegateEditor;
+    private BasicInLineXmlEditor delegateEditor;
 
     private Scope variables;
 
@@ -54,7 +54,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
 
     public VariableAwareInLineXMLEditor(File xmlFile) throws IOException {
 
-        this.delegateEditor = new BasicInLineXMLEditor(xmlFile);
+        this.delegateEditor = new BasicInLineXmlEditor(xmlFile);
 
         //
         // we start with an empty scope, we need a non-null scope here to detect variable reference syntax errors
@@ -91,7 +91,7 @@ public class VariableAwareInLineXMLEditor implements InLineXMLEditor {
     }
 
     @Override
-    public List<XMLElement> getElements(String path) {
+    public List<XmlElement> getElements(String path) {
 
         //
         // there are no variables in the element names, delegate

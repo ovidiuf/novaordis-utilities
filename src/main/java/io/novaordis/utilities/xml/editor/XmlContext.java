@@ -22,7 +22,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/11/16
  */
-public class XMLContext {
+public class XmlContext {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ public class XMLContext {
 
     // Constructors ----------------------------------------------------------------------------------------------------
 
-    public XMLContext(String xmlContentPath, XMLEvent previous, XMLEvent current) {
+    public XmlContext(String xmlContentPath, XMLEvent previous, XMLEvent current) {
 
         this.xmlContentPath = xmlContentPath;
         this.current = current;

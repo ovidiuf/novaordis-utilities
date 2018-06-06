@@ -44,11 +44,11 @@ import java.util.List;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class BasicInLineXMLEditor implements InLineXMLEditor {
+public class BasicInLineXmlEditor implements InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(BasicInLineXMLEditor.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicInLineXmlEditor.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -120,7 +120,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
      *
      * @throws java.io.IOException
      */
-    public BasicInLineXMLEditor(File xmlFile) throws IOException {
+    public BasicInLineXmlEditor(File xmlFile) throws IOException {
 
         if (xmlFile == null) {
             throw new IllegalArgumentException("null xml file");
@@ -189,9 +189,9 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
 
         List<String> result = new ArrayList<>();
 
-        List<XMLContext> matches = collectMatches(path);
+        List<XmlContext> matches = collectMatches(path);
 
-        for(XMLContext c: matches) {
+        for(XmlContext c: matches) {
 
             XMLEvent current = c.getCurrent();
 
@@ -208,9 +208,9 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
     }
 
     @Override
-    public List<XMLElement> getElements(String path) {
+    public List<XmlElement> getElements(String path) {
 
-        List<XMLElement> children = new ArrayList<>();
+        List<XmlElement> children = new ArrayList<>();
 
         // walk the XML content and collect element names and values on match
 
@@ -244,7 +244,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
                         "NOT YET IMPLEMENTED (2): cannot process embedded elements yet (" + normalizedXmlPath + ")");
             }
 
-            XMLElement element = new XMLElement(name, value);
+            XmlElement element = new XmlElement(name, value);
             children.add(element);
         });
 
@@ -254,7 +254,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
     @Override
     public boolean set(String path, String newValue) {
 
-        List<XMLContext> matches = collectMatches(path);
+        List<XmlContext> matches = collectMatches(path);
 
         if (matches.isEmpty()) {
 
@@ -265,7 +265,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
         // set the first match only
         //
 
-        XMLContext match = matches.get(0);
+        XmlContext match = matches.get(0);
         XMLEvent previous = match.getPrevious();
         XMLEvent current = match.getCurrent();
 
@@ -475,7 +475,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
      * @param exactMatch if true, the closure will be applied only in case of exact match. If false, the closure
      *                   will be applied both on exact matches and on paths that start with the given path.
      */
-    void walk(String pathAsString, boolean exactMatch, XMLContextClosure closure) {
+    void walk(String pathAsString, boolean exactMatch, XmlContextClosure closure) {
 
         String normalizedPath = normalize(pathAsString);
 
@@ -546,9 +546,9 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
      * possible. Returns a list of matched contexts, in the order in which they were found, or an empty list if there
      * was no match
      */
-    List<XMLContext> collectMatches(String pathAsString) {
+    List<XmlContext> collectMatches(String pathAsString) {
 
-        List<XMLContext> matches = new ArrayList<>();
+        List<XmlContext> matches = new ArrayList<>();
 
         //
         // the closure simply collects the XMLContext and puts in "matches"
@@ -569,7 +569,7 @@ public class BasicInLineXMLEditor implements InLineXMLEditor {
                 return;
             }
 
-            XMLContext c = new XMLContext(normalizedXmlPath, previous, current);
+            XmlContext c = new XmlContext(normalizedXmlPath, previous, current);
             matches.add(c);
         });
 

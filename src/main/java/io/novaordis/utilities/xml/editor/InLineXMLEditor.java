@@ -29,13 +29,13 @@ import java.util.List;
  *
  * For more details see https://kb.novaordis.com/index.php/In-Line_XML_Editor
  *
- * @see BasicInLineXMLEditor
+ * @see BasicInLineXmlEditor
  * @see VariableAwareInLineXMLEditor
  *
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public interface InLineXMLEditor {
+public interface InLineXmlEditor {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ public interface InLineXMLEditor {
      * @return the text representation of the underlying file, as currently cached in memory. If the instance is
      * dirty, the content does contain changes that are not saved on disk.
      *
-     * @see InLineXMLEditor#isDirty()
+     * @see InLineXmlEditor#isDirty()
      */
     String getContent();
 
@@ -64,7 +64,7 @@ public interface InLineXMLEditor {
      * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
      * are detected. Consult implementation documentation for details.
      *
-     * @see InLineXMLEditor#getList(String)
+     * @see InLineXmlEditor#getList(String)
      */
     String get(String path);
 
@@ -75,7 +75,7 @@ public interface InLineXMLEditor {
      * Implementations may choose to throw unchecked exceptions if invalidity conditions specific to the implementation
      * are detected. Consult implementation documentation for details.
      *
-     * @see InLineXMLEditor#get(String)
+     * @see InLineXmlEditor#get(String)
      */
     List<String> getList(String path);
 
@@ -83,7 +83,7 @@ public interface InLineXMLEditor {
      * @return the XMLElement instances of the first-level child elements for the given path, or an empty list if the
      * path does not exist or it does not have any element children.
      */
-    List<XMLElement> getElements(String path);
+    List<XmlElement> getElements(String path);
 
     /**
      * Updates the value of the element/attribute indicated by the path with the given string.
@@ -99,7 +99,7 @@ public interface InLineXMLEditor {
      *
      * @return true if state was changed on disk as result of the save operation, false otherwise.
      *
-     * @see InLineXMLEditor#undo()
+     * @see InLineXmlEditor#undo()
      */
     boolean save() throws IOException;
 
@@ -119,7 +119,7 @@ public interface InLineXMLEditor {
      *
      * @return true if disk state was changed as result of the last undo() operation, false otherwise.
      *
-     * @see InLineXMLEditor#save()
+     * @see InLineXmlEditor#save()
      *
      * @throws IOException
      */

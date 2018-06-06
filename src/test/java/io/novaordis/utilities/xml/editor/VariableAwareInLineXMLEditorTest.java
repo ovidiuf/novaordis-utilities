@@ -35,7 +35,7 @@ import static org.junit.Assert.fail;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class VariableAwareInLineXMLEditorTest extends InLineXMLEditorTest {
+public class VariableAwareInLineXMLEditorTest extends InLineXmlEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 

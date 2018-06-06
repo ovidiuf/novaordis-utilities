@@ -33,11 +33,11 @@ import static org.junit.Assert.assertTrue;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/10/16
  */
-public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
+public class BasicInLineXmlEditorTest extends InLineXmlEditorTest {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
-    private static final Logger log = LoggerFactory.getLogger(BasicInLineXMLEditorTest.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicInLineXmlEditorTest.class);
 
     // Static ----------------------------------------------------------------------------------------------------------
 
@@ -52,21 +52,21 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
     @Test
     public void normalize() throws Exception {
 
-        String s = BasicInLineXMLEditor.normalize("/a/b/c");
+        String s = BasicInLineXmlEditor.normalize("/a/b/c");
         assertEquals("/a/b/c", s);
     }
 
     @Test
     public void normalize2() throws Exception {
 
-        String s = BasicInLineXMLEditor.normalize("/a/b/c/");
+        String s = BasicInLineXmlEditor.normalize("/a/b/c/");
         assertEquals("/a/b/c", s);
     }
 
     @Test
     public void split3() throws Exception {
 
-        String s = BasicInLineXMLEditor.normalize("a/b/c/");
+        String s = BasicInLineXmlEditor.normalize("a/b/c/");
         assertEquals("/a/b/c", s);
     }
 
@@ -77,13 +77,13 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp("xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/level1/level2/level3");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/level3");
 
         assertEquals(1, matches.size());
 
-        XMLContext ctx = matches.get(0);
+        XmlContext ctx = matches.get(0);
 
         XMLEvent c = ctx.getCurrent();
 
@@ -108,13 +108,13 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/level1/level2-b/level3-b");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2-b/level3-b");
 
         assertEquals(1, matches.size());
 
-        XMLContext ctx = matches.get(0);
+        XmlContext ctx = matches.get(0);
 
         XMLEvent c = ctx.getCurrent();
 
@@ -138,9 +138,9 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/level1/level2/no-such-element");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/no-such-element");
 
         assertTrue(matches.isEmpty());
     }
@@ -150,9 +150,9 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/no-such-element1/no-such-element2");
+        List<XmlContext> matches = ed.collectMatches("/no-such-element1/no-such-element2");
 
         assertTrue(matches.isEmpty());
     }
@@ -162,9 +162,9 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/level1/level2/level3/level4/level5");
+        List<XmlContext> matches = ed.collectMatches("/level1/level2/level3/level4/level5");
 
         assertTrue(matches.isEmpty());
     }
@@ -174,13 +174,13 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
 
         File pom = Util.cp(baseDirectory, "src/test/resources/data/xml/walk.xml", scratchDirectory);
 
-        BasicInLineXMLEditor ed = new BasicInLineXMLEditor(pom);
+        BasicInLineXmlEditor ed = new BasicInLineXmlEditor(pom);
 
-        List<XMLContext> matches = ed.collectMatches("/level1/list1/list1-element");
+        List<XmlContext> matches = ed.collectMatches("/level1/list1/list1-element");
 
         assertEquals(3, matches.size());
 
-        XMLContext match;
+        XmlContext match;
         XMLEvent c, p;
 
         match = matches.get(0);
@@ -205,9 +205,9 @@ public class BasicInLineXMLEditorTest extends InLineXMLEditorTest {
     // Package protected -----------------------------------------------------------------------------------------------
 
     @Override
-    protected BasicInLineXMLEditor getInLineXmlEditorToTest(File xmlFile) throws Exception {
+    protected BasicInLineXmlEditor getInLineXmlEditorToTest(File xmlFile) throws Exception {
 
-        return new BasicInLineXMLEditor(xmlFile);
+        return new BasicInLineXmlEditor(xmlFile);
     }
 
     // Protected -------------------------------------------------------------------------------------------------------

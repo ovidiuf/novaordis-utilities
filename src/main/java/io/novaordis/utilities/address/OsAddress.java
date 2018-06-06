@@ -22,7 +22,7 @@ package io.novaordis.utilities.address;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public interface OSAddress extends Address {
+public interface OsAddress extends Address {
 
     // Constants -------------------------------------------------------------------------------------------------------
 

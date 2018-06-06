@@ -99,7 +99,7 @@ public class LocalOSAddressTest extends OSAddressTest {
     // Protected -------------------------------------------------------------------------------------------------------
 
     @Override
-    protected OSAddress getAddressToTest() throws Exception {
+    protected OsAddress getAddressToTest() throws Exception {
 
         return new LocalOSAddress();
     }

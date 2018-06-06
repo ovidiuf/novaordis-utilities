@@ -22,7 +22,7 @@ import javax.xml.stream.events.XMLEvent;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 11/27/16
  */
-public interface XMLContextClosure {
+public interface XmlContextClosure {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
