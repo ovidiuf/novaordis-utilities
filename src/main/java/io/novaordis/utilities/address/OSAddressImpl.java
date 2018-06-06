@@ -20,7 +20,7 @@ package io.novaordis.utilities.address;
  * @author Ovidiu Feodorov <ovidiu@novaordis.com>
  * @since 6/12/17
  */
-public class OSAddressImpl extends AddressImpl implements OsAddress {
+public class OSAddressImpl extends AddressImpl implements OSAddress {
 
     // Constants -------------------------------------------------------------------------------------------------------
 
